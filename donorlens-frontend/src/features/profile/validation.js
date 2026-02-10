@@ -1,0 +1,2 @@
+//All form validation related to impact will be defined here. This includes validating the impact creation form, impact update form, and any other forms related to impact.
+//This file will contain functions that take in form data and return validation errors if the data is invalid. If the data is valid, it will return an empty object or null.

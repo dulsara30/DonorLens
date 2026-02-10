@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+
+/* Global styles for DonorLens */
+@layer base {
+  :root {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply text-slate-800 bg-white min-w-[320px];
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  * {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

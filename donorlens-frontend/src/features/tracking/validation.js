@@ -1,0 +1,2 @@
+//All form validation related to tracking will be defined here. This includes validating the tracking creation form, tracking update form, and any other forms related to tracking.
+//This file will contain functions that take in form data and return validation errors if the data is invalid. If the data is valid, it will return an empty object or null.

@@ -1,0 +1,1 @@
+//All API calls related to campaigns will be defined here. This includes creating a campaign, updating a campaign, deleting a campaign, and fetching campaign details.

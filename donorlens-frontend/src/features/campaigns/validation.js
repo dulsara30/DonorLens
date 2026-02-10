@@ -1,0 +1,2 @@
+//All Form validation related to campaigns will be defined here. This includes validating the campaign creation form, campaign update form, and any other forms related to campaigns.
+//This file will contain functions that take in form data and return validation errors if the data is invalid. If the data is valid, it will return an empty object or null.

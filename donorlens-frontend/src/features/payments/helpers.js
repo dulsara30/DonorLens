@@ -1,0 +1,1 @@
+//Pure utility logic related to payments will be defined here. This includes functions for calculating total donations, formatting currency, and any other helper functions related to payments.
