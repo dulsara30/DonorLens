@@ -1,4 +1,3 @@
-// src/components/layout/CampaignGrid.jsx
 // Grid of ongoing campaign cards (static UI placeholders)
 
 const CampaignGrid = () => {

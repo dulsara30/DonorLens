@@ -1,4 +1,3 @@
-// src/state/useAuth.js
 // Custom hook to access authentication context
 
 import { useContext } from "react";

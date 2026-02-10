@@ -1,4 +1,3 @@
-// src/components/auth/AuthHeader.jsx
 // Minimal authentication header with logo and navigation
 
 import { Link } from "react-router-dom";

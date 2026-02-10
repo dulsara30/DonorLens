@@ -1,4 +1,3 @@
-// src/features/campaigns/pages/AdminCreateCampaignPage.jsx
 // Admin page to create new campaign - placeholder
 
 import { Link } from "react-router-dom";

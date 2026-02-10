@@ -1,4 +1,3 @@
-// src/controllers/auth/RegisterNgoController.js
 // HTTP Controller for NGO admin registration endpoint
 
 import RegisterNgoUsecase from "../../usecases/auth/RegisterNgoUsecase.js";
@@ -12,8 +11,7 @@ import RegisterNgoUsecase from "../../usecases/auth/RegisterNgoUsecase.js";
  */
 export const registerNgoController = async (req, res) => {
   try {
-    // Extract NGO admin registration data from request body
-    // Fields are sent flat from frontend for cleaner API
+    
     const { 
       fullName, 
       email, 
@@ -25,7 +23,6 @@ export const registerNgoController = async (req, res) => {
       address
     } = req.body;
 
-    // Call the register NGO admin usecase (business logic layer)
     const result = await RegisterNgoUsecase({
       fullName,
       email,
@@ -37,7 +34,7 @@ export const registerNgoController = async (req, res) => {
       address,
     });
 
-    // If registration failed, return error response
+    
     if (!result.success) {
       return res.status(result.status).json({
         success: false,
@@ -45,7 +42,7 @@ export const registerNgoController = async (req, res) => {
       });
     }
 
-    // Registration successful - return success response
+    
     return res.status(result.status).json({
       success: true,
       message: result.message,
@@ -54,7 +51,7 @@ export const registerNgoController = async (req, res) => {
   } catch (error) {
     console.error("RegisterNgoController error:", error);
 
-    // Generic error response - don't leak implementation details
+    
     return res.status(500).json({
       success: false,
       message: "Internal server error",

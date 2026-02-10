@@ -1,4 +1,3 @@
-// src/components/guards/AdminRoute.jsx
 // Route guard for NGO_ADMIN role only
 
 import { Navigate, Outlet, useLocation } from "react-router-dom";

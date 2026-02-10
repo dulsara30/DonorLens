@@ -1,4 +1,3 @@
-// src/components/layout/HeroSection.jsx
 // Hero section with gradient background and full-page background image
 
 import { Link } from "react-router-dom";

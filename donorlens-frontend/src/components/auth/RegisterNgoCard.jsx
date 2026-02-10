@@ -1,4 +1,3 @@
-// src/components/auth/RegisterNgoCard.jsx
 // NGO registration card component with full API integration
 
 import { Link, useNavigate } from "react-router-dom";

@@ -1,4 +1,3 @@
-// src/components/layout/ImpactSection.jsx
 // Showcasing executed projects and real-world impact
 
 const ImpactSection = () => {

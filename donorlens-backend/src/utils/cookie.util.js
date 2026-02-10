@@ -1,4 +1,3 @@
-// src/utils/cookie.util.js
 // Cookie configuration utilities for secure token storage
 
 /**

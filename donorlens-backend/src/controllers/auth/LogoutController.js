@@ -1,4 +1,3 @@
-// src/controllers/auth/LogoutController.js
 // HTTP Controller for logout endpoint
 
 /**
@@ -10,7 +9,7 @@
  */
 export const logoutController = async (req, res) => {
   try {
-    // Clear refresh token cookie
+    
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

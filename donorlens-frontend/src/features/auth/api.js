@@ -1,4 +1,3 @@
-// src/features/auth/api.js
 // Authentication API service - centralized auth-related API calls
 
 import api from "../../lib/axios.js";
@@ -41,7 +40,7 @@ export const registerNgo = async (ngoData) => {
     const response = await api.post("/auth/register/ngo", ngoData);
     return response.data;
   } catch (error) {
-    // Rethrow with better error handling
+    
     throw error.response?.data || error;
   }
 };
@@ -59,7 +58,7 @@ export const login = async (credentials) => {
     const response = await api.post("/auth/login", credentials);
     return response.data;
   } catch (error) {
-    // Rethrow with better error handling
+    
     throw error.response?.data || error;
   }
 };

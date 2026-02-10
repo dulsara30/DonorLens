@@ -41,7 +41,9 @@ const createApp = () => {
     });
 
     // API Routes
+    //Auth routes (login, register, refresh token, logout, get current user)
     app.use("/api/auth", authRouter);
+
 
     // 404 handler for undefined routes
     app.use((req, res) => {

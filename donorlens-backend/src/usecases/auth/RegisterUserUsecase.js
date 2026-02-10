@@ -1,4 +1,3 @@
-// src/usecases/auth/RegisterUserUsecase.js
 // Business logic for normal user (donor) registration
 
 import User from "../../models/user/User.js";
@@ -15,7 +14,7 @@ export default async function RegisterUserUsecase(userData) {
   try {
     const { fullName, email, password } = userData;
 
-    // Validation: Check if all required fields are provided
+    
     if (!fullName || !email || !password) {
       return {
         success: false,
@@ -24,7 +23,7 @@ export default async function RegisterUserUsecase(userData) {
       };
     }
 
-    // Validate full name length
+    
     if (fullName.trim().length < 2 || fullName.trim().length > 100) {
       return {
         success: false,
@@ -33,7 +32,7 @@ export default async function RegisterUserUsecase(userData) {
       };
     }
 
-    // Email format validation
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return {
@@ -43,7 +42,7 @@ export default async function RegisterUserUsecase(userData) {
       };
     }
 
-    // Password strength validation
+    
     if (password.length < 8) {
       return {
         success: false,
@@ -52,7 +51,7 @@ export default async function RegisterUserUsecase(userData) {
       };
     }
 
-    // Check if user already exists
+    
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return {
@@ -62,8 +61,7 @@ export default async function RegisterUserUsecase(userData) {
       };
     }
 
-    // Create new user
-    // Note: password will be automatically hashed by pre-save hook
+    
     const newUser = new User({
       fullName: fullName.trim(),
       email: email.toLowerCase().trim(),
@@ -75,7 +73,7 @@ export default async function RegisterUserUsecase(userData) {
     // Save user to database
     await newUser.save();
 
-    // Return success response with safe user data (no password)
+    
     return {
       success: true,
       status: 201,
@@ -87,7 +85,7 @@ export default async function RegisterUserUsecase(userData) {
   } catch (error) {
     console.error("RegisterUserUsecase error:", error);
 
-    // Handle MongoDB duplicate key error (in case of race condition)
+   
     if (error.code === 11000) {
       return {
         success: false,
@@ -96,7 +94,7 @@ export default async function RegisterUserUsecase(userData) {
       };
     }
 
-    // Handle Mongoose validation errors
+   
     if (error.name === "ValidationError") {
       return {
         success: false,
@@ -105,7 +103,7 @@ export default async function RegisterUserUsecase(userData) {
       };
     }
 
-    // Don't leak internal errors to the client
+
     return {
       success: false,
       status: 500,

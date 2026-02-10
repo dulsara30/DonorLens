@@ -1,4 +1,3 @@
-// src/components/layout/AboutSection.jsx
 // Who We Are section - mission and values
 
 const AboutSection = () => {

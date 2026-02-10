@@ -85,7 +85,7 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // createdAt & updatedAt
+    timestamps: true, 
   }
 );
 
@@ -95,7 +95,7 @@ const userSchema = new mongoose.Schema(
  * Note: Using async/await, so no 'next' parameter needed - Mongoose handles promise resolution
  */
 userSchema.pre("save", async function () {
-  // Only hash the password if it has been modified (or is new)
+  
   if (!this.isModified("passwordHash")) {
     return;
   }

@@ -1,6 +1,4 @@
-// src/controllers/auth/GetCurrentUserController.js
 // HTTP Controller for getting current authenticated user
-
 import GetCurrentUserUsecase from "../../usecases/auth/GetCurrentUserUsecase.js";
 
 /**
@@ -12,13 +10,13 @@ import GetCurrentUserUsecase from "../../usecases/auth/GetCurrentUserUsecase.js"
  */
 export const getCurrentUserController = async (req, res) => {
   try {
-    // userId is attached by authenticateToken middleware
+    
     const { userId } = req.user;
 
-    // Call the get current user usecase
+    
     const result = await GetCurrentUserUsecase(userId);
 
-    // If failed, return error response
+    
     if (!result.success) {
       return res.status(result.status).json({
         success: false,
@@ -26,7 +24,7 @@ export const getCurrentUserController = async (req, res) => {
       });
     }
 
-    // Success - return user data
+    
     return res.status(200).json({
       success: true,
       data: result.data,

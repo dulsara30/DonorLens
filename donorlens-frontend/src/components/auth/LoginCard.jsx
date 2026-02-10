@@ -1,4 +1,3 @@
-// src/components/auth/LoginCard.jsx
 // Professional login card with full authentication integration
 
 import { useState } from "react";
@@ -8,7 +7,7 @@ import { login as loginApi } from "../../features/auth/api";
 import { setAccessToken as setAxiosAccessToken } from "../../lib/axios";
 
 const LoginCard = () => {
-  // Form state
+  
   const [formData, setFormData] = useState({
     email: "",
     password: "",

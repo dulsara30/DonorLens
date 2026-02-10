@@ -1,4 +1,3 @@
-// src/middleware/auth.middleware.js
 // Authentication middleware to protect routes
 
 import { verifyAccessToken } from "../utils/jwt.util.js";
@@ -14,8 +13,7 @@ import User from "../models/user/User.js";
  */
 export const authenticateToken = async (req, res, next) => {
   try {
-    // Extract token from Authorization header
-    // Expected format: "Bearer <token>"
+   
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -25,10 +23,10 @@ export const authenticateToken = async (req, res, next) => {
       });
     }
 
-    // Extract token (remove "Bearer " prefix)
+    
     const token = authHeader.substring(7);
 
-    // Verify token
+ 
     const decoded = verifyAccessToken(token);
 
     if (!decoded) {
@@ -38,7 +36,7 @@ export const authenticateToken = async (req, res, next) => {
       });
     }
 
-    // Optionally: Fetch user from database to ensure they still exist and are active
+ 
     const user = await User.findById(decoded.userId);
 
     if (!user || !user.isActive) {
@@ -48,13 +46,13 @@ export const authenticateToken = async (req, res, next) => {
       });
     }
 
-    // Attach user info to request object for use in route handlers
+  
     req.user = {
       userId: decoded.userId,
       role: decoded.role,
     };
 
-    next(); // Proceed to next middleware or route handler
+    next();
   } catch (error) {
     console.error("Authentication middleware error:", error);
     return res.status(500).json({
@@ -73,7 +71,7 @@ export const authenticateToken = async (req, res, next) => {
  */
 export const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    // Check if user info exists (should be set by authenticateToken)
+  
     if (!req.user || !req.user.role) {
       return res.status(401).json({
         success: false,
@@ -81,7 +79,7 @@ export const authorizeRoles = (...allowedRoles) => {
       });
     }
 
-    // Check if user's role is in the allowed roles
+
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
@@ -89,6 +87,6 @@ export const authorizeRoles = (...allowedRoles) => {
       });
     }
 
-    next(); // User has required role, proceed
+    next(); 
   };
 };

@@ -1,4 +1,3 @@
-// src/lib/axios.js
 // Centralized axios instance with automatic token refresh
 
 import axios from "axios";

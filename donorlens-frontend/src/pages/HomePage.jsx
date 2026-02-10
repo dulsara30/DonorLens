@@ -1,4 +1,3 @@
-// src/pages/HomePage.jsx
 // Main landing page for DonorLens - showcasing transparency and impact
 
 import Header from "../components/layout/Header";

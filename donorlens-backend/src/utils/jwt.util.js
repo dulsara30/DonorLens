@@ -1,4 +1,3 @@
-// src/utils/jwt.util.js
 // JWT utility functions for token generation and verification
 
 import jwt from "jsonwebtoken";

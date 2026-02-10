@@ -1,4 +1,3 @@
-// src/state/AuthContext.jsx
 // Global authentication state management with automatic token refresh
 
 import { createContext, useState, useEffect, useCallback } from "react";

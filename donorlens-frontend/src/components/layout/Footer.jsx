@@ -1,4 +1,3 @@
-// src/components/layout/Footer.jsx
 // Site footer with logo, links, and copyright
 
 import { Link } from "react-router-dom";

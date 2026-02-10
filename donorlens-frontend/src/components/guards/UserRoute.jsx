@@ -1,4 +1,3 @@
-// src/components/guards/UserRoute.jsx
 // Route guard for USER role only (donors)
 
 import { Navigate, Outlet, useLocation } from "react-router-dom";

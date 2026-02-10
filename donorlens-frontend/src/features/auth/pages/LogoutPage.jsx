@@ -1,4 +1,3 @@
-// src/features/auth/pages/LogoutPage.jsx
 // Logout page - automatically logs user out and redirects to login
 
 import { useEffect } from "react";

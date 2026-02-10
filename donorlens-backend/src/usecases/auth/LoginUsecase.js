@@ -1,4 +1,3 @@
-// src/usecases/auth/LoginUsecase.js
 // Business logic for user login - validates credentials and generates tokens
 
 import User from "../../models/user/User.js";
@@ -12,7 +11,7 @@ import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.util.
  */
 export default async function LoginUsecase(email, password) {
   try {
-    // Validation: Check if email and password are provided
+  
     if (!email || !password) {
       return {
         success: false,
@@ -21,7 +20,7 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-    // Basic email format validation
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return {
@@ -31,14 +30,13 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-    // Find user by email and explicitly select passwordHash
-    // Note: passwordHash has select: false in schema, so we must explicitly include it
+
     const user = await User.findOne({ email: email.toLowerCase() })
       .select("+passwordHash");
 
-    // Check if user exists
+
     if (!user) {
-      // Generic error message to prevent email enumeration attacks
+
       return {
         success: false,
         status: 401,
@@ -46,7 +44,7 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-    // Check if user account is active
+    
     if (!user.isActive) {
       return {
         success: false,
@@ -55,11 +53,11 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-    // Compare provided password with stored hash using bcrypt
+  
     const isPasswordValid = await user.comparePassword(password);
 
     if (!isPasswordValid) {
-      // Generic error message to prevent timing attacks
+ 
       return {
         success: false,
         status: 401,
@@ -67,11 +65,11 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-    // Update last login timestamp
+    
     user.lastLoginAt = new Date();
     await user.save();
 
-    // Generate JWT tokens
+    
     const accessToken = generateAccessToken({
       userId: user._id.toString(),
       role: user.role,
@@ -81,20 +79,20 @@ export default async function LoginUsecase(email, password) {
       userId: user._id.toString(),
     });
 
-    // Return success response with tokens and safe user data
+    
     return {
       success: true,
       status: 200,
       data: {
         accessToken,
         refreshToken,
-        user: user.toSafeObject(), // Remove sensitive fields
+        user: user.toSafeObject(),
       },
     };
   } catch (error) {
     console.error("LoginUsecase error:", error);
     
-    // Don't leak internal errors to the client
+  
     return {
       success: false,
       status: 500,

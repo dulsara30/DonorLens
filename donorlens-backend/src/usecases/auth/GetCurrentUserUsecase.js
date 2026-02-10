@@ -1,4 +1,3 @@
-// src/usecases/auth/GetCurrentUserUsecase.js
 // Business logic for fetching current authenticated user
 
 import User from "../../models/user/User.js";
@@ -11,7 +10,7 @@ import User from "../../models/user/User.js";
  */
 export default async function GetCurrentUserUsecase(userId) {
   try {
-    // Validation: Check if userId is provided
+
     if (!userId) {
       return {
         success: false,
@@ -20,7 +19,7 @@ export default async function GetCurrentUserUsecase(userId) {
       };
     }
 
-    // Fetch user from database
+    
     const user = await User.findById(userId);
 
     if (!user) {
@@ -39,7 +38,7 @@ export default async function GetCurrentUserUsecase(userId) {
       };
     }
 
-    // Return success response with safe user data
+    
     return {
       success: true,
       status: 200,

@@ -1,4 +1,3 @@
-// src/pages/RegisterNgoPage.jsx
 // NGO registration page with split-screen layout
 
 import { Link } from "react-router-dom";

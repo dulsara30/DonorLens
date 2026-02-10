@@ -1,4 +1,3 @@
-// src/pages/Unauthorized.jsx
 // Unauthorized access page
 
 import { Link } from "react-router-dom";

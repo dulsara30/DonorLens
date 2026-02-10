@@ -1,4 +1,3 @@
-// src/usecases/auth/RegisterNgoUsecase.js
 // Business logic for NGO admin registration
 
 import User from "../../models/user/User.js";
@@ -29,7 +28,7 @@ export default async function RegisterNgoUsecase(userData) {
       address
     } = userData;
 
-    // Validation: Check if all required fields are provided
+    
     if (!fullName || !email || !password) {
       return {
         success: false,
@@ -38,7 +37,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Validate NGO required fields
+ 
     if (!ngoName || !contactNumber || !address) {
       return {
         success: false,
@@ -47,7 +46,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Validate full name length
+    
     if (fullName.trim().length < 2 || fullName.trim().length > 100) {
       return {
         success: false,
@@ -56,7 +55,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Validate NGO name length
+    
     if (ngoName.trim().length < 2) {
       return {
         success: false,
@@ -65,7 +64,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Email format validation
+   
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return {
@@ -75,7 +74,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Password strength validation
+  
     if (password.length < 8) {
       return {
         success: false,
@@ -84,7 +83,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Validate contact number
+  
     if (contactNumber.trim().length < 10) {
       return {
         success: false,
@@ -93,7 +92,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Validate address
+  
     if (address.trim().length < 10) {
       return {
         success: false,
@@ -102,7 +101,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Validate website URL format if provided
+    
     if (website && website.trim() !== "") {
       const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
       if (!urlRegex.test(website)) {
@@ -114,7 +113,7 @@ export default async function RegisterNgoUsecase(userData) {
       }
     }
 
-    // Check if user already exists
+   
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return {
@@ -124,12 +123,11 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Create new NGO admin user
-    // Note: password will be automatically hashed by pre-save hook
+   
     const newNgoAdmin = new User({
       fullName: fullName.trim(),
       email: email.toLowerCase().trim(),
-      passwordHash: password, // Will be hashed by pre-save hook
+      passwordHash: password, 
       role: "NGO_ADMIN",
       isActive: true,
       ngoDetails: {
@@ -141,10 +139,10 @@ export default async function RegisterNgoUsecase(userData) {
       },
     });
 
-    // Save NGO admin to database
+   
     await newNgoAdmin.save();
 
-    // Return success response with safe user data (no password)
+    
     return {
       success: true,
       status: 201,
@@ -156,7 +154,7 @@ export default async function RegisterNgoUsecase(userData) {
   } catch (error) {
     console.error("RegisterNgoUsecase error:", error);
 
-    // Handle MongoDB duplicate key error (in case of race condition)
+   
     if (error.code === 11000) {
       return {
         success: false,
@@ -165,7 +163,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Handle Mongoose validation errors
+   
     if (error.name === "ValidationError") {
       return {
         success: false,
@@ -174,7 +172,7 @@ export default async function RegisterNgoUsecase(userData) {
       };
     }
 
-    // Don't leak internal errors to the client
+  
     return {
       success: false,
       status: 500,

@@ -1,4 +1,3 @@
-// src/features/auth/pages/LoginPage.jsx
 // Professional login page with split-screen layout
 
 import { Link } from "react-router-dom";
@@ -14,8 +13,8 @@ const LoginPage = () => {
         {/* Left Side - Visual Content Section */}
         <div className="hidden lg:flex lg:w-1/2 bg-slate-900 p-16 items-center justify-center relative overflow-hidden">
           {/* Gradient Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 opacity-95" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-teal-500/10 via-transparent to-cyan-500/10" />
+          <div className="absolute inset-0 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 opacity-95" />
+          <div className="absolute inset-0 bg-linear-to-tr from-teal-500/10 via-transparent to-cyan-500/10" />
           
           {/* Decorative Elements */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl" />

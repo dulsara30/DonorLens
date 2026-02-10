@@ -1,4 +1,3 @@
-// src/features/campaigns/pages/CampaignDetailsPage.jsx
 // Campaign details page - placeholder
 
 import { useParams, Link } from "react-router-dom";

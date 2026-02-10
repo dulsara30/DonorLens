@@ -1,4 +1,3 @@
-// src/components/layout/Header.jsx
 // Sticky navigation header with logo, nav links, and CTA buttons
 
 import { useState, useEffect, useRef } from "react";

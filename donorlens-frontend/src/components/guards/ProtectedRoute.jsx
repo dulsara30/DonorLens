@@ -1,4 +1,3 @@
-// src/components/guards/ProtectedRoute.jsx
 // Route guard for protected routes - requires authentication
 
 import { Navigate, Outlet, useLocation } from "react-router-dom";
