@@ -17,7 +17,7 @@ export default function AdminDashboardPage() {
                 NGO Admin Dashboard
               </h1>
               <p className="text-slate-600">
-                Welcome back, {user?.name || "Admin"}!
+                Welcome back, {user?.fullName || "Admin"}!
               </p>
             </div>
             <button
@@ -37,7 +37,7 @@ export default function AdminDashboardPage() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-slate-500 w-24">Name:</span>
-              <span className="text-base text-slate-900">{user?.name}</span>
+              <span className="text-base text-slate-900">{user?.fullName}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-slate-500 w-24">Email:</span>
