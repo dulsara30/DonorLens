@@ -1,12 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "../components/guards/ProtectedRoute";
 import UserRoute from "../components/guards/UserRoute";
-import AdminRoute from "../components/guards/AdminRoute";
+import NGOAdminRoute from "../components/guards/NGOAdminRoute";
 import { ROLES } from "../lib/constants";
 
 import LoginPage from "../features/auth/pages/LoginPage";
 import LogoutPage from "../features/auth/pages/LogoutPage";
 import Unauthorized from "../pages/Unauthorized";
+import NotFound from "../pages/NotFound";
 import HomePage from "../pages/HomePage";
 import RegisterUserPage from "../pages/RegisterUserPage";
 import RegisterNgoPage from "../pages/RegisterNgoPage";
@@ -22,11 +23,14 @@ import AdminExpenseTrackerPage from "../features/tracking/pages/AdminExpenseTrac
 import AdminFinalReportPage from "../features/impact/pages/AdminFinalReportPage";
 
 import ProfilePage from "../features/profile/pages/ProfilePage";
+import AdminRoute from "../components/guards/AdminRoute";
+import SystemAdminDashboardPage from "../features/systemAdmin/pages/SystemAdminDashboardPage";
 
 export const router = createBrowserRouter([
   // AUTH ROUTES (Public)
   { path: "/login", element: <LoginPage /> },
   { path: "/logout", element: <LogoutPage /> },
+  { path: "/register", element: <RegisterUserPage /> }, 
   { path: "/register/user", element: <RegisterUserPage /> },
   { path: "/register/ngo", element: <RegisterNgoPage /> },
   { path: "/unauthorized", element: <Unauthorized /> },
@@ -48,8 +52,9 @@ export const router = createBrowserRouter([
 
   // ADMIN ONLY ROUTES (NGO_ADMIN)
   {
-    element: <AdminRoute />,
+    element: <NGOAdminRoute />,
     children: [
+      { path: "/admin", element: <AdminDashboardPage /> }, // Base layout for admin routes
       { path: "/admin/dashboard", element: <AdminDashboardPage /> },
       { path: "/admin/campaigns/new", element: <AdminCreateCampaignPage /> },
       { path: "/admin/tracking/:id", element: <AdminExpenseTrackerPage /> },
@@ -57,4 +62,16 @@ export const router = createBrowserRouter([
       // Add more NGO_ADMIN-only routes here
     ],
   },
+
+    // ADMIN ONLY ROUTES (NGO_ADMIN)
+  {
+    element: <AdminRoute/>,
+    children: [
+      { path: "/sys-admin", element: <SystemAdminDashboardPage /> },
+
+    ],
+  },
+
+  // 404 Catch-all Route (MUST be last)
+  { path: "*", element: <NotFound /> },
 ]);

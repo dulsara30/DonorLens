@@ -44,7 +44,9 @@ const LoginCard = () => {
     }
     
     // Otherwise, redirect based on role
-    if (role === "NGO_ADMIN") {
+    if (role === "ADMIN"){
+      return "/sys-admin";
+    } else if (role === "NGO_ADMIN") {
       return "/admin/dashboard";
     } else if (role === "USER") {
       return "/"; // Users stay on homepage/website (no separate dashboard)

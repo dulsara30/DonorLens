@@ -1,65 +1,28 @@
 // Unauthorized access page
 
 import { Link } from "react-router-dom";
+import getRedirectPath from "../lib/getRedirectPath";
+import useAuth from "../state/useAuth";
 
 const Unauthorized = () => {
+
+  const {user } = useAuth();
+
   return (
-    <div style={styles.container}>
-      <div style={styles.content}>
-        <h1 style={styles.title}>403</h1>
-        <h2 style={styles.subtitle}>Unauthorized Access</h2>
-        <p style={styles.message}>
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-8">
+      <div className="text-center max-w-lg">
+        <h1 className="text-9xl font-extrabold text-teal-500 m-0 leading-none">403</h1>
+        <h2 className="text-3xl font-bold text-slate-800 my-4">Unauthorized Access</h2>
+        <p className="text-lg text-slate-500 mb-8">
           You don't have permission to access this page.
         </p>
-        <Link to="/" style={styles.button}>
-          Go Back Home
+        <Link to={getRedirectPath(user?.role)} className="inline-block px-8 py-3.5 bg-gradient-to-br from-teal-500 to-cyan-600 text-white rounded-full font-semibold no-underline transition-transform duration-200 ease-in-out hover:scale-105">
+          {user.role === "ADMIN" ? "Go to Admin Dashboard" : 
+          user.role === "NGO_ADMIN" ? "Go to NGO Dashboard": "Go Back Home" }
         </Link>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: "100vh",
-    backgroundColor: "#f8fafc",
-    padding: "2rem",
-  },
-  content: {
-    textAlign: "center",
-    maxWidth: "500px",
-  },
-  title: {
-    fontSize: "6rem",
-    fontWeight: "800",
-    color: "#14b8a6",
-    margin: "0",
-    lineHeight: "1",
-  },
-  subtitle: {
-    fontSize: "2rem",
-    fontWeight: "700",
-    color: "#1e293b",
-    margin: "1rem 0",
-  },
-  message: {
-    fontSize: "1.125rem",
-    color: "#64748b",
-    marginBottom: "2rem",
-  },
-  button: {
-    display: "inline-block",
-    padding: "0.875rem 2rem",
-    background: "linear-gradient(135deg, #14b8a6, #0891b2)",
-    color: "white",
-    borderRadius: "30px",
-    fontWeight: "600",
-    textDecoration: "none",
-    transition: "transform 0.2s ease",
-  },
 };
 
 export default Unauthorized;
