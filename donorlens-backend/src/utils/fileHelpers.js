@@ -1,3 +1,5 @@
+import path from "path";
+
 export const ALLOWED_FILE_TYPES = {
   images: ["image/jpeg", "image/png", "image/webp", "image/jpg"],
   documents: [
@@ -33,12 +35,13 @@ export const getFileCategory = (mimetype) => {
 };
 
 export const getFileExtension = (filename) => {
-  return filename.split(".").pop().toLowerCase();
+  return path.extname(filename);
 };
 
 export const generateUniqueFilename = (originalName) => {
   const timestamp = Date.now();
   const randomString = Math.random().toString(36).substring(2, 15);
   const fileExtension = getFileExtension(originalName);
-  return `${timestamp}-${randomString}.${fileExtension}`;
+  const fileNameWithoutExt = path.basename(originalName, fileExtension);
+  return `${timestamp}-${randomString}-${fileNameWithoutExt}${fileExtension}`;
 };

@@ -18,12 +18,12 @@ export const uploadToCloudinary = async (fileBuffer, options = {}) => {
   try {
     const {
       folder = "donorlens",
-      originalName = "unnamed",
+      originalName = "file",
       resourceType = "auto",
       transformation = [],
     } = options;
 
-    // Generate unique filename
+    // Generate unique filename (keeps extension for proper URLs)
     const uniqueFilename = generateUniqueFilename(originalName);
 
     // Upload to Cloudinary using upload_stream
@@ -31,13 +31,17 @@ export const uploadToCloudinary = async (fileBuffer, options = {}) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: folder,
-          public_id: uniqueFilename.split(".")[0], // Remove extension
+          public_id: uniqueFilename, // Keeps extension for raw files
           resource_type: resourceType, // 'image', 'raw', 'video', or 'auto'
           transformation: transformation,
-          // Enable automatic format optimization
-          format: resourceType === "image" ? "webp" : undefined,
-          quality: "auto",
-          fetch_format: "auto",
+          use_filename: true,
+          unique_filename: false,
+          // Only apply format optimization for images
+          ...(resourceType === "image" && {
+            format: "webp",
+            quality: "auto",
+            fetch_format: "auto",
+          }),
         },
         (error, result) => {
           if (error) {

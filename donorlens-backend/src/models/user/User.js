@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
-
     fullName: {
       type: String,
       required: true,
@@ -23,10 +22,11 @@ const userSchema = new mongoose.Schema(
 
     passwordHash: {
       type: String,
-      required: true,
+      required: function () {
+        return this.role !== "NGO_ADMIN";
+      },
       select: false, // IMPORTANT: never return password by default
     },
-
 
     role: {
       type: String,
@@ -40,7 +40,6 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
-
     ngoDetails: {
       ngoName: {
         type: String,
@@ -50,7 +49,11 @@ const userSchema = new mongoose.Schema(
         type: String,
         trim: true,
       },
-      contactNumber: {
+      primaryPhone: {
+        type: String,
+        trim: true,
+      },
+      secondaryPhone: {
         type: String,
         trim: true,
       },
@@ -62,8 +65,60 @@ const userSchema = new mongoose.Schema(
         type: String,
         trim: true,
       },
+      description: {
+        type: String,
+        trim: true,
+      },
+      documents: {
+        registrationCertificate: {
+          url: String,
+          publicId: String,
+          format: String,
+          size: Number,
+          uploadedAt: { type: Date, default: Date.now },
+        },
+        additionalDocuments: [
+          {
+            url: String,
+            publicId: String,
+            format: String,
+            size: Number,
+            uploadedAt: { type: Date, default: Date.now },
+          },
+        ],
+      },
+      status: {
+        type: String,
+        enum: [
+          "PENDING",
+          "APPROVED",
+          "REJECTED",
+          "RESUBMIT_REQUIRED",
+          "DEACTIVATED",
+        ],
+        default: "PENDING",
+      },
+      rejectionReason: {
+        type: String,
+        trim: true,
+      },
+      reviewNotes: [
+        {
+          note: String,
+          createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+          createdAt: { type: Date, default: Date.now },
+        },
+      ],
+      submissionHistory: [
+        {
+          submittedAt: Date,
+          status: String,
+          documents: Object, // Store snapshot of submitted docs
+        },
+      ],
+      reviewedAt: Date,
+      reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     },
-
 
     profile: {
       phone: {
@@ -79,14 +134,13 @@ const userSchema = new mongoose.Schema(
       },
     },
 
-
     lastLoginAt: {
       type: Date,
     },
   },
   {
-    timestamps: true, 
-  }
+    timestamps: true,
+  },
 );
 
 /**
@@ -95,7 +149,6 @@ const userSchema = new mongoose.Schema(
  * Note: Using async/await, so no 'next' parameter needed - Mongoose handles promise resolution
  */
 userSchema.pre("save", async function () {
-  
   if (!this.isModified("passwordHash")) {
     return;
   }
@@ -126,11 +179,11 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
  */
 userSchema.methods.toSafeObject = function () {
   const userObject = this.toObject();
-  
+
   // Remove sensitive fields
   delete userObject.passwordHash;
   delete userObject.__v;
-  
+
   return {
     id: userObject._id,
     fullName: userObject.fullName,
@@ -144,6 +197,6 @@ userSchema.methods.toSafeObject = function () {
   };
 };
 
-const User =  mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
 
 export default User;
