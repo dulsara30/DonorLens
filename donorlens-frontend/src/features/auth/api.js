@@ -35,12 +35,11 @@ export const registerUser = async (userData) => {
  * @returns {Promise<Object>} Response data with user information
  * @throws {Error} API error with response data
  */
-export const registerNgo = async (ngoData) => {
+export const ngoRegister = async (ngoData) => {
   try {
-    const response = await api.post("/auth/register/ngo", ngoData);
+    const response = await api.post("/admin/register-ngo", ngoData);
     return response.data;
   } catch (error) {
-    
     throw error.response?.data || error;
   }
 };
@@ -58,7 +57,26 @@ export const login = async (credentials) => {
     const response = await api.post("/auth/login", credentials);
     return response.data;
   } catch (error) {
-    
+    throw error.response?.data || error;
+  }
+};
+
+/**
+ * Submit NGO verification request with documents
+ * @param {FormData} formData - FormData containing NGO info and documents
+ * @returns {Promise<Object>} Response data with request ID and status
+ * @throws {Error} API error with response data
+ */
+export const submitNgoRequest = async (formData) => {
+  try {
+    console.log("Submitting NGO request with formData:", formData);
+    const response = await api.post("/admin/register-ngo", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
     throw error.response?.data || error;
   }
 };

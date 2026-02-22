@@ -10,7 +10,8 @@ import Unauthorized from "../pages/Unauthorized";
 import NotFound from "../pages/NotFound";
 import HomePage from "../pages/HomePage";
 import RegisterUserPage from "../pages/RegisterUserPage";
-import RegisterNgoPage from "../pages/RegisterNgoPage";
+import NgoRequestPage from "../pages/NgoRequestPage";
+import TermsPage from "../pages/TermsPage";
 
 import CampaignListPage from "../features/campaigns/pages/CampaignListPage";
 import CampaignDetailsPage from "../features/campaigns/pages/CampaignDetailsPage";
@@ -32,7 +33,9 @@ export const router = createBrowserRouter([
   { path: "/logout", element: <LogoutPage /> },
   { path: "/register", element: <RegisterUserPage /> }, 
   { path: "/register/user", element: <RegisterUserPage /> },
-  { path: "/register/ngo", element: <RegisterNgoPage /> },
+  { path: "/register/ngo", element: <NgoRequestPage /> },
+  // { path: "/ngo-request", element: <NgoRequestPage /> },
+  { path: "/terms-privacy", element: <TermsPage /> },
   { path: "/unauthorized", element: <Unauthorized /> },
 
   // PUBLIC ROUTES
