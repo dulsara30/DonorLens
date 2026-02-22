@@ -12,21 +12,21 @@ const RegisterCard = () => {
     password: "",
     confirmPassword: "",
   });
-  
+
   // UI state
   const [agreed, setAgreed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  
+
   const navigate = useNavigate();
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Clear error when user starts typing
     if (error) setError("");
@@ -35,8 +35,12 @@ const RegisterCard = () => {
   // Validate form on client side
   const validateForm = () => {
     // Check all fields are filled
-    if (!formData.fullName.trim() || !formData.email.trim() || 
-        !formData.password || !formData.confirmPassword) {
+    if (
+      !formData.fullName.trim() ||
+      !formData.email.trim() ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
       setError("All fields are required");
       return false;
     }
@@ -78,7 +82,7 @@ const RegisterCard = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Clear previous errors
     setError("");
 
@@ -101,21 +105,21 @@ const RegisterCard = () => {
       // Registration successful
       if (response.success) {
         setSuccess(true);
-        
+
         // Redirect to login page after 2 seconds
         setTimeout(() => {
-          navigate("/login", { 
-            state: { 
+          navigate("/login", {
+            state: {
               message: "Registration successful! Please sign in.",
-              email: formData.email.trim().toLowerCase()
-            } 
+              email: formData.email.trim().toLowerCase(),
+            },
           });
         }, 2000);
       }
     } catch (err) {
       // Handle API errors
       console.error("Registration error:", err);
-      
+
       // Display user-friendly error message
       if (err.message) {
         setError(err.message);
@@ -126,7 +130,7 @@ const RegisterCard = () => {
       } else {
         setError("Registration failed. Please try again later");
       }
-      
+
       setIsLoading(false);
     }
   };
@@ -147,12 +151,26 @@ const RegisterCard = () => {
       {success && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-green-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <svg
+              className="w-5 h-5 text-green-600 mt-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
             <div>
-              <p className="text-sm font-semibold text-green-900 mb-1">Account created successfully!</p>
-              <p className="text-sm text-green-700">Redirecting to login page...</p>
+              <p className="text-sm font-semibold text-green-900 mb-1">
+                Account created successfully!
+              </p>
+              <p className="text-sm text-green-700">
+                Redirecting to login page...
+              </p>
             </div>
           </div>
         </div>
@@ -162,8 +180,18 @@ const RegisterCard = () => {
       {error && !success && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-red-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-5 h-5 text-red-600 mt-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <p className="text-sm text-red-800">{error}</p>
           </div>
@@ -174,7 +202,10 @@ const RegisterCard = () => {
       <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
         {/* Full Name Input */}
         <div className="flex flex-col gap-2">
-          <label htmlFor="fullName" className="text-sm font-semibold text-slate-700">
+          <label
+            htmlFor="fullName"
+            className="text-sm font-semibold text-slate-700"
+          >
             Full Name
           </label>
           <input
@@ -192,7 +223,10 @@ const RegisterCard = () => {
 
         {/* Email Input */}
         <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-sm font-semibold text-slate-700">
+          <label
+            htmlFor="email"
+            className="text-sm font-semibold text-slate-700"
+          >
             Email Address
           </label>
           <input
@@ -212,7 +246,10 @@ const RegisterCard = () => {
         <div className="grid grid-cols-2 gap-4">
           {/* Password Input */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="password" className="text-sm font-semibold text-slate-700">
+            <label
+              htmlFor="password"
+              className="text-sm font-semibold text-slate-700"
+            >
               Password
             </label>
             <input
@@ -230,7 +267,10 @@ const RegisterCard = () => {
 
           {/* Confirm Password Input */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="confirmPassword" className="text-sm font-semibold text-slate-700">
+            <label
+              htmlFor="confirmPassword"
+              className="text-sm font-semibold text-slate-700"
+            >
               Confirm Password
             </label>
             <input
@@ -257,36 +297,71 @@ const RegisterCard = () => {
             className="mt-1 w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-2 focus:ring-slate-900/20 disabled:cursor-not-allowed"
             disabled={isLoading || success}
           />
-          <label htmlFor="terms" className="text-sm text-slate-600 leading-relaxed">
+          <label
+            htmlFor="terms"
+            className="text-sm text-slate-600 leading-relaxed"
+          >
             I agree to the{" "}
-            <Link to="/terms" className="text-slate-900 no-underline font-medium hover:underline">
+            <Link
+              to="/terms-privacy"
+              className="text-slate-900 no-underline font-medium hover:underline"
+            >
               Terms of Service
             </Link>
             {" and "}
-            <Link to="/privacy" className="text-slate-900 no-underline font-medium hover:underline">
+            <Link
+              to="/terms-privacy#privacy"
+              className="text-slate-900 no-underline font-medium hover:underline"
+            >
               Privacy Policy
             </Link>
           </label>
         </div>
 
         {/* Submit Button */}
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="w-full px-6 py-4 bg-slate-900 text-white border-none rounded-lg font-semibold text-base cursor-pointer transition-all duration-200 hover:bg-slate-800 hover:shadow-lg disabled:bg-slate-300 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2"
           disabled={!agreed || isLoading || success}
         >
           {isLoading ? (
             <>
-              <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               Creating account...
             </>
           ) : success ? (
             <>
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
               Account created!
             </>
@@ -301,17 +376,32 @@ const RegisterCard = () => {
         <div className="mt-8 text-center">
           <p className="text-sm text-slate-600 m-0">
             Already have an account?{" "}
-            <Link to="/login" className="text-slate-900 no-underline font-semibold hover:underline">
+            <Link
+              to="/login"
+              className="text-slate-900 no-underline font-semibold hover:underline"
+            >
               Sign in
             </Link>
           </p>
           <div className="mt-6 pt-6 border-t border-slate-200">
-            <Link 
-              to="/register/ngo" 
+            <Link
+              to="/register/ngo"
               className="inline-flex items-center gap-1.5 text-sm text-slate-600 no-underline font-medium hover:text-slate-900 transition-colors"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 17L17 7M17 7H7M17 7V17"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               Register as an NGO
             </Link>

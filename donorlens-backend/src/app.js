@@ -5,56 +5,58 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import authRouter from "./routes/auth/auth.route.js";
+import adminRouter from "./routes/ngoAdmin/ngoRegister.route.js";
+import errorHandler from "./middleware/errorHandler.middleware.js";
+import { NotFoundError } from "./utils/errors.js";
 
 const createApp = () => {
-    dotenv.config();
-    const app = express();
-    
-    // Security middleware
-    app.use(helmet());
-    
-    // Body parser middleware
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-    
-    // Cookie parser middleware
-    app.use(cookieParser());
+  dotenv.config();
+  const app = express();
 
-    // CORS configuration - allow credentials for HttpOnly cookies
-    app.use(
-        cors({
-            origin: process.env.CLIENT_URL || "http://localhost:5173",
-            credentials: true, // Important: allows cookies to be sent
-        })
-    );
+  // Security middleware
+  app.use(helmet());
 
-    // Connect to MongoDB
-    connectDB();
+  // Body parser middleware
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-    // Health check endpoint
-    app.get("/health", (req, res) => {
-        res.status(200).json({ 
-            success: true, 
-            message: "DonorLens API is running",
-            timestamp: new Date().toISOString()
-        });
+  // Cookie parser middleware
+  app.use(cookieParser());
+
+  // CORS configuration - allow credentials for HttpOnly cookies
+  app.use(
+    cors({
+      origin: process.env.CLIENT_URL || "http://localhost:5173",
+      credentials: true, // Important: allows cookies to be sent
+    }),
+  );
+
+  // Connect to MongoDB
+  connectDB();
+
+  // Health check endpoint
+  app.get("/health", (req, res) => {
+    res.status(200).json({
+      success: true,
+      message: "DonorLens API is running",
+      timestamp: new Date().toISOString(),
     });
+  });
 
-    // API Routes
-    //Auth routes (login, register, refresh token, logout, get current user)
-    app.use("/api/auth", authRouter);
+  // API Routes
+  //Auth routes (login, register, refresh token, logout, get current user)
+  app.use("/api/auth", authRouter);
+  app.use("/api/admin", adminRouter);
 
+  // 404 handler for undefined routes (must be before error handler)
+  app.use((req, res, next) => {
+    next(new NotFoundError(`Route ${req.originalUrl}`));
+  });
 
-    // 404 handler for undefined routes
-    app.use((req, res) => {
-        res.status(404).json({
-            success: false,
-            message: "Route not found",
-        });
-    });
+  // Global error handler (MUST BE LAST!)
+  app.use(errorHandler);
 
-    return app;
-
-}
+  return app;
+};
 
 export default createApp;
