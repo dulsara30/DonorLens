@@ -9,6 +9,8 @@ import adminRouter from "./routes/ngoAdmin/ngoRegister.route.js";
 import errorHandler from "./middleware/errorHandler.middleware.js";
 import { NotFoundError } from "./utils/errors.js";
 
+import campaignRoutes from "./routes/campaigns/campaign.routes.js";
+
 const createApp = () => {
   dotenv.config();
   const app = express();
@@ -47,6 +49,8 @@ const createApp = () => {
   //Auth routes (login, register, refresh token, logout, get current user)
   app.use("/api/auth", authRouter);
   app.use("/api/admin", adminRouter);
+
+  app.use("/api/campaigns", campaignRoutes);
 
   // 404 handler for undefined routes (must be before error handler)
   app.use((req, res, next) => {
