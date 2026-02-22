@@ -6,14 +6,13 @@ import User from "../models/user/User.js";
 /**
  * Middleware to verify JWT access token from Authorization header
  * Attaches user information to req.user for downstream use
- * 
+ *
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Function} next - Express next middleware function
  */
 export const authenticateToken = async (req, res, next) => {
   try {
-   
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -23,10 +22,8 @@ export const authenticateToken = async (req, res, next) => {
       });
     }
 
-    
     const token = authHeader.substring(7);
 
- 
     const decoded = verifyAccessToken(token);
 
     if (!decoded) {
@@ -36,7 +33,6 @@ export const authenticateToken = async (req, res, next) => {
       });
     }
 
- 
     const user = await User.findById(decoded.userId);
 
     if (!user || !user.isActive) {
@@ -46,7 +42,6 @@ export const authenticateToken = async (req, res, next) => {
       });
     }
 
-  
     req.user = {
       userId: decoded.userId,
       role: decoded.role,
@@ -65,20 +60,18 @@ export const authenticateToken = async (req, res, next) => {
 /**
  * Middleware to check if user has required role(s)
  * Must be used after authenticateToken middleware
- * 
+ *
  * @param {Array<string>} allowedRoles - Array of allowed roles (e.g., ["NGO_ADMIN"])
  * @returns {Function} Express middleware function
  */
 export const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
-  
     if (!req.user || !req.user.role) {
       return res.status(401).json({
         success: false,
         message: "Authentication required",
       });
     }
-
 
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
@@ -87,6 +80,6 @@ export const authorizeRoles = (...allowedRoles) => {
       });
     }
 
-    next(); 
+    next();
   };
 };
