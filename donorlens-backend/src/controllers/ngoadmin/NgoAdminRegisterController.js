@@ -4,7 +4,7 @@ import { ApiResponse } from "../../utils/apiResponse.js";
 
 export const adminRegisterController = async (req, res, next) => {
   try {
-    console.log("📝 AdminRegisterController called");
+    console.log("AdminRegisterController called");
     console.log("Body:", req.body);
     console.log("Files:", req.files);
 
