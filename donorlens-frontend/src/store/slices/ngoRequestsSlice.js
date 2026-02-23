@@ -215,7 +215,6 @@ const ngoRequestsSlice = createSlice({
       .addCase(fetchNgoRequests.fulfilled, (state, action) => {
         state.loading = false;
         state.requests = action.payload; // Store the fetched requests
-        state.noOfRequest = action.payload.length();
         state.error = null;
       })
       // When fetchNgoRequests() fails
@@ -302,7 +301,7 @@ const ngoRequestsSlice = createSlice({
       // ========================================
       .addCase(resendPasswordEmail.fulfilled, (state) => {
         // Show success notification (you can add a toast notification here)
-        console.log("✅ Email sent successfully");
+        console.log("Email sent successfully");
       });
   },
 });
