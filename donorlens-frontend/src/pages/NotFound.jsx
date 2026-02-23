@@ -12,7 +12,7 @@ const NotFound = () => {
     const timer = setTimeout(() => {
       if (user) {
         // Redirect based on role
-        if (user.role === "ADMIN"){
+        if (user.role === "ADMIN") {
           navigate("/admin/dashboard");
         } else if (user.role === "NGO_ADMIN") {
           navigate("/admin/dashboard");
@@ -29,13 +29,15 @@ const NotFound = () => {
     return () => clearTimeout(timer);
   }, [user, navigate]);
 
-
-
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 p-8">
       <div className="text-center max-w-lg">
-        <h1 className="text-9xl font-bold text-red-600 m-0 leading-none">404</h1>
-        <h2 className="text-3xl font-semibold text-gray-800 mt-4 mb-4">Page Not Found</h2>
+        <h1 className="text-9xl font-bold text-red-600 m-0 leading-none">
+          404
+        </h1>
+        <h2 className="text-3xl font-semibold text-gray-800 mt-4 mb-4">
+          Page Not Found
+        </h2>
         <p className="text-lg text-gray-500 mb-2">
           Sorry, the page you're looking for doesn't exist.
         </p>
@@ -43,19 +45,30 @@ const NotFound = () => {
           You will be redirected automatically in 5 seconds...
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
-          <Link to={getRedirectPath(user?.role)} className="inline-block px-8 py-3 bg-blue-600 text-white no-underline rounded-lg font-medium transition hover:bg-blue-700 cursor-pointer">
+          <Link
+            to={getRedirectPath(user?.role)}
+            className="inline-block px-8 py-3 bg-blue-600 text-white no-underline rounded-lg font-medium transition hover:bg-blue-700 cursor-pointer"
+          >
             {user
               ? user.role === "NGO_ADMIN"
                 ? "Go to Dashboard"
-                : "View Campaigns"
-              : "Go Home"}
+                  ? user.role === "ADMIN"
+                  : "Go to Dashboard"
+                : "Go to Home"
+              : "Go to Home"}
           </Link>
           {!user && (
             <>
-              <Link to="/login" className="inline-block px-8 py-3 bg-gray-200 text-gray-800 no-underline rounded-lg font-medium transition hover:bg-gray-300 cursor-pointer">
+              <Link
+                to="/login"
+                className="inline-block px-8 py-3 bg-gray-200 text-gray-800 no-underline rounded-lg font-medium transition hover:bg-gray-300 cursor-pointer"
+              >
                 Login
               </Link>
-              <Link to="/register/user" className="inline-block px-8 py-3 bg-gray-200 text-gray-800 no-underline rounded-lg font-medium transition hover:bg-gray-300 cursor-pointer">
+              <Link
+                to="/register/user"
+                className="inline-block px-8 py-3 bg-gray-200 text-gray-800 no-underline rounded-lg font-medium transition hover:bg-gray-300 cursor-pointer"
+              >
                 Register
               </Link>
             </>
