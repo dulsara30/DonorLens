@@ -39,6 +39,8 @@ export const createCampaignUsecase = async ({
     coverImage,
     financialBreakdown,
     location,
+    totalUsedAmount: 0,
+    progressPercentage: 0,
   });
 
   await campaign.save();

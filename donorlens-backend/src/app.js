@@ -10,6 +10,7 @@ import errorHandler from "./middleware/errorHandler.middleware.js";
 import { NotFoundError } from "./utils/errors.js";
 
 import campaignRoutes from "./routes/campaigns/campaign.routes.js";
+import executionUpdateRoutes from "./routes/campaigns/executions/executions.routes.js";
 
 const createApp = () => {
   dotenv.config();
@@ -51,6 +52,7 @@ const createApp = () => {
   app.use("/api/admin", adminRouter);
 
   app.use("/api/campaigns", campaignRoutes);
+  app.use("/api/campaigns/executions", executionUpdateRoutes);
 
   // 404 handler for undefined routes (must be before error handler)
   app.use((req, res, next) => {
