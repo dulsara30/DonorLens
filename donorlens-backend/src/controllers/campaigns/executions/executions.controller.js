@@ -3,6 +3,7 @@ import {
   getAllExecutionsUsecase,
   getExecutionByIdUsecase,
 } from "../../../usecases/campaigns/executions/readExecutionsUsecase.js";
+import { deleteExecutionUsecase } from "../../../usecases/campaigns/executions/deleteExecutionUsecase.js";
 import { ApiResponse, sendCreated } from "../../../utils/apiResponse.js";
 import { NotFoundError } from "../../../utils/errors.js";
 
@@ -86,6 +87,37 @@ export const getExecutionById = async (req, res, next) => {
     return ApiResponse.success(res, {
       message: "Execution update retrieved successfully",
       data: execution,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Delete Execution Update Controller
+ * Deletes an execution update and recalculates campaign progress
+ */
+export const deleteExecutionUpdate = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    // const userId = "698e1f3cb308e018d5d2186f";
+
+
+    if (!userId) {
+      throw new NotFoundError("User not found. Authentication required.");
+    }
+
+    const { campaignId, executionId } = req.params;
+
+    const result = await deleteExecutionUsecase({
+      userId,
+      campaignId,
+      executionId,
+    });
+
+    return ApiResponse.success(res, {
+      message: "Execution update deleted successfully",
+      data: result,
     });
   } catch (error) {
     next(error);

@@ -3,6 +3,7 @@ import {
   createExecutionUpdate,
   getAllExecutionsByCampaign,
   getExecutionById,
+  deleteExecutionUpdate,
 } from "../../../controllers/campaigns/executions/executions.controller.js";
 import {
   authenticateToken,
@@ -36,5 +37,13 @@ router.get("/:campaignId", getAllExecutionsByCampaign);
 
 // Get a single execution update by ID
 router.get("/:campaignId/:executionId", getExecutionById);
+
+// Delete an execution update
+router.delete(
+  "/:campaignId/:executionId",
+  authenticateToken,
+  authorizeRoles("NGO_ADMIN"),
+  deleteExecutionUpdate,
+);
 
 export default router;
