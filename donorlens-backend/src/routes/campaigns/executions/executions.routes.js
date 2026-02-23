@@ -1,5 +1,9 @@
 import express from "express";
-import { createExecutionUpdate } from "../../../controllers/campaigns/executions/executions.controller.js";
+import {
+  createExecutionUpdate,
+  getAllExecutionsByCampaign,
+  getExecutionById,
+} from "../../../controllers/campaigns/executions/executions.controller.js";
 import {
   authenticateToken,
   authorizeRoles,
@@ -10,11 +14,11 @@ import { ALLOWED_FILE_TYPES } from "../../../utils/fileHelpers.js";
 
 const router = express.Router();
 
-//create execution update
+// Create execution update
 router.post(
   "/:campaignId/add-execution",
-  // authenticateToken,
-  // authorizeRoles("NGO_ADMIN"),
+  authenticateToken,
+  authorizeRoles("NGO_ADMIN"),
   uploadFields([
     { name: "evidencePhotos", maxCount: 5 },
     { name: "receipts", maxCount: 5 },
@@ -26,5 +30,11 @@ router.post(
   }),
   createExecutionUpdate,
 );
+
+// Get all execution updates for a specific campaign
+router.get("/:campaignId", getAllExecutionsByCampaign);
+
+// Get a single execution update by ID
+router.get("/:campaignId/:executionId", getExecutionById);
 
 export default router;
