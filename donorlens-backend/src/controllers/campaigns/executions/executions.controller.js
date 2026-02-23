@@ -1,4 +1,8 @@
 import { createExecutions } from "../../../usecases/campaigns/executions/createExecutionsUsecase.js";
+import {
+  getAllExecutionsUsecase,
+  getExecutionByIdUsecase,
+} from "../../../usecases/campaigns/executions/readExecutionsUsecase.js";
 import { ApiResponse, sendCreated } from "../../../utils/apiResponse.js";
 import { NotFoundError } from "../../../utils/errors.js";
 
@@ -45,6 +49,44 @@ export const createExecutionUpdate = async (req, res, next) => {
       result,
       "Execution update created successfully",
     );
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get All Execution Updates for a Campaign Controller
+ * Returns all execution updates for a specific campaign
+ */
+export const getAllExecutionsByCampaign = async (req, res, next) => {
+  try {
+    const { campaignId } = req.params;
+
+    const executions = await getAllExecutionsUsecase(campaignId);
+
+    return ApiResponse.success(res, {
+      message: "Execution updates retrieved successfully",
+      data: executions,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get Single Execution Update by ID Controller
+ * Returns a single execution update with full details
+ */
+export const getExecutionById = async (req, res, next) => {
+  try {
+    const { campaignId, executionId } = req.params;
+
+    const execution = await getExecutionByIdUsecase(executionId, campaignId);
+
+    return ApiResponse.success(res, {
+      message: "Execution update retrieved successfully",
+      data: execution,
+    });
   } catch (error) {
     next(error);
   }
