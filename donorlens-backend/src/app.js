@@ -5,12 +5,12 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import authRouter from "./routes/auth/auth.route.js";
-import adminRouter from "./routes/ngoAdmin/ngoRegister.route.js";
 import errorHandler from "./middleware/errorHandler.middleware.js";
 import { NotFoundError } from "./utils/errors.js";
-
 import campaignRoutes from "./routes/campaigns/campaign.routes.js";
 import executionUpdateRoutes from "./routes/campaigns/executions/executions.routes.js";
+import ngoAdminRouter from "./routes/ngoAdmin/ngoRegister.route.js";
+import adminRoutes from "./routes/admin/systemAdmin.route.js";
 
 const createApp = () => {
   dotenv.config();
@@ -49,10 +49,15 @@ const createApp = () => {
   // API Routes
   //Auth routes (login, register, refresh token, logout, get current user)
   app.use("/api/auth", authRouter);
-  app.use("/api/admin", adminRouter);
 
   app.use("/api/campaigns", campaignRoutes);
   app.use("/api/campaigns/executions", executionUpdateRoutes);
+  //NGO Admin routes (NGO registration)
+  app.use("/api/ngo/auth", ngoAdminRouter);
+  app.use("/api/ngo/campaigns", campaignRoutes);
+
+  //System Admin routes (to be added later)
+  app.use("/api/admin", adminRoutes);
 
   // 404 handler for undefined routes (must be before error handler)
   app.use((req, res, next) => {

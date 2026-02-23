@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { adminRegisterController } from "../../controllers/admin/AdminRegisterController.js";
+import { adminRegisterController } from "../../controllers/ngoadmin/NgoAdminRegisterController.js";
 import { uploadFields } from "../../middleware/upload.middleware.js";
 import { validateFiles } from "../../middleware/fileValidation.middleware.js";
 import { ALLOWED_FILE_TYPES } from "../../utils/fileHelpers.js";
 
-const adminRouter = Router();
+const ngoAdminRouter = Router();
 
-adminRouter.post(
+ngoAdminRouter.post(
   "/register-ngo",
   uploadFields([
     { name: "registrationCertificate", maxCount: 1 }, // Required, 1 file
@@ -22,4 +22,4 @@ adminRouter.post(
   adminRegisterController,
 );
 
-export default adminRouter;
+export default ngoAdminRouter;

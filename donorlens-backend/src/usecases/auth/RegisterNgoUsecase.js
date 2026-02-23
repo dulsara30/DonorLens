@@ -8,6 +8,7 @@ import {
   ValidationError,
 } from "../../utils/errors.js";
 import { uploadToCloudinary } from "../../services/cloudinary.service.js";
+import emailService from "../../services/email.service.js";
 
 /**
  * Register NGO Admin Usecase - Handles NGO administrator registration business logic
@@ -166,6 +167,17 @@ export default async function RegisterNgoUsecase(userData, files) {
   });
 
   await newNgoAdmin.save();
+
+  try {
+    await emailService.sendNgoRegistrationReceived({
+      email: newNgoAdmin.email,
+      ngoName: newNgoAdmin.ngoDetails.ngoName,
+      fullName: newNgoAdmin.fullName,
+    });
+    console.log("Registration confirmation email sent to:", newNgoAdmin.email);
+  } catch (emailError) {
+    console.error("Failed to send registration email:", emailError.message);
+  }
 
   return newNgoAdmin.toSafeObject();
 }
