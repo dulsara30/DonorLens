@@ -10,7 +10,7 @@ const adminRoutes = Router();
 adminRoutes.get(
   "/fetch-all-register-requests",
   authenticateToken,
-  authorizeRoles(["ADMIN"]),
+  authorizeRoles("ADMIN"),
   FetchAllRegisterRequestController,
 );
 
