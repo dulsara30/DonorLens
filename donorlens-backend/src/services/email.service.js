@@ -82,7 +82,6 @@ class EmailService {
       subject: "🎉 NGO Registration Approved - DonorLens",
       template: "ngo-registration-approved",
       context: {
-        adminName: ngoData.fullName,
         ngoName: ngoData.ngoName,
         loginUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/login`,
         dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
@@ -161,6 +160,19 @@ class EmailService {
           day: "numeric",
         }),
         trackingUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/profile/donations`,
+      },
+    });
+  }
+
+  async sendNgoPasswordSetup(ngoData) {
+    return this.sendEmail({
+      to: ngoData.email,
+      subject: "🔐 Password Setup Required - DonorLens",
+      template: "ngo-password-setup",
+      context: {
+        ngoName: ngoData.ngoName,
+        setupUrl: ngoData.setupUrl,
+        dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
       },
     });
   }
