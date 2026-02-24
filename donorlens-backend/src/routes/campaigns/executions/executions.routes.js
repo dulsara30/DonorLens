@@ -42,8 +42,8 @@ router.get("/:campaignId/:executionId", getExecutionById);
 // Update an execution update
 router.patch(
   "/:campaignId/:executionId",
-  // authenticateToken,
-  // authorizeRoles("NGO_ADMIN"),
+  authenticateToken,
+  authorizeRoles("NGO_ADMIN"),
   uploadFields([
     { name: "evidencePhotos", maxCount: 5 },
     { name: "receipts", maxCount: 5 },
