@@ -116,6 +116,18 @@ const userSchema = new mongoose.Schema(
           documents: Object, // Store snapshot of submitted docs
         },
       ],
+      passwordSetupToken: {
+        type: String,
+        default: null,
+      },
+      passwordSetupTokenExpiry: {
+        type: Date,
+        default: null,
+      },
+      passwordSetupTokenUsed: {
+        type: Boolean,
+        default: false,
+      },
       reviewedAt: Date,
       reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     },

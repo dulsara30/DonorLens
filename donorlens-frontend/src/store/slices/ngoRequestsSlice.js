@@ -1,6 +1,3 @@
-// ============================================
-// NGO REQUESTS SLICE - Redux State Management
-// ============================================
 // This manages ALL NGO registration requests data and operations
 // A "slice" is a portion of your Redux store with its own state and reducers
 
@@ -74,13 +71,14 @@ export const approveRequest = createAsyncThunk(
   "ngoRequests/approve",
   async ({ requestId, note }, { rejectWithValue }) => {
     try {
-      // TODO: Call your backend approval endpoint
-      // const response = await api.post(`/admin/approve-ngo/${requestId}`, { note });
-      // return response.data.data;
+      const response = await api.put(
+        `/admin/ngo-request/${requestId}/approve`,
+        { note },
+      );
 
-      console.log("✅ Approving request:", requestId, "with note:", note);
+      console.log("Approving request:", requestId, "with note:", note);
       // Return the updated request
-      return { requestId, status: "APPROVED", note };
+      return response.data.message;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to approve request",

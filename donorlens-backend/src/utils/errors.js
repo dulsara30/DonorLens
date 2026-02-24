@@ -135,6 +135,12 @@ export class DuplicateError extends AppError {
   }
 }
 
+export class AnyDuplicationError extends AppError {
+  constructor(message) {
+    super(message, 409);
+  }
+}
+
 export class InvalidIdError extends AppError {
   constructor(message = "Invalid ID format") {
     super(message, 400);
