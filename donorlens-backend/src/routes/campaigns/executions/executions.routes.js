@@ -3,6 +3,7 @@ import {
   createExecutionUpdate,
   getAllExecutionsByCampaign,
   getExecutionById,
+  updateExecutionUpdate,
   deleteExecutionUpdate,
 } from "../../../controllers/campaigns/executions/executions.controller.js";
 import {
@@ -37,6 +38,23 @@ router.get("/:campaignId", getAllExecutionsByCampaign);
 
 // Get a single execution update by ID
 router.get("/:campaignId/:executionId", getExecutionById);
+
+// Update an execution update
+router.patch(
+  "/:campaignId/:executionId",
+  // authenticateToken,
+  // authorizeRoles("NGO_ADMIN"),
+  uploadFields([
+    { name: "evidencePhotos", maxCount: 5 },
+    { name: "receipts", maxCount: 5 },
+  ]),
+  validateFiles({
+    allowedTypes: ALLOWED_FILE_TYPES.all,
+    minFiles: 0, // Files are optional for update
+    maxFiles: 15,
+  }),
+  updateExecutionUpdate,
+);
 
 // Delete an execution update
 router.delete(

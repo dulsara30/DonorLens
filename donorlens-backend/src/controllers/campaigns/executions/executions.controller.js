@@ -3,6 +3,7 @@ import {
   getAllExecutionsUsecase,
   getExecutionByIdUsecase,
 } from "../../../usecases/campaigns/executions/readExecutionsUsecase.js";
+import { updateExecutionUsecase } from "../../../usecases/campaigns/executions/updateExecutionUsecase.js";
 import { deleteExecutionUsecase } from "../../../usecases/campaigns/executions/deleteExecutionUsecase.js";
 import { ApiResponse, sendCreated } from "../../../utils/apiResponse.js";
 import { NotFoundError } from "../../../utils/errors.js";
@@ -87,6 +88,46 @@ export const getExecutionById = async (req, res, next) => {
     return ApiResponse.success(res, {
       message: "Execution update retrieved successfully",
       data: execution,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Update Execution Update Controller
+ * Handles partial updates to execution updates with optional file uploads
+ */
+export const updateExecutionUpdate = async (req, res, next) => {
+  try {
+    //const userId = req.user.userId;
+    const userId = "698e1f3cb308e018d5d2186f";
+
+    if (!userId) {
+      throw new NotFoundError("User not found. Authentication required.");
+    }
+
+    const { campaignId, executionId } = req.params;
+    const { title, date, description, fundsUsed } = req.body;
+
+    const executionFile = req.files; // Optional files for update
+
+    const updateData = {
+      userId,
+      campaignId,
+      executionId,
+      title,
+      date,
+      description,
+      fundsUsed: fundsUsed ? Number(fundsUsed) : undefined,
+      executionFile,
+    };
+
+    const result = await updateExecutionUsecase(updateData);
+
+    return ApiResponse.success(res, {
+      message: "Execution update updated successfully",
+      data: result,
     });
   } catch (error) {
     next(error);
