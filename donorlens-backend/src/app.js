@@ -50,7 +50,7 @@ const createApp = () => {
   app.use("/api/auth", authRouter);
   app.use("/api/admin", adminRouter);
 
-  app.use("/api/campaigns", campaignRoutes);
+  app.use("/api/ngo/campaigns", campaignRoutes);
 
   // 404 handler for undefined routes (must be before error handler)
   app.use((req, res, next) => {
