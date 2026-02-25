@@ -21,7 +21,7 @@ const financialItemSchema = new Schema(
       maxlength: 500,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const locationSchema = new Schema(
@@ -40,7 +40,7 @@ const locationSchema = new Schema(
       required: true,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const coverImageSchema = new Schema(
@@ -54,7 +54,7 @@ const coverImageSchema = new Schema(
       required: true,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const campaignSchema = new Schema(
@@ -120,6 +120,19 @@ const campaignSchema = new Schema(
       min: 0,
     },
 
+    totalUsedAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    progressPercentage: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
+
     status: {
       type: String,
       enum: ["ONGOING", "COMPLETED"],
@@ -133,7 +146,7 @@ const campaignSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 /**
@@ -143,7 +156,7 @@ campaignSchema.pre("save", function () {
   if (this.financialBreakdown && this.financialBreakdown.length > 0) {
     this.totalPlannedCost = this.financialBreakdown.reduce(
       (sum, item) => sum + item.cost,
-      0
+      0,
     );
   } else {
     this.totalPlannedCost = 0;

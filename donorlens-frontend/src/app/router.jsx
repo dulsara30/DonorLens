@@ -17,7 +17,6 @@ import CampaignListPage from "../features/campaigns/pages/CampaignListPage";
 import CampaignDetailsPage from "../features/campaigns/pages/CampaignDetailsPage";
 import DonatePage from "../features/payments/pages/DonatePage";
 
-import AdminLayout from "../features/admin/layout/AdminLayout";
 import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import AdminCreateCampaignPage from "../features/campaigns/pages/AdminCreateCampaignPage";
 import AdminExpenseTrackerPage from "../features/tracking/pages/AdminExpenseTrackerPage";
@@ -25,13 +24,17 @@ import AdminFinalReportPage from "../features/impact/pages/AdminFinalReportPage"
 
 import ProfilePage from "../features/profile/pages/ProfilePage";
 import AdminRoute from "../components/guards/AdminRoute";
-import SystemAdminDashboardPage from "../features/systemAdmin/pages/SystemAdminDashboardPage";
+import SystemAdminLayout from "../features/systemAdmin/layout/SystemAdminLayout";
+import SystemAdminOverviewPage from "../features/systemAdmin/pages/SystemAdminOverviewPage";
+import SystemAdminUsersPage from "../features/systemAdmin/pages/SystemAdminUsersPage";
+import SystemAdminNgoRequestsPage from "../features/systemAdmin/pages/SystemAdminNgoRequestsPage";
+import SystemAdminCampaignsPage from "../features/systemAdmin/pages/SystemAdminCampaignsPage";
 
 export const router = createBrowserRouter([
   // AUTH ROUTES (Public)
   { path: "/login", element: <LoginPage /> },
   { path: "/logout", element: <LogoutPage /> },
-  { path: "/register", element: <RegisterUserPage /> }, 
+  { path: "/register", element: <RegisterUserPage /> },
   { path: "/register/user", element: <RegisterUserPage /> },
   { path: "/register/ngo", element: <NgoRequestPage /> },
   // { path: "/ngo-request", element: <NgoRequestPage /> },
@@ -66,12 +69,21 @@ export const router = createBrowserRouter([
     ],
   },
 
-    // ADMIN ONLY ROUTES (NGO_ADMIN)
+  // ADMIN ONLY ROUTES (NGO_ADMIN)
   {
-    element: <AdminRoute/>,
+    element: <AdminRoute />,
     children: [
-      { path: "/sys-admin", element: <SystemAdminDashboardPage /> },
-
+      { path: "/sys-admin", element: <SystemAdminLayout /> },
+      { path: "/sys-admin/dashboard", element: <SystemAdminOverviewPage /> },
+      { path: "/sys-admin/users", element: <SystemAdminUsersPage /> },
+      {
+        path: "/sys-admin/ngo-requests",
+        element: <SystemAdminNgoRequestsPage />,
+      },
+      {
+        path: "/sys-admin/campaigns",
+        element: <SystemAdminCampaignsPage />,
+      },
     ],
   },
 

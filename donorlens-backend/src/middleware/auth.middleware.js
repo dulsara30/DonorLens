@@ -15,6 +15,8 @@ export const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
+    //console.log("Authenticating request. Authorization header:", authHeader);
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
@@ -66,6 +68,13 @@ export const authenticateToken = async (req, res, next) => {
  */
 export const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
+    console.log(
+      "Authorizing user. Required roles:",
+      allowedRoles,
+      "User role:",
+      req.user?.role,
+    );
+
     if (!req.user || !req.user.role) {
       return res.status(401).json({
         success: false,

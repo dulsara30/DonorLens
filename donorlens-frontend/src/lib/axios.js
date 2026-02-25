@@ -71,7 +71,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 /**
@@ -89,8 +89,10 @@ api.interceptors.response.use(
     // Check if error is 401 (Unauthorized) and not already retried
     if (error.response?.status === 401 && !originalRequest._retry) {
       // Skip refresh for auth endpoints to avoid infinite loops
-      if (originalRequest.url?.includes("/auth/refresh") || 
-          originalRequest.url?.includes("/auth/login")) {
+      if (
+        originalRequest.url?.includes("/auth/refresh") ||
+        originalRequest.url?.includes("/auth/login")
+      ) {
         return Promise.reject(error);
       }
 
@@ -104,7 +106,7 @@ api.interceptors.response.use(
           const response = await axios.post(
             `${import.meta.env.VITE_API_URL}/auth/refresh`,
             {},
-            { withCredentials: true }
+            { withCredentials: true },
           );
 
           const newAccessToken = response.data.data.accessToken;
@@ -129,14 +131,14 @@ api.interceptors.response.use(
           // Refresh failed - user needs to login again
           isRefreshing = false;
           refreshSubscribers = [];
-          
+
           // Clear token
           setAccessToken(null);
-          
+
           // Optionally redirect to login
           // Note: Better to handle this in AuthContext
           console.error("Token refresh failed:", refreshError);
-          
+
           return Promise.reject(refreshError);
         }
       } else {
@@ -152,13 +154,15 @@ api.interceptors.response.use(
 
     // For other errors, reject normally
     return Promise.reject(error);
-  }
+  },
 );
 
 // Attach interceptors function (for backward compatibility)
 export const attachInterceptors = (getAccessToken, setAccessToken) => {
   // This function is kept for compatibility but core logic is now in interceptors above
-  console.warn("attachInterceptors is deprecated. Interceptors are automatically configured.");
+  console.warn(
+    "attachInterceptors is deprecated. Interceptors are automatically configured.",
+  );
 };
 
 export default api;
