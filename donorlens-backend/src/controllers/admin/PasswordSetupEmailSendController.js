@@ -1,4 +1,5 @@
-import { ApiResponse } from "../../utils/apiResponse";
+import PasswordSetupEmailSendUsecase from "../../usecases/admin/PasswordSetupEmailSendUsecase.js";
+import { ApiResponse } from "../../utils/apiResponse.js";
 
 export default async function PasswordSetupEmailSendController(req, res, next) {
   try {

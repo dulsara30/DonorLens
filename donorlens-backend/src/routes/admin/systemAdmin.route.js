@@ -6,6 +6,7 @@ import {
 } from "../../middleware/auth.middleware.js";
 import ApproveNgoRequestController from "../../controllers/admin/ApproveNgoRequestController.js";
 import PasswordSetupEmailSendController from "../../controllers/admin/PasswordSetupEmailSendController.js";
+import RejectNgoRequestController from "../../controllers/admin/RejectNgoRequestController.js";
 
 const adminRoutes = Router();
 
@@ -21,6 +22,13 @@ adminRoutes.put(
   authenticateToken,
   authorizeRoles("ADMIN"),
   ApproveNgoRequestController,
+);
+
+adminRoutes.put(
+  "/ngo-request/:ngoId/reject",
+  authenticateToken,
+  authorizeRoles("ADMIN"),
+  RejectNgoRequestController,
 );
 
 adminRoutes.put(

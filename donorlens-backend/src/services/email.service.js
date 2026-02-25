@@ -103,7 +103,7 @@ class EmailService {
       subject: "NGO Registration Update - DonorLens",
       template: "ngo-registration-rejected",
       context: {
-        adminName: ngoData.fullName,
+        adminName: ngoData.ngoName,
         ngoName: ngoData.ngoName,
         reason:
           reason || "The submitted information does not meet our requirements.",
@@ -173,6 +173,21 @@ class EmailService {
         ngoName: ngoData.ngoName,
         setupUrl: ngoData.setupUrl,
         dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
+      },
+    });
+  }
+
+  async sendNgoPasswordSetupSuccess(ngoData) {
+    return this.sendEmail({
+      to: ngoData.email,
+      subject: "✅ Password Setup Complete - DonorLens",
+      template: "ngo-password-setup-success",
+      context: {
+        ngoName: ngoData.ngoName,
+        email: ngoData.email,
+        currentYear: new Date().getFullYear(),
+        dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}`,
+        loginUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/login`,
       },
     });
   }

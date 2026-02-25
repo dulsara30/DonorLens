@@ -10,6 +10,8 @@ import { getCurrentUserController } from "../../controllers/auth/GetCurrentUserC
 import { logoutController } from "../../controllers/auth/LogoutController.js";
 import { authenticateToken } from "../../middleware/auth.middleware.js";
 import PasswordSetupTokenVerificationController from "../../controllers/admin/PasswordSetupTokenVerificationController.js";
+import VerifyIdentityController from "../../controllers/admin/VerifyIdentityController.js";
+import SetPasswordController from "../../controllers/admin/SetPasswordController.js";
 
 const authRouter = Router();
 
@@ -29,5 +31,9 @@ authRouter.get(
   "/verify-password-setup-token",
   PasswordSetupTokenVerificationController,
 );
+
+authRouter.post("/verify-identity", VerifyIdentityController);
+
+authRouter.post("/set-password", SetPasswordController);
 
 export default authRouter;
