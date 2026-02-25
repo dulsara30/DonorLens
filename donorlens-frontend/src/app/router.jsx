@@ -6,6 +6,7 @@ import { ROLES } from "../lib/constants";
 
 import LoginPage from "../features/auth/pages/LoginPage";
 import LogoutPage from "../features/auth/pages/LogoutPage";
+import PasswordSetupPage from "../features/auth/pages/PasswordSetupPage";
 import Unauthorized from "../pages/Unauthorized";
 import NotFound from "../pages/NotFound";
 import HomePage from "../pages/HomePage";
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
   // AUTH ROUTES (Public)
   { path: "/login", element: <LoginPage /> },
   { path: "/logout", element: <LogoutPage /> },
+  { path: "/password-setup", element: <PasswordSetupPage /> },
   { path: "/register", element: <RegisterUserPage /> },
   { path: "/register/user", element: <RegisterUserPage /> },
   { path: "/register/ngo", element: <NgoRequestPage /> },

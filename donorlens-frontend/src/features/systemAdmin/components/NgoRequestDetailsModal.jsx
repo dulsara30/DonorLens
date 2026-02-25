@@ -144,7 +144,6 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
 
     setLoading(true);
     try {
-      // TODO: Integrate with backend
       await dispatch(resendPasswordEmail(request._id)).unwrap();
       alert("Password setup email sent successfully!");
     } catch (error) {

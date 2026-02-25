@@ -326,8 +326,14 @@ const useNgoRequestForm = () => {
       // Submit to backend API
       const response = await submitNgoRequest(formData);
 
-      console.log("NGO Request submission response:", response);
+      //console.log("NGO Request submission response:", response);
 
+      if (!response.success) {
+        return {
+          success: false,
+          error: "Submission failed.",
+        };
+      }
       setIsSubmitting(false);
       return {
         success: true,
@@ -339,8 +345,7 @@ const useNgoRequestForm = () => {
 
       return {
         success: false,
-        error:
-          error.message || "Failed to submit NGO request. Please try again.",
+        error: "Failed to submit NGO request. Please try again.",
       };
     }
   };

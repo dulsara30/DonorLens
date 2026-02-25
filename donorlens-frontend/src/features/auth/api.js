@@ -70,7 +70,7 @@ export const login = async (credentials) => {
 export const submitNgoRequest = async (formData) => {
   try {
     console.log("Submitting NGO request with formData:", formData);
-    const response = await api.post("/admin/register-ngo", formData, {
+    const response = await api.post("/ngo/auth/register-ngo", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

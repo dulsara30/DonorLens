@@ -8,6 +8,7 @@ import SendEmailUsecase from "../email/SendEmailUsecase.js";
 
 export default async function PasswordSetupEmailSendUsecase(ngoId) {
   try {
+    console.log("Initiating password setup email send for NGO ID:", ngoId);
     if (!ngoId?.trim()) {
       throw new ValidationError("NGO ID is required");
     }
@@ -34,8 +35,9 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
     }
 
     const ngoData = {
-      ngoID: ngo._id.toString(),
+      ngoId: ngo._id.toString(),
       email: ngo.email,
+      ngoName: ngo.ngoDetails.ngoName,
       registrationNumber: ngo.ngoDetails.registrationNumber,
     };
     const token = await generatePasswordSetupToken(ngoData);
@@ -55,7 +57,9 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
 
     const setupUrl = `${process.env.CLIENT_URL}/password-setup?token=${token}`;
 
+    // ✅ Add all required fields for email template
     ngoData.setupUrl = setupUrl;
+    ngoData.expiryHours = 24; // ✅ Required by email template
 
     const emailResult = await SendEmailUsecase({
       type: "NGO_PASSWORD_SETUP",
@@ -69,6 +73,8 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
         error: emailResult.error,
       };
     }
+
+    console.log("Password setup email sent successfully to:", ngo.email);
 
     return {
       success: true,
