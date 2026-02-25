@@ -1,6 +1,13 @@
 import Campaign from "../../models/campaigns/Campaign.js";
 import User from "../../models/user/User.js";
+import {
+  NotFoundError,
+  ForbiddenError,
+  ValidationError,
+} from "../../utils/errors.js";
+
 import emailService from "../../services/email.service.js";
+
 
 export const createCampaignUsecase = async ({
   userId,
@@ -16,17 +23,17 @@ export const createCampaignUsecase = async ({
   const user = await User.findById(userId);
 
   if (!user) {
-    throw new Error("User not found");
+    throw new NotFoundError("User");
   }
 
   // Check role
   if (user.role !== "NGO_ADMIN") {
-    throw new Error("Only NGO Admin can create campaigns");
+    throw new ForbiddenError("Only NGO Admin can create campaigns");
   }
 
   // Validate end date
   if (new Date(endDate) <= new Date()) {
-    throw new Error("End date must be in the future");
+    throw new ValidationError("End date must be in the future");
   }
 
   // Create campaign
@@ -53,11 +60,11 @@ export const createCampaignUsecase = async ({
       campaignTitle: campaign.title,
       campaignId: campaign._id.toString(),
     });
-    console.log("✅ Campaign creation email sent to:", user.email);
+    console.log(" Campaign creation email sent to:", user.email);
   } catch (emailError) {
     // Log error but don't fail campaign creation
     console.error(
-      "⚠️ Failed to send campaign creation email:",
+      "Failed to send campaign creation email:",
       emailError.message,
     );
   }

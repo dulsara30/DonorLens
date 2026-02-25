@@ -51,8 +51,11 @@ const createApp = () => {
   //Auth routes (login, register, refresh token, logout, get current user)
   app.use("/api/auth", authRouter);
 
+
+  //app.use("/api/ngo/campaigns", campaignRoutes);
+
   app.use("/api/campaigns/executions", executionUpdateRoutes);
-  app.use("/api/campaigns", campaignRoutes);
+  //app.use("/api/campaigns", campaignRoutes);
   //NGO Admin routes (NGO registration)
   app.use("/api/ngo/auth", ngoAdminRouter);
   app.use("/api/ngo/campaigns", campaignRoutes);
@@ -62,6 +65,7 @@ const createApp = () => {
 
   //Payment routes
   app.use("/api/payment", paymentRoutes);
+
 
   // 404 handler for undefined routes (must be before error handler)
   app.use((req, res, next) => {
