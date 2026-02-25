@@ -94,12 +94,9 @@ export const fetchAllNgoRequestsAPI = async () => {
  */
 export const approveNgoRequestAPI = async (requestId, note = "") => {
   try {
-    const response = await api.post(
-      `/admin/ngo-requests/${requestId}/approve`,
-      {
-        note,
-      },
-    );
+    const response = await api.put(`/admin/ngo-request/${requestId}/approve`, {
+      note,
+    });
     return response.data.data;
   } catch (error) {
     console.error("Failed to approve NGO request:", error);
@@ -136,7 +133,7 @@ export const requestNgoResubmitAPI = async (requestId, instructions) => {
  */
 export const rejectNgoRequestAPI = async (requestId, reason) => {
   try {
-    const response = await api.post(`/admin/ngo-requests/${requestId}/reject`, {
+    const response = await api.put(`/admin/ngo-request/${requestId}/reject`, {
       reason,
     });
     return response.data.data;
@@ -153,9 +150,7 @@ export const rejectNgoRequestAPI = async (requestId, reason) => {
  */
 export const resendPasswordEmailAPI = async (requestId) => {
   try {
-    const response = await api.post(
-      `/admin/ngo-requests/${requestId}/resend-password-email`,
-    );
+    const response = await api.put(`/admin/pw-Request/${requestId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to resend password email:", error);

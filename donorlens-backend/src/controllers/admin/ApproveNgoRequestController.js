@@ -3,10 +3,14 @@ import { ApiResponse } from "../../utils/apiResponse.js";
 
 export default async function ApproveNgoRequestController(req, res, next) {
   try {
-    console.log("Approving Details", req.body);
+    console.log("Approving NGO registration request");
     const { ngoId } = req.params;
     const { note } = req.body;
     const adminId = req.user.userId;
+
+    console.log("Received NGO ID:", ngoId);
+    console.log("Received Note:", note);
+    console.log("Admin ID:", adminId);
 
     const ngoData = await ApproveNgoRequestUsecase(ngoId, note, adminId);
 

@@ -144,15 +144,22 @@ export const resendPasswordEmail = createAsyncThunk(
   "ngoRequests/resendEmail",
   async (requestId, { rejectWithValue }) => {
     try {
-      // TODO: Call your backend resend email endpoint
-      // const response = await api.post(`/admin/resend-password-email/${requestId}`);
-      // return response.data;
+      console.log("📧 Resending password setup email for NGO ID:", requestId);
 
-      console.log("📧 Resending password email for:", requestId);
-      return { requestId, message: "Email sent successfully" };
+      // ✅ Call backend endpoint that already exists
+      const response = await api.put(`/admin/pw-Request/${requestId}`);
+
+      console.log("✅ Password setup email sent successfully");
+      return {
+        requestId,
+        message:
+          response.data.message || "Password setup email sent successfully",
+      };
     } catch (error) {
+      console.error("❌ Failed to resend password email:", error);
       return rejectWithValue(
-        error.response?.data?.message || "Failed to resend email",
+        error.response?.data?.message ||
+          "Failed to resend password setup email",
       );
     }
   },

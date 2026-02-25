@@ -89,6 +89,19 @@ class EmailService {
     });
   }
 
+  async sendNgoRegistrationDeleted(ngoData) {
+    return this.sendEmail({
+      to: ngoData.email,
+      subject: "🗑️ NGO Registration Deleted - DonorLens",
+      template: "ngo-registration-deleted",
+      context: {
+        ngoName: ngoData.ngoName,
+        registrationUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/register/ngo`,
+        dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/`,
+      },
+    });
+  }
+
   /**
    * Send email when NGO registration is rejected
    * @param {Object} ngoData - NGO data
@@ -168,10 +181,13 @@ class EmailService {
     return this.sendEmail({
       to: ngoData.email,
       subject: "🔐 Password Setup Required - DonorLens",
-      template: "ngo-password-setup",
+      template: "ngo-password-setup", // ✅ FIXED: Was "password-setup-success"
       context: {
         ngoName: ngoData.ngoName,
+        email: ngoData.email, // ✅ ADDED: Required by template
+        registrationNumber: ngoData.registrationNumber, // ✅ ADDED: Required by template
         setupUrl: ngoData.setupUrl,
+        expiryHours: 24, // ✅ ADDED: Required by template
         dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
       },
     });
@@ -181,7 +197,7 @@ class EmailService {
     return this.sendEmail({
       to: ngoData.email,
       subject: "✅ Password Setup Complete - DonorLens",
-      template: "ngo-password-setup-success",
+      template: "password-setup-success",
       context: {
         ngoName: ngoData.ngoName,
         email: ngoData.email,

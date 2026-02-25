@@ -59,7 +59,7 @@ export const verifyRefreshToken = (token) => {
 
 export const generatePasswordSetupToken = (ngoData) => {
   const payload = {
-    ngoId: ngoData.ngoId.toString(),
+    ngoId: ngoData.ngoId,
     email: ngoData.email,
     registrationNumber: ngoData.registrationNumber,
     type: "PASSWORD_SETUP",

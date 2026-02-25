@@ -72,6 +72,7 @@ const userSchema = new mongoose.Schema(
       documents: {
         registrationCertificate: {
           url: String,
+          previewUrl: String,
           publicId: String,
           format: String,
           size: Number,
@@ -80,6 +81,7 @@ const userSchema = new mongoose.Schema(
         additionalDocuments: [
           {
             url: String,
+            previewUrl: String,
             publicId: String,
             format: String,
             size: Number,

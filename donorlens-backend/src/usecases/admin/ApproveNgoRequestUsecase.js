@@ -80,6 +80,8 @@ export default async function ApproveNgoRequestUsecase(ngoId, note, adminId) {
       );
     }
 
+    console.log("NGO registration request approved successfully");
+
     return {
       success: true,
       message: "NGO registration request approved successfully",
