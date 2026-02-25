@@ -41,7 +41,6 @@ export const router = createBrowserRouter([
   { path: "/register/ngo", element: <NgoRequestPage /> },
   // { path: "/ngo-request", element: <NgoRequestPage /> },
   { path: "/terms-privacy", element: <TermsPage /> },
-  { path: "/unauthorized", element: <Unauthorized /> },
 
   // PUBLIC ROUTES
   { path: "/", element: <HomePage /> },
@@ -89,6 +88,7 @@ export const router = createBrowserRouter([
     ],
   },
 
+  { path: "/unauthorized", element: <Unauthorized /> },
   // 404 Catch-all Route (MUST be last)
   { path: "*", element: <NotFound /> },
 ]);
