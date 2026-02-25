@@ -1,5 +1,5 @@
-import PasswordSetupTokenVerificationUsecase from "../../usecases/admin/PasswordSetupTokenVerificationUsecase";
-import { ApiResponse } from "../../utils/apiResponse";
+import PasswordSetupTokenVerificationUsecase from "../../usecases/admin/PasswordSetupTokenVerificationUsecase.js";
+import { ApiResponse } from "../../utils/apiResponse.js";
 
 export default async function PasswordSetupTokenVerificationController(
   req,

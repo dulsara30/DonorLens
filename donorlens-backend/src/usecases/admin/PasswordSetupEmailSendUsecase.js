@@ -1,10 +1,10 @@
-import User from "../../models/user/User";
-import { NotFoundError, ValidationError } from "../../utils/errors";
+import User from "../../models/user/User.js";
+import { NotFoundError, ValidationError } from "../../utils/errors.js";
 import {
   generatePasswordSetupToken,
   getTokenExpiryDate,
-} from "../../utils/jwt.util";
-import SendEmailUsecase from "../email/SendEmailUsecase";
+} from "../../utils/jwt.util.js";
+import SendEmailUsecase from "../email/SendEmailUsecase.js";
 
 export default async function PasswordSetupEmailSendUsecase(ngoId) {
   try {
@@ -57,7 +57,10 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
 
     ngoData.setupUrl = setupUrl;
 
-    const emailResult = await SendEmailUsecase("NGO_PASSWORD_SETUP", ngoData);
+    const emailResult = await SendEmailUsecase({
+      type: "NGO_PASSWORD_SETUP",
+      data: ngoData,
+    });
 
     if (!emailResult.success) {
       return {

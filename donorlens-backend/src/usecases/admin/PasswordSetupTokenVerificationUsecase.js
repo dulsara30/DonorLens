@@ -52,7 +52,9 @@ export default async function PasswordSetupTokenVerificationUsecase(token) {
       success: true,
       message: "Token is valid",
       data: {
-        email: decoded.email,
+        email: ngoUser.email,
+        ngoId: ngoUser._id.toString(),
+        registrationNumber: ngoUser.ngoDetails.registrationNumber,
         ngoName: ngoUser.ngoDetails.ngoName,
         expiresAt: ngoUser.ngoDetails.passwordSetupTokenExpiry,
         timeRemainingHours: Math.floor(
