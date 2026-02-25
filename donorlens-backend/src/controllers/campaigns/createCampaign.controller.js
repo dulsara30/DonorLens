@@ -1,5 +1,7 @@
 import { createCampaignUsecase } from "../../usecases/campaigns/createCampaign.usecase.js";
 import { uploadToCloudinary } from "../../services/cloudinary.service.js";
+import { sendCreated } from "../../utils/apiResponse.js";
+import { MissingFieldError } from "../../utils/errors.js";
 
 export const createCampaign = async (req, res, next) => {
   try {
@@ -15,7 +17,7 @@ export const createCampaign = async (req, res, next) => {
     } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ message: "Cover image is required" });
+      throw new MissingFieldError("coverImage");
     }
 
     // Upload image to Cloudinary
@@ -37,10 +39,7 @@ export const createCampaign = async (req, res, next) => {
       location: JSON.parse(location),
     });
 
-    res.status(201).json({
-      success: true,
-      data: campaign,
-    });
+    return sendCreated(res, campaign, "Campaign created successfully");
 
   } catch (error) {
     next(error);
