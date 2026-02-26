@@ -60,6 +60,13 @@ export const updateCampaignUsecase = async ({
     campaign.title = updateData.title;
   }
 
+  // Validate end date
+  if (updateData.endDate !== undefined) {
+    if (new Date(updateData.endDate) <= new Date()) {
+      throw new InvalidInputError("End date must be in the future");
+    }
+  }
+
   if (updateData.sdgGoalNumber !== undefined) {
     campaign.sdgGoalNumber = updateData.sdgGoalNumber;
   }
