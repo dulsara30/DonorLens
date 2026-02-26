@@ -1,6 +1,7 @@
 // JWT utility functions for token generation and verification
 
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 /**
  * Generate JWT Access Token (short-lived)
@@ -10,11 +11,9 @@ import jwt from "jsonwebtoken";
 export const generateAccessToken = (payload) => {
   const { userId, role } = payload;
 
-  return jwt.sign(
-    { userId, role },
-    process.env.JWT_ACCESS_SECRET,
-    { expiresIn: process.env.JWT_ACCESS_EXPIRY || "15m" }
-  );
+  return jwt.sign({ userId, role }, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRY || "15m",
+  });
 };
 
 /**
@@ -25,11 +24,9 @@ export const generateAccessToken = (payload) => {
 export const generateRefreshToken = (payload) => {
   const { userId } = payload;
 
-  return jwt.sign(
-    { userId },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRY || "14d" }
-  );
+  return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRY || "14d",
+  });
 };
 
 /**
@@ -56,6 +53,72 @@ export const verifyRefreshToken = (token) => {
     return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
   } catch (error) {
     console.error("Refresh token verification failed:", error.message);
+    return null;
+  }
+};
+
+export const generatePasswordSetupToken = (ngoData) => {
+  const payload = {
+    ngoId: ngoData.ngoId,
+    email: ngoData.email,
+    registrationNumber: ngoData.registrationNumber,
+    type: "PASSWORD_SETUP",
+    nonce: crypto.randomBytes(16).toString("hex"),
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: "24h",
+  });
+
+  return token;
+};
+
+export const verifyPasswordSetupToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+
+    if (decoded.type !== "PASSWORD_SETUP") {
+      return null;
+    }
+
+    return decoded;
+  } catch (error) {
+    console.error("Password setup token verification failed:", error.message);
+    return null;
+  }
+};
+
+export const getTokenExpiryDate = () => {
+  return new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+};
+
+export const generateResubmissionToken = (ngoData) => {
+  const payload = {
+    ngoId: ngoData.ngoId,
+    email: ngoData.email,
+    registrationNumber: ngoData.registrationNumber,
+    type: "RESUBMISSION_REQUIRED",
+    nonce: crypto.randomBytes(16).toString("hex"),
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: "24h",
+  });
+
+  return token;
+};
+
+export const verifyResubmissionToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+
+    if (decoded.type !== "RESUBMISSION_REQUIRED") {
+      return null;
+    }
+
+    return decoded;
+  } catch (error) {
+    console.error("Resubmission token verification failed:", error.message);
     return null;
   }
 };

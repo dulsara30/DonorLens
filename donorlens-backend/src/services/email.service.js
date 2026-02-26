@@ -14,9 +14,10 @@ class EmailService {
    * @param {string} options.subject - Email subject
    * @param {string} options.template - Template name (without .hbs extension)
    * @param {Object} options.context - Dynamic data to pass to the template
+   * @param {boolean|string} options.layout - Layout to use (false for no layout, or layout name)
    * @returns {Promise<Object>} - Email sending result
    */
-  async sendEmail({ to, subject, template, context }) {
+  async sendEmail({ to, subject, template, context, layout = "main" }) {
     try {
       const mailOptions = {
         from:
@@ -29,6 +30,7 @@ class EmailService {
           logoUrl: process.env.EMAIL_LOGO_URL,
           currentYear: new Date().getFullYear(),
           frontendUrl: process.env.CLIENT_URL || "http://localhost:5173",
+          layout, // Pass layout option to handlebars
         },
       };
 
@@ -82,10 +84,22 @@ class EmailService {
       subject: "🎉 NGO Registration Approved - DonorLens",
       template: "ngo-registration-approved",
       context: {
-        adminName: ngoData.fullName,
         ngoName: ngoData.ngoName,
         loginUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/login`,
         dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
+      },
+    });
+  }
+
+  async sendNgoRegistrationDeleted(ngoData) {
+    return this.sendEmail({
+      to: ngoData.email,
+      subject: "🗑️ NGO Registration Deleted - DonorLens",
+      template: "ngo-registration-deleted",
+      context: {
+        ngoName: ngoData.ngoName,
+        registrationUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/register/ngo`,
+        dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/`,
       },
     });
   }
@@ -104,7 +118,7 @@ class EmailService {
       subject: "NGO Registration Update - DonorLens",
       template: "ngo-registration-rejected",
       context: {
-        adminName: ngoData.fullName,
+        adminName: ngoData.ngoName,
         ngoName: ngoData.ngoName,
         reason:
           reason || "The submitted information does not meet our requirements.",
@@ -161,6 +175,56 @@ class EmailService {
           day: "numeric",
         }),
         trackingUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/profile/donations`,
+      },
+    });
+  }
+
+  async sendNgoPasswordSetup(ngoData) {
+    return this.sendEmail({
+      to: ngoData.email,
+      subject: "🔐 Password Setup Required - DonorLens",
+      template: "ngo-password-setup",
+      layout: false, // This template has its own complete HTML structure
+      context: {
+        ngoName: ngoData.ngoName,
+        email: ngoData.email,
+        registrationNumber: ngoData.registrationNumber,
+        setupUrl: ngoData.setupUrl,
+        expiryHours: 24,
+        dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
+      },
+    });
+  }
+
+  async sendNgoRegistrationResubmissionRequired(ngoData) {
+    return this.sendEmail({
+      to: ngoData.email,
+      subject: "⚠️ Resubmission Required - DonorLens",
+      template: "ngo-registration-resubmit",
+      context: {
+        ngoName: ngoData.ngoName,
+        email: ngoData.email, // ✅ ADDED: Required by template
+        registrationNumber: ngoData.registrationNumber, // ✅ ADDED: Required by template
+        resubmissionUrl: ngoData.resubmissionUrl,
+        reason: ngoData.reason,
+        expiryHours: 24, // ✅ ADDED: Required by template
+        dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
+      },
+    });
+  }
+
+  async sendNgoPasswordSetupSuccess(ngoData) {
+    return this.sendEmail({
+      to: ngoData.email,
+      subject: "✅ Password Setup Complete - DonorLens",
+      template: "password-setup-success",
+      layout: false, // This template has its own complete HTML structure
+      context: {
+        ngoName: ngoData.ngoName,
+        email: ngoData.email,
+        currentYear: new Date().getFullYear(),
+        dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}`,
+        loginUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/login`,
       },
     });
   }

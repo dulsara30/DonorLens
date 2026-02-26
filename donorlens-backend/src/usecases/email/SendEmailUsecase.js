@@ -23,6 +23,23 @@ export default async function SendEmailUsecase({ type, data }) {
         result = await emailService.sendNgoRegistrationApproved(data);
         break;
 
+      case "NGO_REGISTRATION_DELETED":
+        result = await emailService.sendNgoRegistrationDeleted(data);
+        break;
+
+      case "NGO_PASSWORD_SETUP":
+        result = await emailService.sendNgoPasswordSetup(data);
+        break;
+
+      case "NGO_REGISTRATION_RESUBMISSION_REQUIRED":
+        result =
+          await emailService.sendNgoRegistrationResubmissionRequired(data);
+        break;
+
+      case "NGO_PASSWORD_SETUP_SUCCESS":
+        result = await emailService.sendNgoPasswordSetupSuccess(data);
+        break;
+
       case "NGO_REGISTRATION_REJECTED":
         result = await emailService.sendNgoRegistrationRejected(
           data,

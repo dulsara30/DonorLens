@@ -11,6 +11,7 @@ import {
   setSelectedRequest,
   clearSelectedRequest,
   setActiveFilter,
+  resendPasswordEmail,
   selectAllRequests,
   selectRequestsByStatus,
   selectRequestsCountByStatus,
@@ -71,6 +72,18 @@ export default function SystemAdminNgoRequestsPage() {
    */
   const handleCloseModal = () => {
     dispatch(clearSelectedRequest());
+  };
+
+  /**
+   * Handle resend password email
+   */
+  const handleResendEmail = async (requestId) => {
+    try {
+      await dispatch(resendPasswordEmail(requestId)).unwrap();
+      alert("Password setup email sent successfully!");
+    } catch (error) {
+      alert(`Failed to send email: ${error}`);
+    }
   };
 
   /**
@@ -286,6 +299,7 @@ export default function SystemAdminNgoRequestsPage() {
                 key={request._id}
                 request={request}
                 onReview={handleReviewRequest}
+                onResendEmail={handleResendEmail}
                 formatDate={formatDate}
               />
             ))}
@@ -308,8 +322,16 @@ export default function SystemAdminNgoRequestsPage() {
  * NgoRequestCard Component
  * Displays individual NGO request information
  */
-function NgoRequestCard({ request, onReview, formatDate }) {
+function NgoRequestCard({ request, onReview, onResendEmail, formatDate }) {
   const ngo = request.ngoDetails;
+  console.log(
+    "Rendering NgoRequestCard for NGO:",
+    ngo.ngoName,
+    "with status:",
+    ngo.status,
+    "and request ID:",
+    request._id,
+  );
   const status = ngo.status;
 
   const getStatusStyles = (status) => {
@@ -539,7 +561,10 @@ function NgoRequestCard({ request, onReview, formatDate }) {
       {/* Resend Email Button (for approved) */}
       {status === "APPROVED" && (
         <div className="px-6 pb-4 bg-slate-50">
-          <button className="w-full px-4 py-2 border border-blue-300 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+          <button
+            onClick={() => onResendEmail(request._id)}
+            className="w-full px-4 py-2 border border-blue-300 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+          >
             <svg
               className="w-4 h-4"
               fill="none"

@@ -135,7 +135,7 @@ const campaignSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["ONGOING", "COMPLETED"],
+      enum: ["ONGOING", "COMPLETED", "CANCELLED"],
       default: "ONGOING",
     },
 

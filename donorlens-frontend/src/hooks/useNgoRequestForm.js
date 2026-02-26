@@ -1,8 +1,12 @@
 // Custom hook for managing NGO request form state across multiple steps
 // Handles form data, validation, navigation between steps, and document uploads
+// Supports both NEW registration and RESUBMISSION workflows
 
 import { useState } from "react";
-import { submitNgoRequest } from "../features/auth/api";
+import {
+  submitNgoRequest,
+  resubmitNgoRegistrationAPI,
+} from "../features/auth/api";
 
 const useNgoRequestForm = () => {
   // Current step state (1-4)
@@ -34,6 +38,14 @@ const useNgoRequestForm = () => {
 
   // Loading state for submission
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ============================================
+  // RESUBMISSION MODE SPECIFIC STATE
+  // ============================================
+  const [isResubmission, setIsResubmission] = useState(false);
+  const [ngoId, setNgoId] = useState(null);
+  const [adminReviewNote, setAdminReviewNote] = useState(null);
+  const [existingDocuments, setExistingDocuments] = useState(null);
 
   // Update basic info field
   const updateBasicInfo = (field, value) => {
@@ -254,6 +266,58 @@ const useNgoRequestForm = () => {
     }));
   };
 
+  // ============================================
+  // RESUBMISSION SPECIFIC FUNCTIONS
+  // ============================================
+
+  /**
+   * Pre-populate form with existing NGO data for resubmission
+   * @param {Object} ngoData - NGO user data from backend
+   */
+  const prePopulateForm = (ngoData) => {
+    console.log("🔄 Pre-populating form with existing NGO data:", ngoData);
+
+    setIsResubmission(true);
+    setNgoId(ngoData._id);
+
+    // Set basic info from existing data
+    setBasicInfo({
+      ngoName: ngoData.ngoDetails?.ngoName || "",
+      registrationNumber: ngoData.ngoDetails?.registrationNumber || "",
+      address: ngoData.ngoDetails?.address || "",
+      description: ngoData.ngoDetails?.description || "",
+      officialEmail: ngoData.email || "",
+      primaryPhone: ngoData.ngoDetails?.primaryPhone || "",
+      secondaryPhone: ngoData.ngoDetails?.secondaryPhone || "",
+      website: ngoData.ngoDetails?.website || "",
+    });
+
+    // Store existing documents reference (for display, not upload)
+    if (ngoData.ngoDetails?.documents) {
+      setExistingDocuments(ngoData.ngoDetails.documents);
+    }
+
+    // Get latest review note (admin's reason for resubmission)
+    if (
+      ngoData.ngoDetails?.reviewNotes &&
+      ngoData.ngoDetails.reviewNotes.length > 0
+    ) {
+      const latestNote =
+        ngoData.ngoDetails.reviewNotes[
+          ngoData.ngoDetails.reviewNotes.length - 1
+        ];
+      setAdminReviewNote(latestNote.note);
+    }
+
+    // Auto-check terms for resubmission (they already agreed before)
+    setTermsAgreed(true);
+
+    // Start from step 2 (skip terms) for resubmission
+    setCurrentStep(2);
+
+    console.log("✅ Form pre-populated successfully");
+  };
+
   // Navigate to next step
   const goToNextStep = () => {
     // Validate current step before proceeding
@@ -306,6 +370,14 @@ const useNgoRequestForm = () => {
         }
       });
 
+      // ============================================
+      // RESUBMISSION MODE: Add ngoId
+      // ============================================
+      if (isResubmission && ngoId) {
+        formData.append("ngoId", ngoId);
+        console.log("📤 Resubmitting for NGO ID:", ngoId);
+      }
+
       // Add registration certificate (required)
       if (documents.registrationCertificate) {
         formData.append(
@@ -322,16 +394,34 @@ const useNgoRequestForm = () => {
       console.log("Submitting form with data:", {
         basicInfo,
         documents,
+        isResubmission,
+        ngoId,
       });
-      // Submit to backend API
-      const response = await submitNgoRequest(formData);
 
-      console.log("NGO Request submission response:", response);
+      // ============================================
+      // Choose API based on mode
+      // ============================================
+      const response = isResubmission
+        ? await resubmitNgoRegistrationAPI(formData)
+        : await submitNgoRequest(formData);
+
+      console.log(
+        `${isResubmission ? "🔄 Resubmission" : "📝 Initial submission"} response:`,
+        response,
+      );
+
+      if (!response.success && !response.data?.success) {
+        return {
+          success: false,
+          error: response.message || "Submission failed.",
+        };
+      }
 
       setIsSubmitting(false);
       return {
         success: true,
         data: response,
+        isResubmission,
       };
     } catch (error) {
       console.error("NGO Request submission error:", error);
@@ -376,6 +466,12 @@ const useNgoRequestForm = () => {
     errors,
     isSubmitting,
 
+    // Resubmission state
+    isResubmission,
+    ngoId,
+    adminReviewNote,
+    existingDocuments,
+
     // Actions
     setTermsAgreed,
     updateBasicInfo,
@@ -388,6 +484,9 @@ const useNgoRequestForm = () => {
     goToStep,
     submitForm,
     resetForm,
+
+    // Resubmission actions
+    prePopulateForm,
 
     // Validation helpers
     validateStep2,

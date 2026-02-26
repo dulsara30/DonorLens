@@ -7,31 +7,40 @@ import {
   requestResubmit,
   rejectRequest,
   resendPasswordEmail,
+  resendResubmissionEmail,
+  deactivateNgo,
+  deleteNgo,
 } from "../../../store/slices/ngoRequestsSlice";
 
 /**
  * NgoRequestDetailsModal Component
+ * Comprehensive NGO registration review modal with all admin actions
  * Features:
- * - View organization details
- * - View and download documents
- * - Approve with optional note
- * - Request resubmission with instructions
+ * - View organization details and documents
+ * - Approve (sends password setup email)
+ * - Request resubmission with note
  * - Reject with reason
+ * - Deactivate approved NGOs
+ * - Delete deactivated NGOs
+ * - Resend emails (password setup / resubmission)
+ * - Show token status and account status
  */
 export default function NgoRequestDetailsModal({ request, onClose }) {
   const dispatch = useDispatch();
   const ngo = request.ngoDetails;
 
   // State for action modals
-  const [activeAction, setActiveAction] = useState(null); // 'approve', 'resubmit', 'reject'
+  const [activeAction, setActiveAction] = useState(null); // 'approve', 'resubmit', 'reject', 'deactivate'
   const [actionNote, setActionNote] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   /**
    * Handle Approve
    */
   const handleApprove = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (
       !confirm(
@@ -43,18 +52,18 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
 
     setLoading(true);
     try {
-      // TODO: Integrate with backend
-      await dispatch(
+      const result = await dispatch(
         approveRequest({
           requestId: request._id,
           note: actionNote,
         }),
       ).unwrap();
 
-      alert("NGO approved successfully! Password setup email sent.");
+      alert(result.message || "NGO approved successfully!");
       onClose();
-    } catch (error) {
-      alert("Failed to approve request: " + error);
+    } catch (err) {
+      setError(err);
+      alert(" Failed to approve: " + err);
     } finally {
       setLoading(false);
     }
@@ -65,15 +74,16 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
    */
   const handleRequestResubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (!actionNote.trim()) {
-      alert("Please provide instructions for resubmission");
+      setError("Please provide instructions for resubmission");
       return;
     }
 
     if (
       !confirm(
-        "Request resubmission from this NGO? They will be notified via email.",
+        "Request resubmission from this NGO? They will be notified via email with instructions.",
       )
     ) {
       return;
@@ -81,18 +91,18 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
 
     setLoading(true);
     try {
-      // TODO: Integrate with backend
-      await dispatch(
+      const result = await dispatch(
         requestResubmit({
           requestId: request._id,
-          instructions: actionNote,
+          note: actionNote,
         }),
       ).unwrap();
 
-      alert("Resubmission request sent successfully!");
+      alert(result.message || "Resubmission request sent successfully!");
       onClose();
-    } catch (error) {
-      alert("Failed to request resubmission: " + error);
+    } catch (err) {
+      setError(err || "Failed to request resubmission");
+      alert(" Failed to request resubmission: " + err);
     } finally {
       setLoading(false);
     }
@@ -103,9 +113,10 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
    */
   const handleReject = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (!actionNote.trim()) {
-      alert("Please provide a rejection reason");
+      setError("Please provide a rejection reason");
       return;
     }
 
@@ -117,25 +128,98 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
 
     setLoading(true);
     try {
-      // TODO: Integrate with backend
-      await dispatch(
+      const result = await dispatch(
         rejectRequest({
           requestId: request._id,
-          reason: actionNote,
+          note: actionNote,
         }),
       ).unwrap();
 
-      alert("NGO registration rejected.");
+      alert(result.message || "NGO registration rejected.");
       onClose();
-    } catch (error) {
-      alert("Failed to reject request: " + error);
+    } catch (err) {
+      setError(err || "Failed to reject request");
+      alert(" Failed to reject: " + err);
     } finally {
       setLoading(false);
     }
   };
 
   /**
-   * Handle Resend Password Email
+   * Handle Deactivate (for APPROVED NGOs)
+   */
+  const handleDeactivate = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!actionNote.trim()) {
+      setError("Please provide a deactivation reason");
+      return;
+    }
+
+    if (
+      !confirm(
+        "Deactivate this NGO account? They will lose access to the platform.",
+      )
+    ) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await dispatch(
+        deactivateNgo({
+          ngoId: request._id,
+          note: actionNote,
+        }),
+      ).unwrap();
+
+      alert(result.message || "NGO deactivated successfully.");
+      onClose();
+    } catch (err) {
+      setError(err || "Failed to deactivate NGO");
+      alert(" Failed to deactivate: " + err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Handle Delete (for DEACTIVATED NGOs)
+   */
+  const handleDelete = async () => {
+    if (
+      !confirm(
+        "⚠️ PERMANENTLY DELETE this NGO? This action CANNOT be undone and will remove all data!",
+      )
+    ) {
+      return;
+    }
+
+    if (
+      !confirm(
+        "Are you absolutely sure? Type 'DELETE' to confirm (just click OK).",
+      )
+    ) {
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    try {
+      await dispatch(deleteNgo(request._id)).unwrap();
+      alert("NGO deleted permanently.");
+      onClose();
+    } catch (err) {
+      setError(err || "Failed to delete NGO");
+      alert(" Failed to delete: " + err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Handle Resend Password Email (for APPROVED)
    */
   const handleResendPasswordEmail = async () => {
     if (!confirm("Resend password setup email to this NGO?")) {
@@ -143,12 +227,34 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
     }
 
     setLoading(true);
+    setError("");
     try {
-      // TODO: Integrate with backend
       await dispatch(resendPasswordEmail(request._id)).unwrap();
       alert("Password setup email sent successfully!");
-    } catch (error) {
-      alert("Failed to send email: " + error);
+    } catch (err) {
+      setError(err || "Failed to send email");
+      alert(" Failed to send email: " + err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Handle Resend Resubmission Email (for RESUBMIT_REQUIRED)
+   */
+  const handleResendResubmissionEmail = async () => {
+    if (!confirm("Resend resubmission email to this NGO?")) {
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    try {
+      await dispatch(resendResubmissionEmail(request._id)).unwrap();
+      alert("Resubmission email sent successfully!");
+    } catch (err) {
+      setError(err || "Failed to send resubmission email");
+      alert(" Failed to send resubmission email: " + err);
     } finally {
       setLoading(false);
     }
@@ -281,6 +387,63 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                 label="Submitted On"
                 value={formatDate(request.createdAt)}
               />
+
+              {/* Account Status (for APPROVED) */}
+              {ngo.status === "APPROVED" && (
+                <>
+                  <DetailField
+                    icon={request.isActive ? "✅" : "🔴"}
+                    label="Account Status"
+                    value={request.isActive ? "Active" : "Inactive"}
+                    className={
+                      request.isActive ? "text-green-600" : "text-red-600"
+                    }
+                  />
+                  <DetailField
+                    icon={ngo.passwordSetupTokenUsed ? "🔓" : "🔒"}
+                    label="Password Setup"
+                    value={
+                      ngo.passwordSetupTokenUsed
+                        ? "Completed"
+                        : "Pending (Email sent)"
+                    }
+                  />
+                </>
+              )}
+
+              {/* Resubmission Status (for RESUBMIT_REQUIRED, REJECTED, DEACTIVATED) */}
+              {(ngo.status === "RESUBMIT_REQUIRED" ||
+                ngo.status === "REJECTED" ||
+                ngo.status === "DEACTIVATED") && (
+                <DetailField
+                  icon="📨"
+                  label="Resubmission Link Status"
+                  value={
+                    ngo.resubmissionTokenUsed
+                      ? "Used"
+                      : ngo.resubmissionToken
+                        ? "Sent (Pending)"
+                        : "Not Sent"
+                  }
+                  className="col-span-2"
+                />
+              )}
+
+              {/* Reviewed Info (if reviewed) */}
+              {ngo.reviewedAt && (
+                <>
+                  <DetailField
+                    icon="👨‍💼"
+                    label="Reviewed By"
+                    value={ngo.reviewedBy?.fullName || "Admin"}
+                  />
+                  <DetailField
+                    icon="📅"
+                    label="Reviewed On"
+                    value={formatDate(ngo.reviewedAt)}
+                  />
+                </>
+              )}
             </div>
           </section>
 
@@ -443,6 +606,13 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
 
         {/* Action Section (Sticky Footer) */}
         <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 sticky bottom-0 rounded-b-xl">
+          {/* Show error if any */}
+          {error && (
+            <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              ⚠️ {error}
+            </div>
+          )}
+
           {!activeAction ? (
             /* ========================================
                ACTION BUTTONS (Initial State)
@@ -451,11 +621,15 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
               <h4 className="text-sm font-semibold text-slate-900 mb-3">
                 Take Action
               </h4>
-              <div className="flex items-center gap-3">
-                {/* Approve Button */}
-                {ngo.status === "PENDING" && (
+
+              {/* PENDING Status Actions */}
+              {ngo.status === "PENDING" && (
+                <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setActiveAction("approve")}
+                    onClick={() => {
+                      setActiveAction("approve");
+                      setError("");
+                    }}
                     className="flex-1 px-4 py-2.5 bg-white border-2 border-green-300 text-green-700 font-medium rounded-lg hover:bg-green-50 transition-colors flex items-center justify-center gap-2"
                   >
                     <svg
@@ -473,13 +647,11 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                     </svg>
                     Approve
                   </button>
-                )}
-
-                {/* Ask to Resubmit Button */}
-                {(ngo.status === "PENDING" ||
-                  ngo.status === "RESUBMIT_REQUIRED") && (
                   <button
-                    onClick={() => setActiveAction("resubmit")}
+                    onClick={() => {
+                      setActiveAction("resubmit");
+                      setError("");
+                    }}
                     className="flex-1 px-4 py-2.5 bg-white border-2 border-blue-300 text-blue-700 font-medium rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
                   >
                     <svg
@@ -495,14 +667,13 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                       />
                     </svg>
-                    Ask to Resubmit
+                    Ask Resubmit
                   </button>
-                )}
-
-                {/* Reject Button */}
-                {ngo.status === "PENDING" && (
                   <button
-                    onClick={() => setActiveAction("reject")}
+                    onClick={() => {
+                      setActiveAction("reject");
+                      setError("");
+                    }}
                     className="flex-1 px-4 py-2.5 bg-white border-2 border-red-300 text-red-700 font-medium rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
                   >
                     <svg
@@ -520,10 +691,12 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                     </svg>
                     Reject
                   </button>
-                )}
+                </div>
+              )}
 
-                {/* Resend Email (for approved) */}
-                {ngo.status === "APPROVED" && (
+              {/* APPROVED Status Actions */}
+              {ngo.status === "APPROVED" && (
+                <div className="flex items-center gap-3">
                   <button
                     onClick={handleResendPasswordEmail}
                     disabled={loading}
@@ -544,8 +717,176 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                     </svg>
                     Resend Password Email
                   </button>
-                )}
-              </div>
+                  <button
+                    onClick={() => {
+                      setActiveAction("deactivate");
+                      setError("");
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-white border-2 border-orange-300 text-orange-700 font-medium rounded-lg hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                      />
+                    </svg>
+                    Deactivate
+                  </button>
+                </div>
+              )}
+
+              {/* RESUBMIT_REQUIRED Status Actions */}
+              {ngo.status === "RESUBMIT_REQUIRED" && (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleResendResubmissionEmail}
+                    disabled={loading}
+                    className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Resend Resubmission Email
+                  </button>
+                </div>
+              )}
+
+              {/* REJECTED Status Actions */}
+              {ngo.status === "REJECTED" && (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      setActiveAction("resubmit");
+                      setError("");
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-white border-2 border-blue-300 text-blue-700 font-medium rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    Allow Resubmission
+                  </button>
+                  {ngo.resubmissionToken && (
+                    <button
+                      onClick={handleResendResubmissionEmail}
+                      disabled={loading}
+                      className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Resend Email
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* DEACTIVATED Status Actions */}
+              {ngo.status === "DEACTIVATED" && (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      setActiveAction("resubmit");
+                      setError("");
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-white border-2 border-blue-300 text-blue-700 font-medium rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    Allow Resubmission
+                  </button>
+                  {ngo.resubmissionToken && (
+                    <button
+                      onClick={handleResendResubmissionEmail}
+                      disabled={loading}
+                      className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Resend Email
+                    </button>
+                  )}
+                  <button
+                    onClick={handleDelete}
+                    disabled={loading}
+                    className="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                    Delete Permanently
+                  </button>
+                </div>
+              )}
             </div>
           ) : activeAction === "approve" ? (
             /* ========================================
@@ -568,6 +909,7 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                   onClick={() => {
                     setActiveAction(null);
                     setActionNote("");
+                    setError("");
                   }}
                   className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
                 >
@@ -626,6 +968,7 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                   onClick={() => {
                     setActiveAction(null);
                     setActionNote("");
+                    setError("");
                   }}
                   className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
                 >
@@ -640,7 +983,7 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                 </button>
               </div>
             </form>
-          ) : (
+          ) : activeAction === "reject" ? (
             /* ========================================
                REJECT FORM
                ======================================== */
@@ -662,6 +1005,7 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                   onClick={() => {
                     setActiveAction(null);
                     setActionNote("");
+                    setError("");
                   }}
                   className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
                 >
@@ -673,6 +1017,43 @@ export default function NgoRequestDetailsModal({ request, onClose }) {
                   className="flex-1 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                 >
                   {loading ? "Rejecting..." : "Reject Registration"}
+                </button>
+              </div>
+            </form>
+          ) : (
+            /* ========================================
+               DEACTIVATE FORM
+               ======================================== */
+            <form onSubmit={handleDeactivate} className="space-y-4">
+              <h4 className="text-sm font-semibold text-slate-900">
+                Deactivation Note
+              </h4>
+              <textarea
+                value={actionNote}
+                onChange={(e) => setActionNote(e.target.value)}
+                placeholder="Explain why this NGO account is being deactivated..."
+                rows={4}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                required
+              />
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveAction(null);
+                    setActionNote("");
+                    setError("");
+                  }}
+                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50"
+                >
+                  {loading ? "Deactivating..." : "Deactivate Account"}
                 </button>
               </div>
             </form>

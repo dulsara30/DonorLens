@@ -1,7 +1,10 @@
 // Business logic for refreshing access tokens using refresh token
 
 import User from "../../models/user/User.js";
-import { generateAccessToken, verifyRefreshToken } from "../../utils/jwt.util.js";
+import {
+  generateAccessToken,
+  verifyRefreshToken,
+} from "../../utils/jwt.util.js";
 
 /**
  * Refresh Token Usecase - Generates new access token from valid refresh token
@@ -10,7 +13,6 @@ import { generateAccessToken, verifyRefreshToken } from "../../utils/jwt.util.js
  */
 export default async function RefreshTokenUsecase(refreshToken) {
   try {
-    
     if (!refreshToken) {
       return {
         success: false,
@@ -19,7 +21,6 @@ export default async function RefreshTokenUsecase(refreshToken) {
       };
     }
 
-    
     const decoded = verifyRefreshToken(refreshToken);
 
     if (!decoded || !decoded.userId) {
@@ -30,7 +31,6 @@ export default async function RefreshTokenUsecase(refreshToken) {
       };
     }
 
-    
     const user = await User.findById(decoded.userId);
 
     if (!user) {
@@ -49,13 +49,11 @@ export default async function RefreshTokenUsecase(refreshToken) {
       };
     }
 
-    
     const accessToken = generateAccessToken({
       userId: user._id.toString(),
       role: user.role,
     });
 
-    
     return {
       success: true,
       status: 200,
@@ -65,7 +63,7 @@ export default async function RefreshTokenUsecase(refreshToken) {
     };
   } catch (error) {
     console.error("RefreshTokenUsecase error:", error);
-    
+
     return {
       success: false,
       status: 500,

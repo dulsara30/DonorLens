@@ -156,6 +156,7 @@ export default async function RegisterNgoUsecase(userData, files) {
       address: address.trim(),
       documents: uploadedDocuments,
       status: "PENDING",
+      reviewNotes: [],
       submissionHistory: [
         {
           submittedAt: new Date(),

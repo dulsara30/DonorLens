@@ -72,6 +72,7 @@ const userSchema = new mongoose.Schema(
       documents: {
         registrationCertificate: {
           url: String,
+          previewUrl: String,
           publicId: String,
           format: String,
           size: Number,
@@ -80,6 +81,7 @@ const userSchema = new mongoose.Schema(
         additionalDocuments: [
           {
             url: String,
+            previewUrl: String,
             publicId: String,
             format: String,
             size: Number,
@@ -116,6 +118,30 @@ const userSchema = new mongoose.Schema(
           documents: Object, // Store snapshot of submitted docs
         },
       ],
+      passwordSetupToken: {
+        type: String,
+        default: null,
+      },
+      passwordSetupTokenExpiry: {
+        type: Date,
+        default: null,
+      },
+      passwordSetupTokenUsed: {
+        type: Boolean,
+        default: false,
+      },
+      resubmissionToken: {
+        type: String,
+        default: null,
+      },
+      resubmissionTokenExpiry: {
+        type: Date,
+        default: null,
+      },
+      resubmissionTokenUsed: {
+        type: Boolean,
+        default: false,
+      },
       reviewedAt: Date,
       reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     },
@@ -148,15 +174,39 @@ const userSchema = new mongoose.Schema(
  * Only runs if password field is modified or document is new
  * Note: Using async/await, so no 'next' parameter needed - Mongoose handles promise resolution
  */
+/**
+ * Pre-save middleware to hash password before saving to database
+ * Only runs if password field is modified or document is new
+ * Note: Using async/await - don't call next(), just return or throw
+ */
 userSchema.pre("save", async function () {
+  // Skip if passwordHash wasn't modified
   if (!this.isModified("passwordHash")) {
     return;
   }
 
-  // Generate salt and hash password
-  // If error occurs, Mongoose will catch it automatically
-  const salt = await bcrypt.genSalt(10);
-  this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
+  // Skip if no password (NGO hasn't set one yet)
+  if (!this.passwordHash) {
+    return;
+  }
+
+  // Skip if already a bcrypt hash (starts with $2a$, $2b$, or $2y$)
+  if (
+    typeof this.passwordHash === "string" &&
+    this.passwordHash.match(/^\$2[aby]\$/)
+  ) {
+    console.log("⏭Password already hashed, skipping for:", this.email);
+    return;
+  }
+
+  // Only hash plain text passwords
+  if (typeof this.passwordHash === "string" && this.passwordHash.length > 0) {
+    console.log("Hashing password for user:", this.email);
+    const salt = await bcrypt.genSalt(10);
+    this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
+  }
+
+  // Mongoose automatically continues when the promise resolves
 });
 
 /**
