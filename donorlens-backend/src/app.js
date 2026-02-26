@@ -12,6 +12,7 @@ import executionUpdateRoutes from "./routes/campaigns/executions/executions.rout
 import ngoAdminRouter from "./routes/ngoAdmin/ngoRegister.route.js";
 import adminRoutes from "./routes/admin/systemAdmin.route.js";
 import paymentRoutes from "./routes/payment/payment.route.js";
+import paymentLogRoutes from "./routes/payment/paymentLogs.route.js";
 
 const createApp = () => {
   dotenv.config();
@@ -62,6 +63,7 @@ const createApp = () => {
 
   //Payment routes
   app.use("/api/payment", paymentRoutes);
+  app.use("/api/payment/logs", paymentLogRoutes);
 
   // 404 handler for undefined routes (must be before error handler)
   app.use((req, res, next) => {
