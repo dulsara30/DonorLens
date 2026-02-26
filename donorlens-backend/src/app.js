@@ -12,6 +12,7 @@ import executionUpdateRoutes from "./routes/campaigns/executions/executions.rout
 import ngoAdminRouter from "./routes/ngoAdmin/ngoRegister.route.js";
 import adminRoutes from "./routes/admin/systemAdmin.route.js";
 import paymentRoutes from "./routes/payment/payment.route.js";
+import campaignCommentRoutes from "./routes/campaigns/campaignComment.routes.js";
 import paymentLogRoutes from "./routes/payment/paymentLogs.route.js";
 
 const createApp = () => {
@@ -54,6 +55,8 @@ const createApp = () => {
 
   app.use("/api/campaigns/executions", executionUpdateRoutes);
   app.use("/api/campaigns", campaignRoutes);
+  app.use("/api/campaign", campaignCommentRoutes);
+
   //NGO Admin routes (NGO registration)
   app.use("/api/ngo/auth", ngoAdminRouter);
   app.use("/api/ngo/campaigns", campaignRoutes);
