@@ -18,10 +18,6 @@ export default async function VerifyIdentityController(req, res, next) {
         message: result.message,
         data: result.data,
       });
-    } else {
-      return ApiResponse.error(res, {
-        message: result.message,
-      });
     }
   } catch (error) {
     console.error(" Error in VerifyIdentityController:", error);

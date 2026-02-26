@@ -91,3 +91,34 @@ export const verifyPasswordSetupToken = (token) => {
 export const getTokenExpiryDate = () => {
   return new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
 };
+
+export const generateResubmissionToken = (ngoData) => {
+  const payload = {
+    ngoId: ngoData.ngoId,
+    email: ngoData.email,
+    registrationNumber: ngoData.registrationNumber,
+    type: "RESUBMISSION_REQUIRED",
+    nonce: crypto.randomBytes(16).toString("hex"),
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: "24h",
+  });
+
+  return token;
+};
+
+export const verifyResubmissionToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+
+    if (decoded.type !== "RESUBMISSION_REQUIRED") {
+      return null;
+    }
+
+    return decoded;
+  } catch (error) {
+    console.error("Resubmission token verification failed:", error.message);
+    return null;
+  }
+};

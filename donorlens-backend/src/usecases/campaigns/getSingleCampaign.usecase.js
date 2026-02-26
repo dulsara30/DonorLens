@@ -1,6 +1,10 @@
 import Campaign from "../../models/campaigns/Campaign.js";
 import User from "../../models/user/User.js";
-import { NotFoundError, ForbiddenError } from "../../utils/errors.js";
+import {
+  NotFoundError,
+  ForbiddenError,
+  ValidationError,
+} from "../../utils/errors.js";
 
 export const getSingleCampaignUsecase = async ({ userId, campaignId }) => {
   // Check user exists
@@ -20,6 +24,10 @@ export const getSingleCampaignUsecase = async ({ userId, campaignId }) => {
 
   if (!campaign) {
     throw new NotFoundError("Campaign");
+  }
+
+  if (campaign.status === "CANCELLED") {
+    throw new ValidationError("Cannot view details of a cancelled campaign");
   }
 
   // Ownership check

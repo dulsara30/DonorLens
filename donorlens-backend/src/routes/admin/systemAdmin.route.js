@@ -8,6 +8,8 @@ import ApproveNgoRequestController from "../../controllers/admin/ApproveNgoReque
 import PasswordSetupEmailSendController from "../../controllers/admin/PasswordSetupEmailSendController.js";
 import RejectNgoRequestController from "../../controllers/admin/RejectNgoRequestController.js";
 import DeleteNgoRegistrationRequestController from "../../controllers/admin/DeleteNgoRegistrationRequestController.js";
+import ResubmissionRequiredController from "../../controllers/admin/ResubmissionRequiredController.js";
+import DeactivateNgoRequestController from "../../controllers/admin/DeactivateNgoRequestController.js";
 
 const adminRoutes = Router();
 
@@ -33,6 +35,20 @@ adminRoutes.put(
 );
 
 adminRoutes.put(
+  "/ngo-request/:ngoId/deactivate",
+  authenticateToken,
+  authorizeRoles("ADMIN"),
+  DeactivateNgoRequestController,
+);
+
+adminRoutes.put(
+  "/ngo-request/:ngoId/resubmission-required",
+  authenticateToken,
+  authorizeRoles("ADMIN"),
+  ResubmissionRequiredController,
+);
+
+adminRoutes.put(
   "/pw-Request/:ngoId",
   authenticateToken,
   authorizeRoles("ADMIN"),
@@ -40,7 +56,7 @@ adminRoutes.put(
 );
 
 adminRoutes.delete(
-  "/ngo-request/:requestId/delete",
+  "/ngo-request/:ngoId/delete",
   authenticateToken,
   authorizeRoles("ADMIN"),
   DeleteNgoRegistrationRequestController,

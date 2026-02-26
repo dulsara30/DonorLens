@@ -31,6 +31,11 @@ export default async function SendEmailUsecase({ type, data }) {
         result = await emailService.sendNgoPasswordSetup(data);
         break;
 
+      case "NGO_REGISTRATION_RESUBMISSION_REQUIRED":
+        result =
+          await emailService.sendNgoRegistrationResubmissionRequired(data);
+        break;
+
       case "NGO_PASSWORD_SETUP_SUCCESS":
         result = await emailService.sendNgoPasswordSetupSuccess(data);
         break;

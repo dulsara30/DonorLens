@@ -8,16 +8,12 @@ export default async function DeleteNgoRegistrationRequestController(
 ) {
   try {
     console.log("Deleting NGO registration request...");
-    const { requestId } = req.params;
+    const { ngoId } = req.params;
 
-    const result = await DeleteNgoRegistrationRequestUsecase(requestId);
+    const result = await DeleteNgoRegistrationRequestUsecase(ngoId);
 
     if (result.success) {
       return ApiResponse.success(res, {
-        message: result.message,
-      });
-    } else {
-      return ApiResponse.error(res, {
         message: result.message,
       });
     }

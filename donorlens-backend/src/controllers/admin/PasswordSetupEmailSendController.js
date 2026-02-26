@@ -12,11 +12,6 @@ export default async function PasswordSetupEmailSendController(req, res, next) {
       return ApiResponse.success(res, {
         message: result.message,
       });
-    } else {
-      return ApiResponse.error(res, {
-        message: result.message,
-        statusCode: 400,
-      });
     }
   } catch (error) {
     console.error("Error in PasswordSetupEmailSendController:", error);

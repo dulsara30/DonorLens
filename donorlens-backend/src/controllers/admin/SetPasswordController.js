@@ -14,11 +14,7 @@ export default async function SetPasswordController(req, res, next) {
       confirmPassword,
     );
 
-    if (!result.success) {
-      return ApiResponse.error(res, {
-        message: result.message,
-      });
-    } else {
+    if (result.success) {
       return ApiResponse.success(res, {
         message: "Password has been set successfully",
       });

@@ -2,20 +2,20 @@ import User from "../../models/user/User.js";
 import { ValidationError } from "../../utils/errors.js";
 import SendEmailUsecase from "../email/SendEmailUsecase.js";
 
-export default async function DeleteNgoRegistrationRequestUsecase(requestId) {
+export default async function DeleteNgoRegistrationRequestUsecase(ngoId) {
   try {
-    if (!requestId) {
-      throw new ValidationError("Request ID is required");
+    if (!ngoId) {
+      throw new ValidationError("NGO ID is required");
     }
 
-    const ngoUser = await User.findById(requestId.toString());
+    const ngoUser = await User.findById(ngoId.toString());
 
     if (!ngoUser) {
       throw new ValidationError("NGO registration request not found");
     }
 
     if (ngoUser.role !== "NGO_ADMIN") {
-      throw new ValidationError("User is not an NGO registration request");
+      throw new ValidationError("User is not an NGO admin");
     }
 
     const deletableStatuses = ["DEACTIVATED", "REJECTED"];

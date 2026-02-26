@@ -17,11 +17,6 @@ export default async function PasswordSetupTokenVerificationController(
         message: result.message,
         data: result.data,
       });
-    } else {
-      return ApiResponse.error(res, {
-        message: result.message,
-        statusCode: 400,
-      });
     }
   } catch (error) {
     console.error("Error in PasswordSetupTokenVerificationController:", error);

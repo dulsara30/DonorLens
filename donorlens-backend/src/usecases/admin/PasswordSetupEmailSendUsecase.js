@@ -15,6 +15,8 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
 
     const ngo = await User.findById(ngoId);
 
+    console.log("NGO status is", ngo?.isActive);
+
     if (!ngo) {
       throw new NotFoundError("NGO");
     }
@@ -25,6 +27,10 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
 
     if (ngo.ngoDetails.status !== "APPROVED") {
       throw new ValidationError("NGO is not in approved status");
+    }
+
+    if (ngo.isActive) {
+      throw new ValidationError("NGO account is already active");
     }
 
     if (ngo.ngoDetails.passwordSetupToken) {
