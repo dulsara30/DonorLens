@@ -7,14 +7,14 @@ import { updateCampaignController } from "../../controllers/campaigns/updateCamp
 import { deleteCampaignController } from "../../controllers/campaigns/deleteCampaign.controller.js";
 
 import { authenticateToken } from "../../middleware/auth.middleware.js";
-import upload from "../../middleware/upload.middleware.js";
+import upload, { uploadImageOnly } from "../../middleware/upload.middleware.js";
 
 const router = express.Router();
 
 router.post(
   "/add-campaign",
   authenticateToken,
-  upload.single("coverImage"),
+  uploadImageOnly.single("coverImage"),
   createCampaign,
 );
 
@@ -34,6 +34,7 @@ router.get(
 router.put(
   "/update-campaign/:campaignId", 
   authenticateToken, 
+  uploadImageOnly.single("coverImage"),
   updateCampaignController
 );
 

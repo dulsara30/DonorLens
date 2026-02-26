@@ -122,12 +122,41 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+const imageOnlyFilter = (req, file, cb) => {
+  try {
+    // Allow only image mime types
+    const allowedImages = ["image/jpeg", "image/png", "image/webp"];
+
+    if (!allowedImages.includes(file.mimetype)) {
+      return cb(
+        new FileUploadError(
+          `Only image files are allowed for cover image. Allowed: jpg, png, webp`,
+        ),
+        false,
+      );
+    }
+
+    cb(null, true);
+  } catch (error) {
+    cb(error, false);
+  }
+};
+
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
     fileSize: FILE_SIZE_LIMITS.default,
     files: 10,
+  },
+});
+
+export const uploadImageOnly = multer({
+  storage,
+  fileFilter: imageOnlyFilter,
+  limits: {
+    fileSize: FILE_SIZE_LIMITS.default,
+    files: 1,
   },
 });
 
