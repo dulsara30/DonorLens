@@ -14,9 +14,10 @@ class EmailService {
    * @param {string} options.subject - Email subject
    * @param {string} options.template - Template name (without .hbs extension)
    * @param {Object} options.context - Dynamic data to pass to the template
+   * @param {boolean|string} options.layout - Layout to use (false for no layout, or layout name)
    * @returns {Promise<Object>} - Email sending result
    */
-  async sendEmail({ to, subject, template, context }) {
+  async sendEmail({ to, subject, template, context, layout = "main" }) {
     try {
       const mailOptions = {
         from:
@@ -29,6 +30,7 @@ class EmailService {
           logoUrl: process.env.EMAIL_LOGO_URL,
           currentYear: new Date().getFullYear(),
           frontendUrl: process.env.CLIENT_URL || "http://localhost:5173",
+          layout, // Pass layout option to handlebars
         },
       };
 
@@ -181,12 +183,30 @@ class EmailService {
     return this.sendEmail({
       to: ngoData.email,
       subject: "🔐 Password Setup Required - DonorLens",
-      template: "ngo-password-setup", // ✅ FIXED: Was "password-setup-success"
+      template: "ngo-password-setup",
+      layout: false, // This template has its own complete HTML structure
+      context: {
+        ngoName: ngoData.ngoName,
+        email: ngoData.email,
+        registrationNumber: ngoData.registrationNumber,
+        setupUrl: ngoData.setupUrl,
+        expiryHours: 24,
+        dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
+      },
+    });
+  }
+
+  async sendNgoRegistrationResubmissionRequired(ngoData) {
+    return this.sendEmail({
+      to: ngoData.email,
+      subject: "⚠️ Resubmission Required - DonorLens",
+      template: "ngo-registration-resubmit",
       context: {
         ngoName: ngoData.ngoName,
         email: ngoData.email, // ✅ ADDED: Required by template
         registrationNumber: ngoData.registrationNumber, // ✅ ADDED: Required by template
-        setupUrl: ngoData.setupUrl,
+        resubmissionUrl: ngoData.resubmissionUrl,
+        reason: ngoData.reason,
         expiryHours: 24, // ✅ ADDED: Required by template
         dashboardUrl: `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
       },
@@ -198,6 +218,7 @@ class EmailService {
       to: ngoData.email,
       subject: "✅ Password Setup Complete - DonorLens",
       template: "password-setup-success",
+      layout: false, // This template has its own complete HTML structure
       context: {
         ngoName: ngoData.ngoName,
         email: ngoData.email,

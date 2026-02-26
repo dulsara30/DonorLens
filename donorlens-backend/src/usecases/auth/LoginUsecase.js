@@ -1,7 +1,10 @@
 // Business logic for user login - validates credentials and generates tokens
 
 import User from "../../models/user/User.js";
-import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.util.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../../utils/jwt.util.js";
 
 /**
  * Login Usecase - Handles the complete login business logic
@@ -11,7 +14,6 @@ import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.util.
  */
 export default async function LoginUsecase(email, password) {
   try {
-  
     if (!email || !password) {
       return {
         success: false,
@@ -20,7 +22,6 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return {
@@ -30,13 +31,11 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-
-    const user = await User.findOne({ email: email.toLowerCase() })
-      .select("+passwordHash");
-
+    const user = await User.findOne({ email: email.toLowerCase() }).select(
+      "+passwordHash",
+    );
 
     if (!user) {
-
       return {
         success: false,
         status: 401,
@@ -44,7 +43,6 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-    
     if (!user.isActive) {
       return {
         success: false,
@@ -53,11 +51,9 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-  
     const isPasswordValid = await user.comparePassword(password);
 
     if (!isPasswordValid) {
- 
       return {
         success: false,
         status: 401,
@@ -65,11 +61,9 @@ export default async function LoginUsecase(email, password) {
       };
     }
 
-    
     user.lastLoginAt = new Date();
     await user.save();
 
-    
     const accessToken = generateAccessToken({
       userId: user._id.toString(),
       role: user.role,
@@ -79,7 +73,6 @@ export default async function LoginUsecase(email, password) {
       userId: user._id.toString(),
     });
 
-    
     return {
       success: true,
       status: 200,
@@ -91,8 +84,7 @@ export default async function LoginUsecase(email, password) {
     };
   } catch (error) {
     console.error("LoginUsecase error:", error);
-    
-  
+
     return {
       success: false,
       status: 500,

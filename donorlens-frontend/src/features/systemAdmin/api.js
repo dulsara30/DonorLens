@@ -79,6 +79,7 @@ export const fetchRecentActivityAPI = async (limit = 10) => {
 export const fetchAllNgoRequestsAPI = async () => {
   try {
     const response = await api.get("/admin/fetch-all-register-requests");
+    console.log("Fetched NGO requests:", response.data.data);
     return response.data.data;
   } catch (error) {
     console.error("Failed to fetch NGO requests:", error);
@@ -97,7 +98,7 @@ export const approveNgoRequestAPI = async (requestId, note = "") => {
     const response = await api.put(`/admin/ngo-request/${requestId}/approve`, {
       note,
     });
-    return response.data.data;
+    return response;
   } catch (error) {
     console.error("Failed to approve NGO request:", error);
     throw error;
@@ -107,18 +108,16 @@ export const approveNgoRequestAPI = async (requestId, note = "") => {
 /**
  * Request resubmission for an NGO registration
  * @param {string} requestId - NGO request ID
- * @param {string} instructions - Resubmission instructions
- * @returns {Promise} Updated request object
+ * @param {string} note - Resubmission reason/instructions
+ * @returns {Promise} Success message
  */
-export const requestNgoResubmitAPI = async (requestId, instructions) => {
+export const requestNgoResubmitAPI = async (requestId, note) => {
   try {
-    const response = await api.post(
-      `/admin/ngo-requests/${requestId}/request-resubmit`,
-      {
-        instructions,
-      },
+    const response = await api.put(
+      `/admin/ngo-request/${requestId}/resubmission-required`,
+      { note },
     );
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error("Failed to request resubmission:", error);
     throw error;
@@ -128,15 +127,15 @@ export const requestNgoResubmitAPI = async (requestId, instructions) => {
 /**
  * Reject an NGO registration request
  * @param {string} requestId - NGO request ID
- * @param {string} reason - Rejection reason
- * @returns {Promise} Updated request object
+ * @param {string} note - Rejection reason
+ * @returns {Promise} Success message
  */
-export const rejectNgoRequestAPI = async (requestId, reason) => {
+export const rejectNgoRequestAPI = async (requestId, note) => {
   try {
     const response = await api.put(`/admin/ngo-request/${requestId}/reject`, {
-      reason,
+      note,
     });
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error("Failed to reject NGO request:", error);
     throw error;
@@ -159,16 +158,52 @@ export const resendPasswordEmailAPI = async (requestId) => {
 };
 
 /**
- * Deactivate an NGO account
- * @param {string} ngoId - NGO user ID
- * @returns {Promise} Updated NGO object
+ * Resend resubmission email to NGO
+ * @param {string} requestId - NGO request ID
+ * @returns {Promise} Success message
  */
-export const deactivateNgoAPI = async (ngoId) => {
+export const resendResubmissionEmailAPI = async (requestId) => {
   try {
-    const response = await api.patch(`/admin/ngos/${ngoId}/deactivate`);
-    return response.data.data;
+    const response = await api.put(
+      `/admin/ngo-request/${requestId}/resubmission-required`,
+      { note: "" }, // Empty note means just resend email
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to resend resubmission email:", error);
+    throw error;
+  }
+};
+
+/**
+ * Deactivate an approved NGO account
+ * @param {string} ngoId - NGO user ID
+ * @param {string} note - Deactivation reason
+ * @returns {Promise} Success message
+ */
+export const deactivateNgoAPI = async (ngoId, note) => {
+  try {
+    const response = await api.put(`/admin/ngo-request/${ngoId}/deactivate`, {
+      note,
+    });
+    return response.data;
   } catch (error) {
     console.error("Failed to deactivate NGO:", error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a deactivated NGO permanently
+ * @param {string} ngoId - NGO user ID
+ * @returns {Promise} Success message
+ */
+export const deleteNgoAPI = async (ngoId) => {
+  try {
+    const response = await api.delete(`/admin/ngo-request/${ngoId}/delete`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete NGO:", error);
     throw error;
   }
 };

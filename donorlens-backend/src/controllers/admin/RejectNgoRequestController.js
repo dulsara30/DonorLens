@@ -5,10 +5,10 @@ export default async function RejectNgoRequestController(req, res, next) {
   try {
     console.log("Rejecting NGO Request with details", req.body);
     const { ngoId } = req.params;
-    const { reason } = req.body;
+    const { note } = req.body;
     const adminId = req.user.userId;
 
-    const ngoData = await RejectNgoRequestUsecase(ngoId, reason, adminId);
+    const ngoData = await RejectNgoRequestUsecase(ngoId, note, adminId);
 
     if (ngoData.success) {
       return ApiResponse.success(res, {

@@ -1,7 +1,8 @@
 // Step 3: Document Upload
 // Collects required registration certificate and up to 3 optional documents
+// Supports RESUBMISSION mode - shows existing documents and allows updates
 
-import DocumentUploader from './DocumentUploader';
+import DocumentUploader from "./DocumentUploader";
 
 const StepThreeDocuments = ({
   registrationCertificate,
@@ -12,7 +13,9 @@ const StepThreeDocuments = ({
   removeAdditionalDocument,
   errors,
   onNext,
-  onPrevious
+  onPrevious,
+  isResubmission = false,
+  existingDocuments = null,
 }) => {
   const handleContinue = () => {
     onNext();
@@ -22,11 +25,47 @@ const StepThreeDocuments = ({
     <div className="max-w-3xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-3">Upload Documents</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-3">
+          {isResubmission ? "Update Documents" : "Upload Documents"}
+        </h1>
         <p className="text-lg text-slate-600">
-          Provide official documents to verify your NGO registration
+          {isResubmission
+            ? "Review and update your documents if needed"
+            : "Provide official documents to verify your NGO registration"}
         </p>
       </div>
+
+      {/* Resubmission Info Banner */}
+      {isResubmission && existingDocuments && (
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <svg
+              className="w-5 h-5 text-blue-600 shrink-0 mt-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-blue-900 mb-1">
+                📄 Previously Uploaded Documents
+              </h3>
+              <p className="text-sm text-blue-800">
+                You previously submitted documents. You can keep them or upload
+                new ones.
+                {!registrationCertificate &&
+                  " Please upload a new registration certificate."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Card */}
       <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm mb-6">
@@ -62,7 +101,8 @@ const StepThreeDocuments = ({
                 Registration Certificate
               </h2>
               <p className="text-sm text-slate-600">
-                Upload your official NGO registration certificate or incorporation document
+                Upload your official NGO registration certificate or
+                incorporation document
               </p>
             </div>
           </div>
@@ -88,13 +128,19 @@ const StepThreeDocuments = ({
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
                 <path d="M12 16V12" stroke="currentColor" strokeWidth="2" />
                 <path d="M12 8H12.01" stroke="currentColor" strokeWidth="2" />
               </svg>
               <span>
-                This document will be verified by our team. Ensure all text is clearly
-                readable and the document is not expired.
+                This document will be verified by our team. Ensure all text is
+                clearly readable and the document is not expired.
               </span>
             </p>
           </div>
@@ -129,12 +175,14 @@ const StepThreeDocuments = ({
             </div>
             <div className="flex-1">
               <h2 className="text-lg font-semibold text-slate-900 mb-1">
-                Additional Documents{' '}
-                <span className="text-sm font-normal text-slate-500">(Optional)</span>
+                Additional Documents{" "}
+                <span className="text-sm font-normal text-slate-500">
+                  (Optional)
+                </span>
               </h2>
               <p className="text-sm text-slate-600">
-                Upload up to 3 additional documents such as tax exemption certificates,
-                annual reports, or other credentials
+                Upload up to 3 additional documents such as tax exemption
+                certificates, annual reports, or other credentials
               </p>
             </div>
           </div>
@@ -176,7 +224,13 @@ const StepThreeDocuments = ({
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <circle cx="12" cy="12" r="10" stroke="#64748b" strokeWidth="2" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="#64748b"
+                    strokeWidth="2"
+                  />
                   <path d="M12 16V12" stroke="#64748b" strokeWidth="2" />
                   <path d="M12 8H12.01" stroke="#64748b" strokeWidth="2" />
                 </svg>

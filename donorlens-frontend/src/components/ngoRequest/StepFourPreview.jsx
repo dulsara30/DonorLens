@@ -1,5 +1,6 @@
 // Step 4: Preview & Confirm
 // Shows all collected information for review before submission
+// Supports both NEW registration and RESUBMISSION modes
 
 const StepFourPreview = ({
   basicInfo,
@@ -7,7 +8,8 @@ const StepFourPreview = ({
   additionalDocs,
   isSubmitting,
   onSubmit,
-  onEditStep
+  onEditStep,
+  isResubmission = false,
 }) => {
   const handleSubmit = async () => {
     await onSubmit();
@@ -18,9 +20,13 @@ const StepFourPreview = ({
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-3">Review Your Request</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-3">
+          {isResubmission ? "Review Your Updates" : "Review Your Request"}
+        </h1>
         <p className="text-lg text-slate-600">
-          Please verify all information before submitting your onboarding request
+          {isResubmission
+            ? "Please verify all updated information before resubmitting"
+            : "Please verify all information before submitting your onboarding request"}
         </p>
       </div>
 
@@ -45,7 +51,13 @@ const StepFourPreview = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
-                  <circle cx="12" cy="7" r="4" stroke="#14b8a6" strokeWidth="2" />
+                  <circle
+                    cx="12"
+                    cy="7"
+                    r="4"
+                    stroke="#14b8a6"
+                    strokeWidth="2"
+                  />
                 </svg>
               </div>
               Basic Information
@@ -82,12 +94,16 @@ const StepFourPreview = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p className="text-sm font-medium text-slate-500 mb-1">NGO Name</p>
+              <p className="text-sm font-medium text-slate-500 mb-1">
+                NGO Name
+              </p>
               <p className="text-slate-900">{basicInfo.ngoName}</p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Registration Number</p>
+              <p className="text-sm font-medium text-slate-500 mb-1">
+                Registration Number
+              </p>
               <p className="text-slate-900">{basicInfo.registrationNumber}</p>
             </div>
 
@@ -97,30 +113,42 @@ const StepFourPreview = ({
             </div>
 
             <div className="md:col-span-2">
-              <p className="text-sm font-medium text-slate-500 mb-1">Description</p>
-              <p className="text-slate-900 leading-relaxed">{basicInfo.description}</p>
+              <p className="text-sm font-medium text-slate-500 mb-1">
+                Description
+              </p>
+              <p className="text-slate-900 leading-relaxed">
+                {basicInfo.description}
+              </p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Official Email</p>
+              <p className="text-sm font-medium text-slate-500 mb-1">
+                Official Email
+              </p>
               <p className="text-slate-900">{basicInfo.officialEmail}</p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Primary Phone</p>
+              <p className="text-sm font-medium text-slate-500 mb-1">
+                Primary Phone
+              </p>
               <p className="text-slate-900">{basicInfo.primaryPhone}</p>
             </div>
 
             {basicInfo.secondaryPhone && (
               <div>
-                <p className="text-sm font-medium text-slate-500 mb-1">Secondary Phone</p>
+                <p className="text-sm font-medium text-slate-500 mb-1">
+                  Secondary Phone
+                </p>
                 <p className="text-slate-900">{basicInfo.secondaryPhone}</p>
               </div>
             )}
 
             {basicInfo.website && (
               <div>
-                <p className="text-sm font-medium text-slate-500 mb-1">Website</p>
+                <p className="text-sm font-medium text-slate-500 mb-1">
+                  Website
+                </p>
                 <a
                   href={basicInfo.website}
                   target="_blank"
@@ -222,7 +250,9 @@ const StepFourPreview = ({
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-900">Registration Certificate</p>
+                <p className="text-sm font-medium text-slate-900">
+                  Registration Certificate
+                </p>
                 <p className="text-xs text-slate-500 truncate">
                   {registrationCertificate?.name}
                 </p>
@@ -286,7 +316,9 @@ const StepFourPreview = ({
                         </svg>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-slate-900 truncate">{doc.name}</p>
+                        <p className="text-sm text-slate-900 truncate">
+                          {doc.name}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -296,7 +328,9 @@ const StepFourPreview = ({
 
             {additionalDocs.length === 0 && (
               <div className="pt-3 border-t border-slate-200">
-                <p className="text-sm text-slate-500 italic">No additional documents uploaded</p>
+                <p className="text-sm text-slate-500 italic">
+                  No additional documents uploaded
+                </p>
               </div>
             )}
           </div>
@@ -313,7 +347,13 @@ const StepFourPreview = ({
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <circle cx="12" cy="12" r="10" stroke="#f59e0b" strokeWidth="2" />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="#f59e0b"
+                  strokeWidth="2"
+                />
                 <path d="M12 8V12" stroke="#f59e0b" strokeWidth="2" />
                 <path d="M12 16H12.01" stroke="#f59e0b" strokeWidth="2" />
               </svg>
@@ -326,19 +366,22 @@ const StepFourPreview = ({
                 <li className="flex items-start gap-2">
                   <span className="font-semibold">•</span>
                   <span>
-                    Our verification team will review your request within 3-5 business days
+                    Our verification team will review your request within 3-5
+                    business days
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="font-semibold">•</span>
                   <span>
-                    You'll receive an email notification once your NGO is approved
+                    You'll receive an email notification once your NGO is
+                    approved
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="font-semibold">•</span>
                   <span>
-                    Providing false information may result in permanent rejection
+                    Providing false information may result in permanent
+                    rejection
                   </span>
                 </li>
               </ul>
@@ -400,10 +443,12 @@ const StepFourPreview = ({
                   opacity="0.75"
                 />
               </svg>
-              Submitting...
+              {isResubmission ? "Resubmitting..." : "Submitting..."}
             </>
+          ) : isResubmission ? (
+            "Resubmit Application"
           ) : (
-            'Submit Request'
+            "Submit Request"
           )}
         </button>
       </div>

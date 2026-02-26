@@ -14,7 +14,7 @@ export default async function RejectNgoRequestUsecase(ngoId, note, adminId) {
     if (!ngoId?.trim() || !mongoose.Types.ObjectId.isValid(ngoId))
       error.ngoId = "NGO ID is required";
     if (!adminId?.trim()) error.adminId = "Admin ID is required";
-    if (!note?.trim()) error.note = "Approval note is required";
+    if (!note?.trim()) error.note = "Reject note is required";
 
     if (Object.keys(error).length > 0) {
       throw new ValidationError("Missing Required Fields", error);
@@ -28,12 +28,15 @@ export default async function RejectNgoRequestUsecase(ngoId, note, adminId) {
 
     const nonApprovableStates = ["REJECTED", "DEACTIVATED"];
 
-    if (
-      nonApprovableStates.includes(ngoUser.ngoDetails.status) ||
-      ngoUser.isActive
-    ) {
+    if (nonApprovableStates.includes(ngoUser.ngoDetails.status)) {
       throw new AnyDuplicationError(
         "NGO registration request is already rejected",
+      );
+    }
+
+    if (ngoUser.isActive) {
+      throw new AnyDuplicationError(
+        "NGO account is already active. Cannot reject an active account.",
       );
     }
 
@@ -44,6 +47,7 @@ export default async function RejectNgoRequestUsecase(ngoId, note, adminId) {
     ngoUser.ngoDetails.status = "REJECTED";
     ngoUser.ngoDetails.reviewedAt = new Date();
     ngoUser.ngoDetails.reviewedBy = adminId;
+    ngoUser.isActive = false;
 
     ngoUser.ngoDetails.reviewNotes.push({
       note: note || "Registration rejected",

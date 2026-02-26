@@ -80,3 +80,29 @@ export const submitNgoRequest = async (formData) => {
     throw error.response?.data || error;
   }
 };
+
+export const verifyResubmissionTokenAPI = async (token) => {
+  try {
+    const response = await api.get(
+      `/auth/verify-resubmission-token?token=${token}`,
+    );
+    return response;
+  } catch (error) {
+    //console.error("Failed to verify resubmission token:", error);
+    throw error.response?.data || error;
+  }
+};
+
+export const resubmitNgoRegistrationAPI = async (formData) => {
+  try {
+    const response = await api.put("/ngo/auth/resubmit-ngo", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

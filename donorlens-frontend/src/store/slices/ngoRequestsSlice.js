@@ -7,6 +7,16 @@ import {
   createSelector,
 } from "@reduxjs/toolkit";
 import api from "../../lib/axios";
+import {
+  approveNgoRequestAPI,
+  rejectNgoRequestAPI,
+  requestNgoResubmitAPI,
+  resendPasswordEmailAPI,
+  resendResubmissionEmailAPI,
+  deactivateNgoAPI,
+  deleteNgoAPI,
+  fetchAllNgoRequestsAPI,
+} from "../../features/systemAdmin/api";
 
 /**
  * INITIAL STATE
@@ -51,11 +61,11 @@ export const fetchNgoRequests = createAsyncThunk(
       // return response.data.data; // Return the requests array
 
       // For now, return empty array (you'll replace this)
-      console.log("🔄 Fetching NGO requests from backend...");
-      const response = await api.get("/admin/fetch-all-register-requests");
-      return response.data.data;
+      console.log("Fetching NGO requests from backend...");
+
+      return await fetchAllNgoRequestsAPI();
     } catch (error) {
-      console.error("❌ Failed to fetch NGO requests:", error);
+      console.error("Failed to fetch NGO requests:", error);
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch requests",
       );
@@ -71,15 +81,14 @@ export const approveRequest = createAsyncThunk(
   "ngoRequests/approve",
   async ({ requestId, note }, { rejectWithValue }) => {
     try {
-      const response = await api.put(
-        `/admin/ngo-request/${requestId}/approve`,
-        { note },
-      );
-
-      console.log("Approving request:", requestId, "with note:", note);
-      // Return the updated request
-      return response.data.message;
+      const response = await approveNgoRequestAPI(requestId, note);
+      console.log(" NGO approved successfully");
+      return {
+        requestId,
+        message: response.message || "NGO approved successfully",
+      };
     } catch (error) {
+      console.error("Failed to approve request:", error);
       return rejectWithValue(
         error.response?.data?.message || "Failed to approve request",
       );
@@ -89,24 +98,20 @@ export const approveRequest = createAsyncThunk(
 
 /**
  * Request resubmission for an NGO registration
- * Usage: dispatch(requestResubmit({ requestId, instructions }))
+ * Usage: dispatch(requestResubmit({ requestId, note }))
  */
 export const requestResubmit = createAsyncThunk(
   "ngoRequests/resubmit",
-  async ({ requestId, instructions }, { rejectWithValue }) => {
+  async ({ requestId, note }, { rejectWithValue }) => {
     try {
-      // TODO: Call your backend resubmit endpoint
-      // const response = await api.post(`/admin/request-resubmit/${requestId}`, { instructions });
-      // return response.data.data;
-
-      console.log(
-        "🔄 Requesting resubmit for:",
+      const response = await requestNgoResubmitAPI(requestId, note);
+      console.log("🔄 Resubmission requested successfully");
+      return {
         requestId,
-        "with instructions:",
-        instructions,
-      );
-      return { requestId, status: "RESUBMIT_REQUIRED", instructions };
+        message: response.message || "Resubmission email sent successfully",
+      };
     } catch (error) {
+      console.error("❌ Failed to request resubmission:", error);
       return rejectWithValue(
         error.response?.data?.message || "Failed to request resubmission",
       );
@@ -116,19 +121,20 @@ export const requestResubmit = createAsyncThunk(
 
 /**
  * Reject an NGO registration request
- * Usage: dispatch(rejectRequest({ requestId, reason }))
+ * Usage: dispatch(rejectRequest({ requestId, note }))
  */
 export const rejectRequest = createAsyncThunk(
   "ngoRequests/reject",
-  async ({ requestId, reason }, { rejectWithValue }) => {
+  async ({ requestId, note }, { rejectWithValue }) => {
     try {
-      // TODO: Call your backend rejection endpoint
-      // const response = await api.post(`/admin/reject-ngo/${requestId}`, { reason });
-      // return response.data.data;
-
-      console.log("❌ Rejecting request:", requestId, "with reason:", reason);
-      return { requestId, status: "REJECTED", reason };
+      const response = await rejectNgoRequestAPI(requestId, note);
+      console.log("❌ NGO request rejected");
+      return {
+        requestId,
+        message: response.message || "NGO request rejected successfully",
+      };
     } catch (error) {
+      console.error("❌ Failed to reject request:", error);
       return rejectWithValue(
         error.response?.data?.message || "Failed to reject request",
       );
@@ -145,21 +151,89 @@ export const resendPasswordEmail = createAsyncThunk(
   async (requestId, { rejectWithValue }) => {
     try {
       console.log("📧 Resending password setup email for NGO ID:", requestId);
-
-      // ✅ Call backend endpoint that already exists
-      const response = await api.put(`/admin/pw-Request/${requestId}`);
-
+      const response = await resendPasswordEmailAPI(requestId);
       console.log("✅ Password setup email sent successfully");
       return {
         requestId,
-        message:
-          response.data.message || "Password setup email sent successfully",
+        message: response.message || "Password setup email sent successfully",
       };
     } catch (error) {
       console.error("❌ Failed to resend password email:", error);
       return rejectWithValue(
         error.response?.data?.message ||
           "Failed to resend password setup email",
+      );
+    }
+  },
+);
+
+/**
+ * Resend resubmission email
+ * Usage: dispatch(resendResubmissionEmail(requestId))
+ */
+export const resendResubmissionEmail = createAsyncThunk(
+  "ngoRequests/resendResubmissionEmail",
+  async (requestId, { rejectWithValue }) => {
+    try {
+      console.log("📧 Resending resubmission email for NGO ID:", requestId);
+      const response = await resendResubmissionEmailAPI(requestId);
+      console.log("✅ Resubmission email sent successfully");
+      return {
+        requestId,
+        message: response.message || "Resubmission email sent successfully",
+      };
+    } catch (error) {
+      console.error("❌ Failed to resend resubmission email:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to resend resubmission email",
+      );
+    }
+  },
+);
+
+/**
+ * Deactivate an approved NGO
+ * Usage: dispatch(deactivateNgo({ ngoId, note }))
+ */
+export const deactivateNgo = createAsyncThunk(
+  "ngoRequests/deactivate",
+  async ({ ngoId, note }, { rejectWithValue }) => {
+    try {
+      console.log("🔴 Deactivating NGO:", ngoId);
+      const response = await deactivateNgoAPI(ngoId, note);
+      console.log("✅ NGO deactivated successfully");
+      return {
+        ngoId,
+        message: response.message || "NGO deactivated successfully",
+      };
+    } catch (error) {
+      console.error("❌ Failed to deactivate NGO:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to deactivate NGO",
+      );
+    }
+  },
+);
+
+/**
+ * Delete a deactivated NGO permanently
+ * Usage: dispatch(deleteNgo(ngoId))
+ */
+export const deleteNgo = createAsyncThunk(
+  "ngoRequests/delete",
+  async (ngoId, { rejectWithValue }) => {
+    try {
+      console.log("🗑️ Deleting NGO:", ngoId);
+      const response = await deleteNgoAPI(ngoId);
+      console.log("✅ NGO deleted successfully");
+      return {
+        ngoId,
+        message: response.message || "NGO deleted successfully",
+      };
+    } catch (error) {
+      console.error("❌ Failed to delete NGO:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete NGO",
       );
     }
   },
