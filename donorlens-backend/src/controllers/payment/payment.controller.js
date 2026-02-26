@@ -1,5 +1,6 @@
 import { PaymentUsecase } from "../../usecases/payment/payment.js";
 import { PaymentLogUsecase } from "../../usecases/payment/paymentLog.js";
+import { isNull } from "../../utils/isNull.js";
 
 const paymentUsecase = new PaymentUsecase();
 const paymentLogUsecase = new PaymentLogUsecase();
@@ -34,7 +35,7 @@ export const getAllPaymentLogs = async (req, res, next) => {
 
 export const createPayment = async (req, res, next) => {
   const donorId = req.user?.userId || null;
-  const { campaignId, amount, currency, paymentMethod } = req.body;
+  const { campaignId, amount, currency, paymentMethod } = req.body || null;
   const ipAddress = req.ip || req.connection?.remoteAddress || null;
 
   const logData = {
@@ -48,7 +49,7 @@ export const createPayment = async (req, res, next) => {
   };
 
   try {
-    if (!campaignId || !amount) {
+    if (isNull(campaignId) || isNull(amount)) {
       paymentLogUsecase.createLog({
         ...logData,
         status: "FAILED",
@@ -62,7 +63,7 @@ export const createPayment = async (req, res, next) => {
       });
     }
 
-    if (typeof amount !== "number" || amount <= 0) {
+    if (typeof amount !== "number" || amount <= 0 || isNull(amount)) {
       paymentLogUsecase.createLog({
         ...logData,
         status: "FAILED",
@@ -73,6 +74,20 @@ export const createPayment = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: "amount must be a positive number",
+      });
+    }
+
+    if (isNull(paymentMethod)) {
+      paymentLogUsecase.createLog({
+        ...logData,
+        status: "FAILED",
+        failureReason: "paymentMethod is required",
+        failureCategory: "VALIDATION_ERROR",
+      });
+
+      return res.status(400).json({
+        success: false,
+        message: "paymentMethod is required",
       });
     }
 
