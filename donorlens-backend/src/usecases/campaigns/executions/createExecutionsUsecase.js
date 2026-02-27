@@ -9,10 +9,6 @@ import {
 } from "../../../utils/errors.js";
 import { uploadMultipleToCloudinary } from "../../../services/cloudinary.service.js";
 
-/**
- * Create Execution Update Usecase
- */
-
 export const createExecutions = async ({ execution }) => {
   
   const {
