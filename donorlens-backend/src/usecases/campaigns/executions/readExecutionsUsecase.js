@@ -3,14 +3,6 @@ import Campaign from "../../../models/campaigns/Campaign.js";
 import { NotFoundError, ValidationError } from "../../../utils/errors.js";
 import mongoose from "mongoose";
 
-/**
- * Get All Execution Updates for a Campaign Usecase
- * Retrieves all execution updates for a specific campaign
- * Sorted by date (newest first)
- *
- * @param {string} campaignId - The campaign ID
- * @returns {Object} - Campaign info and execution updates array
- */
 export const getAllExecutionsUsecase = async (campaignId) => {
   try {
     // Validate campaignId format
@@ -29,8 +21,8 @@ export const getAllExecutionsUsecase = async (campaignId) => {
 
     // Fetch all execution updates for this campaign
     const executions = await ExecutionUpdate.find({ campaignId })
-      .sort({ date: -1 }) // Sort by date, newest first
-      .lean(); // Convert to plain JavaScript objects for better performance
+      .sort({ date: -1 }) 
+      .lean(); 
 
     // Calculate summary statistics
     const summary = {
@@ -65,14 +57,6 @@ export const getAllExecutionsUsecase = async (campaignId) => {
   }
 };
 
-/**
- * Get Single Execution Update by ID Usecase
- * Retrieves a specific execution update with full details
- *
- * @param {string} executionId - The execution update ID
- * @param {string} campaignId - The campaign ID (for validation)
- * @returns {Object} - Execution update with campaign details
- */
 export const getExecutionByIdUsecase = async (executionId, campaignId) => {
   try {
     // Validate IDs format
