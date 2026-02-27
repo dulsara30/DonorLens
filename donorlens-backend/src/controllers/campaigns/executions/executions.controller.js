@@ -8,10 +8,7 @@ import { deleteExecutionUsecase } from "../../../usecases/campaigns/executions/d
 import { ApiResponse, sendCreated } from "../../../utils/apiResponse.js";
 import { NotFoundError } from "../../../utils/errors.js";
 
-/**
- * Create Execution Update Controller
- * Handles file uploads and creates execution update
- */
+//create
 export const createExecutionUpdate = async (req, res, next) => {
   try {
     const userId = req.user.userId;
@@ -56,10 +53,7 @@ export const createExecutionUpdate = async (req, res, next) => {
   }
 };
 
-/**
- * Get All Execution Updates for a Campaign Controller
- * Returns all execution updates for a specific campaign
- */
+//read
 export const getAllExecutionsByCampaign = async (req, res, next) => {
   try {
     const { campaignId } = req.params;
@@ -75,10 +69,7 @@ export const getAllExecutionsByCampaign = async (req, res, next) => {
   }
 };
 
-/**
- * Get Single Execution Update by ID Controller
- * Returns a single execution update with full details
- */
+//single read
 export const getExecutionById = async (req, res, next) => {
   try {
     const { campaignId, executionId } = req.params;
@@ -94,10 +85,7 @@ export const getExecutionById = async (req, res, next) => {
   }
 };
 
-/**
- * Update Execution Update Controller
- * Handles partial updates to execution updates with optional file uploads
- */
+//update
 export const updateExecutionUpdate = async (req, res, next) => {
   try {
     const userId = req.user.userId;
@@ -134,10 +122,7 @@ export const updateExecutionUpdate = async (req, res, next) => {
   }
 };
 
-/**
- * Delete Execution Update Controller
- * Deletes an execution update and recalculates campaign progress
- */
+//delete
 export const deleteExecutionUpdate = async (req, res, next) => {
   try {
     const userId = req.user.userId;
