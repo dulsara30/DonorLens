@@ -51,17 +51,6 @@ jobs:
         working-directory: donorlens-backend
         run: npx playwright install --with-deps
 
-      - name: Wait for MongoDB
-        run: |
-          for i in {1..30}; do
-            if mongosh --eval "db.runCommand({ ping: 1 })" --quiet 2>/dev/null; then
-              echo "MongoDB is ready"
-              break
-            fi
-            echo "Waiting for MongoDB... ($i/30)"
-            sleep 1
-          done
-
       - name: Start backend server
         working-directory: donorlens-backend
         run: node server.js &
