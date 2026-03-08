@@ -14,14 +14,8 @@ jobs:
   backend-tests:
     runs-on: ubuntu-latest
 
-    services:
-      mongodb:
-        image: mongo:7
-        ports:
-          - 27017:27017
-
     env:
-      MONGO_URI: mongodb://localhost:27017/donorlens_test
+      MONGO_URI: ${{ secrets.MONGO_URI }}
       PORT: 5000
       NODE_ENV: test
       JWT_ACCESS_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
@@ -56,17 +50,6 @@ jobs:
       - name: Install Playwright
         working-directory: donorlens-backend
         run: npx playwright install --with-deps
-
-      - name: Wait for MongoDB
-        run: |
-          for i in {1..30}; do
-            if mongosh --eval "db.runCommand({ ping: 1 })" --quiet 2>/dev/null; then
-              echo "MongoDB is ready"
-              break
-            fi
-            echo "Waiting for MongoDB... ($i/30)"
-            sleep 1
-          done
 
       - name: Start backend server
         working-directory: donorlens-backend
