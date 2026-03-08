@@ -27,7 +27,10 @@ export class PaymentUsecase {
    */
   async getUserPayments(userId) {
     const payments = await Payment.find({ donor: userId })
-      .populate("campaign", "title status raisedAmount totalPlannedCost coverImage")
+      .populate(
+        "campaign",
+        "title status raisedAmount totalPlannedCost coverImage",
+      )
       .sort({ createdAt: -1 });
 
     return {
@@ -48,7 +51,13 @@ export class PaymentUsecase {
    * @param {string} paymentData.paymentMethod - Payment method
    * @returns {Promise<Object>} Created payment document
    */
-  async createPayment({ donorId, campaignId, amount, currency, paymentMethod }) {
+  async createPayment({
+    donorId,
+    campaignId,
+    amount,
+    currency,
+    paymentMethod,
+  }) {
     // Validate campaign exists and is ongoing
     const campaign = await Campaign.findById(campaignId);
     if (!campaign) {

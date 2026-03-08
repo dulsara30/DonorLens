@@ -63,9 +63,9 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
 
     const setupUrl = `${process.env.CLIENT_URL}/password-setup?token=${token}`;
 
-    // ✅ Add all required fields for email template
+    // Add all required fields for email template
     ngoData.setupUrl = setupUrl;
-    ngoData.expiryHours = 24; // ✅ Required by email template
+    ngoData.expiryHours = 24; // Required by email template
 
     const emailResult = await SendEmailUsecase({
       type: "NGO_PASSWORD_SETUP",
