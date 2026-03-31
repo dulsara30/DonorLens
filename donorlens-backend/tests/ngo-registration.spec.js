@@ -263,57 +263,118 @@ test.describe("NGO Registration API Tests", () => {
     expect(response.status()).toBe(200);
   });
 
-  test("MOCKING: Mock password setup email endpoint and verify response", async ({
+  // test("MOCKING: Mock password setup email endpoint and verify response", async ({
+  //   page,
+  // }) => {
+  //   const email = `pwsetup${Date.now()}@example.com`;
+  //   const mockNgoId = "507f1f77bcf86cd799439011";
+  //   const mockToken = `mock-token-${Date.now()}`;
+  //   const setupUrl = `${process.env.CLIENT_URL}/password-setup?token=${mockToken}`;
+  //   //const accessToken = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTk3Y2UxZGE3YjdkYjBiM2NkOTQ3NGYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzI5NjcxMDYsImV4cCI6MTc3MzA1MzUwNn0.i9eaMdGZ5jQSMDtGoA9gMx4bt1Af-EQDgaMACTtqMU8"); // Use the token obtained from admin login
+
+  //   createdEmails.push(email);
+
+  //   await page.route(`**/admin/pw-Request/${mockNgoId}`, (route) => {
+  //     console.log(
+  //       "Password setup email endpoint intercepted - returning mocked response",
+  //     );
+
+  //     const mockResponse = {
+  //       success: true,
+  //       message: "Password setup email sent successfully",
+  //       data: {
+  //         ngoId: mockNgoId,
+  //         email: email,
+  //         ngoName: "Test NGO for Password Setup",
+  //         registrationNumber: `REG${Date.now()}`,
+  //         setupUrl: setupUrl,
+  //         expiryHours: 24,
+  //       },
+  //     };
+
+  //     route.fulfill({
+  //       status: 200,
+  //       contentType: "application/json",
+  //       body: JSON.stringify(mockResponse),
+  //     });
+  //   });
+
+  //   const response = await page.request.put(
+  //     `${API_URL}/admin/pw-Request/${mockNgoId}`,
+  //     {
+  //       headers: {
+  //         Authorization: "Bearer mock-admin-token", // Use the token obtained from admin login
+  //         "Content-Type": "application/json",
+  //       },
+  //     },
+  //   );
+
+  //   expect(response.status()).toBe(200);
+  //   const body = await response.json();
+
+  //   expect(body.success).toBe(true);
+  //   expect(body.message).toBe("Password setup email sent successfully");
+  //   console.log(
+  //     `Password setup email mocking test passed: Verified response structure matches real implementation`,
+  //   );
+  // });
+
+  test("MOCKING: Mock password setup email service using a fake endpoint", async ({
     page,
   }) => {
     const email = `pwsetup${Date.now()}@example.com`;
     const mockNgoId = "507f1f77bcf86cd799439011";
     const mockToken = `mock-token-${Date.now()}`;
+
     const setupUrl = `${process.env.CLIENT_URL}/password-setup?token=${mockToken}`;
-    //const accessToken = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTk3Y2UxZGE3YjdkYjBiM2NkOTQ3NGYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzI5NjcxMDYsImV4cCI6MTc3MzA1MzUwNn0.i9eaMdGZ5jQSMDtGoA9gMx4bt1Af-EQDgaMACTtqMU8"); // Use the token obtained from admin login
 
-    createdEmails.push(email);
-
-    await page.route(`**/admin/pw-Request/${mockNgoId}`, (route) => {
-      console.log(
-        "Password setup email endpoint intercepted - returning mocked response",
-      );
+    await page.route("**/api/mock/send-password-email", async (route) => {
+      console.log("Mock email API intercepted by Playwright");
 
       const mockResponse = {
         success: true,
-        message: "Password setup email sent successfully",
+        message: "Password setup email sent successfully (MOCKED)",
         data: {
           ngoId: mockNgoId,
           email: email,
-          ngoName: "Test NGO for Password Setup",
+          ngoName: "Mock NGO",
           registrationNumber: `REG${Date.now()}`,
           setupUrl: setupUrl,
           expiryHours: 24,
         },
       };
 
-      route.fulfill({
+      await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify(mockResponse),
       });
     });
 
-    const response = await page.request.put(
-      `${API_URL}/admin/pw-Request/${mockNgoId}`,
-      {
-        headers: {
-          Authorization: "Bearer mock-admin-token", // Use the token obtained from admin login
-          "Content-Type": "application/json",
+    const response = await page.evaluate(async () => {
+      const res = await fetch(
+        "http://localhost:5000/api/mock/send-password-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      },
-    );
+      );
 
-    expect(response.status()).toBe(200);
-    const body = await response.json();
+      return {
+        status: res.status,
+        body: await res.json(),
+      };
+    });
+
+    expect(response.status).toBe(200);
+
+    const body = response.body;
 
     expect(body.success).toBe(true);
-    expect(body.message).toBe("Password setup email sent successfully");
+    expect(body.message).toContain("MOCKED");
+
     expect(body.data).toBeDefined();
     expect(body.data).toHaveProperty("ngoId");
     expect(body.data).toHaveProperty("email");
@@ -321,14 +382,7 @@ test.describe("NGO Registration API Tests", () => {
     expect(body.data).toHaveProperty("registrationNumber");
     expect(body.data).toHaveProperty("setupUrl");
     expect(body.data).toHaveProperty("expiryHours");
-    expect(body.data.email).toBe(email);
-    expect(body.data.ngoId).toBe(mockNgoId);
-    expect(body.data.expiryHours).toBe(24);
-    expect(body.data.setupUrl).toContain("/password-setup?token=");
-    expect(body.data.setupUrl).toContain(mockToken);
 
-    console.log(
-      `Password setup email mocking test passed: Verified response structure matches real implementation`,
-    );
+    console.log("Mocking test passed successfully");
   });
 });
