@@ -9,10 +9,6 @@ import {
 } from "../../../utils/errors.js";
 import { uploadMultipleToCloudinary } from "../../../services/cloudinary.service.js";
 
-/**
- * Create Execution Update Usecase
- */
-
 export const createExecutions = async ({ execution }) => {
   const {
     userId,
@@ -33,6 +29,20 @@ export const createExecutions = async ({ execution }) => {
 
   if (fundsUsed < 0) {
     throw new ValidationError("Funds used can not be negative.");
+  }
+
+  // Validate that the date is not in the future
+  if (date) {
+    const executionDate = new Date(date);
+    const currentDate = new Date();
+    
+    // Set time to start of day for comparison
+    executionDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
+    
+    if (executionDate > currentDate) {
+      throw new ValidationError("Execution date cannot be a future date.");
+    }
   }
 
   //check if campaign exists

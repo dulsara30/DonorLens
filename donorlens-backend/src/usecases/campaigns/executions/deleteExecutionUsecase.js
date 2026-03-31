@@ -9,17 +9,6 @@ import {
 import { deleteFromCloudinary } from "../../../services/cloudinary.service.js";
 import mongoose from "mongoose";
 
-/**
- * Delete Execution Update Usecase
- * Deletes an execution update, removes files from Cloudinary,
- * and recalculates campaign progress
- *
- * @param {Object} params - Delete parameters
- * @param {string} params.userId - The authenticated user ID
- * @param {string} params.campaignId - The campaign ID
- * @param {string} params.executionId - The execution update ID to delete
- * @returns {Object} - Deleted execution info and updated campaign
- */
 export const deleteExecutionUsecase = async ({
   userId,
   campaignId,
@@ -73,7 +62,6 @@ export const deleteExecutionUsecase = async ({
 
     // Delete files from Cloudinary
     try {
-      // Delete evidence photos
       if (execution.evidencePhotos && execution.evidencePhotos.length > 0) {
         const photoDeletePromises = execution.evidencePhotos.map((photo) =>
           deleteFromCloudinary(photo.public_id),
@@ -95,12 +83,10 @@ export const deleteExecutionUsecase = async ({
         );
       }
     } catch (cloudinaryError) {
-      // Log error but don't fail the deletion
       console.error(
         "Failed to delete some files from Cloudinary:",
         cloudinaryError.message,
       );
-      // Continue with database deletion even if Cloudinary deletion fails
     }
 
     // Delete the execution update from database

@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "npx playwright test",
+    "test:report": "npx playwright show-report",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -31,5 +34,6 @@
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.3.5"
+    "husky": "^9.1.7"
   }
 }

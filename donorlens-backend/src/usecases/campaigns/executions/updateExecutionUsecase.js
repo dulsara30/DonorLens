@@ -13,22 +13,6 @@ import {
 } from "../../../services/cloudinary.service.js";
 import mongoose from "mongoose";
 
-/**
- * Update Execution Update Usecase
- * Updates an execution update with partial data and optional new files
- * Can add new files, but doesn't remove existing ones unless explicitly done
- *
- * @param {Object} updateData - Update parameters
- * @param {string} updateData.userId - The authenticated user ID
- * @param {string} updateData.campaignId - The campaign ID
- * @param {string} updateData.executionId - The execution update ID
- * @param {string} updateData.title - Updated title (optional)
- * @param {Date} updateData.date - Updated date (optional)
- * @param {string} updateData.description - Updated description (optional)
- * @param {number} updateData.fundsUsed - Updated funds used (optional)
- * @param {Object} updateData.executionFile - New files to add (optional)
- * @returns {Object} - Updated execution and campaign data
- */
 export const updateExecutionUsecase = async (updateData) => {
   try {
     const {
