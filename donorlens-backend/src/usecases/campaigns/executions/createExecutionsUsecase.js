@@ -10,7 +10,6 @@ import {
 import { uploadMultipleToCloudinary } from "../../../services/cloudinary.service.js";
 
 export const createExecutions = async ({ execution }) => {
-  
   const {
     userId,
     campaignId,
@@ -48,6 +47,9 @@ export const createExecutions = async ({ execution }) => {
 
   //check if campaign exists
   const campaign = await Campaign.findById(campaignId);
+
+  console.log("Campaign found:", campaign.createdBy.toString());
+  console.log("Campaign found:", userId); // Debug log
 
   if (!campaign) {
     throw new NotFoundError("Campaign not found.");

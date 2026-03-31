@@ -18,7 +18,10 @@ export class PaymentUsecase {
 
   async getUserPayments(userId) {
     const payments = await Payment.find({ donor: userId })
-      .populate("campaign", "title status raisedAmount totalPlannedCost coverImage")
+      .populate(
+        "campaign",
+        "title status raisedAmount totalPlannedCost coverImage",
+      )
       .sort({ createdAt: -1 });
 
     return {
