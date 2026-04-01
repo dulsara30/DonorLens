@@ -56,9 +56,9 @@ const createApp = () => {
 
   //app.use("/api/ngo/campaigns", campaignRoutes);
 
-  app.use("/api/campaigns/executions", executionUpdateRoutes);
   app.use("/api/campaigns", campaignRoutes);
   app.use("/api/campaign", campaignCommentRoutes);
+  app.use("/api/campaign-executions", executionUpdateRoutes);
 
   //app.use("/api/campaigns", campaignRoutes);
   //NGO Admin routes (NGO registration)

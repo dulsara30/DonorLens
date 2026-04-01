@@ -18,9 +18,9 @@ const router = express.Router();
 
 // Create execution update
 router.post(
-  "/:campaignId/add-execution",
-  // authenticateToken,
-  // authorizeRoles("NGO_ADMIN"),
+  "/:campaignId/executions",
+  authenticateToken,
+  authorizeRoles("NGO_ADMIN"),
   uploadFields([
     { name: "evidencePhotos", maxCount: 5 },
     { name: "receipts", maxCount: 5 },
@@ -34,14 +34,14 @@ router.post(
 );
 
 // Get all execution updates for a specific campaign
-router.get("/:campaignId", getAllExecutionsByCampaign);
+router.get("/:campaignId/executions", getAllExecutionsByCampaign);
 
 // Get a single execution update by ID
-router.get("/:campaignId/:executionId", getExecutionById);
+router.get("/:campaignId/executions/:executionId", getExecutionById);
 
 // Update an execution update
 router.patch(
-  "/:campaignId/:executionId",
+  "/:campaignId/executions/:executionId",
   authenticateToken,
   authorizeRoles("NGO_ADMIN"),
   uploadFields([
@@ -58,7 +58,7 @@ router.patch(
 
 // Delete an execution update
 router.delete(
-  "/:campaignId/:executionId",
+  "/:campaignId/executions/:executionId",
   authenticateToken,
   authorizeRoles("NGO_ADMIN"),
   deleteExecutionUpdate,
