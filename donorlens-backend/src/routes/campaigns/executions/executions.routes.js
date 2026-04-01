@@ -19,8 +19,8 @@ const router = express.Router();
 // Create execution update
 router.post(
   "/:campaignId/add-execution",
-  authenticateToken,
-  authorizeRoles("NGO_ADMIN"),
+  // authenticateToken,
+  // authorizeRoles("NGO_ADMIN"),
   uploadFields([
     { name: "evidencePhotos", maxCount: 5 },
     { name: "receipts", maxCount: 5 },
