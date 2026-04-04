@@ -47,6 +47,7 @@ export const router = createBrowserRouter([
   { path: "/campaigns", element: <CampaignListPage /> },
   { path: "/campaigns/:id", element: <CampaignDetailsPage /> },
   { path: "/campaigns/:id/donate", element: <DonatePage /> },
+  // { path: "/admin/campaigns/new", element: <AdminCreateCampaignPage /> },
 
   // USER ONLY ROUTES (Donors)
   {
