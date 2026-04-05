@@ -65,6 +65,7 @@ export const router = createBrowserRouter([
       { path: "/admin", element: <AdminDashboardPage /> }, // Base layout for admin routes
       { path: "/admin/dashboard", element: <AdminDashboardPage /> },
       { path: "/admin/campaigns/new", element: <AdminCreateCampaignPage /> },
+      { path: "/admin/campaigns", element: <CampaignListPage /> },
       { path: "/admin/tracking/:id", element: <AdminExpenseTrackerPage /> },
       { path: "/admin/impact/:id", element: <AdminFinalReportPage /> },
       // Add more NGO_ADMIN-only routes here

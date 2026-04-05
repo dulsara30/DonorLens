@@ -11,6 +11,13 @@ export const createCampaignApi = async (formData) => {
 };
 
 export const getMyCampaignsApi = async () => {
-  const response = await axiosInstance.get("/campaigns/get-my-campaigns");
+  const response = await axiosInstance.get("/ngo/campaigns/get-my-campaigns");
+  return response.data;
+};
+
+export const deleteCampaignApi = async (campaignId) => {
+  const response = await axiosInstance.delete(
+    `/ngo/campaigns/delete-campaign/${campaignId}`
+  );
   return response.data;
 };
