@@ -21,3 +21,10 @@ export const deleteCampaignApi = async (campaignId) => {
   );
   return response.data;
 };
+
+export const getSingleCampaignApi = async (campaignId) => {
+  const response = await axiosInstance.get(
+    `/ngo/campaigns/get-my-campaign/${campaignId}`
+  );
+  return response.data;
+};

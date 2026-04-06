@@ -4,7 +4,7 @@ import CampaignStatusBadge from "./CampaignStatusBadge";
 function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "LKR",
     maximumFractionDigits: 0,
   }).format(Number(value || 0));
 }

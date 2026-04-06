@@ -82,7 +82,7 @@ export default function CampaignFinancialStep({
                   <input
                     type="number"
                     min="0"
-                    placeholder="Cost ($)"
+                    placeholder="Cost"
                     value={item.cost}
                     onChange={(e) =>
                       onItemChange(index, "cost", e.target.value)
