@@ -34,6 +34,7 @@ export default function CampaignReviewStep({
   submitError,
   onPrev,
   onSubmit,
+  submitButtonText="Submit Campaign"
 }) {
   const total = form.financialBreakdown.reduce(
     (sum, item) => sum + Number(item.cost || 0),
@@ -45,8 +46,29 @@ export default function CampaignReviewStep({
   );
 
   const coverPreviewUrl = useMemo(() => {
-    return form.coverImage ? URL.createObjectURL(form.coverImage) : null;
+    if (!form.coverImage) return null;
+
+    // New upload from create form or edit form
+    if (form.coverImage instanceof File || form.coverImage instanceof Blob) {
+      return URL.createObjectURL(form.coverImage);
+    }
+
+    // Existing image object from backend
+    if (
+      typeof form.coverImage === "object" &&
+      form.coverImage?.secure_url
+    ) {
+      return form.coverImage.secure_url;
+    }
+
+    // Existing raw URL string
+    if (typeof form.coverImage === "string") {
+      return form.coverImage;
+    }
+
+    return null;
   }, [form.coverImage]);
+
 
   return (
     <div className="mx-auto max-w-4xl rounded-[24px] border border-slate-200 bg-white px-6 py-7 shadow-sm sm:px-8 sm:py-8">
@@ -160,7 +182,7 @@ export default function CampaignReviewStep({
           disabled={submitting}
           className="rounded-2xl bg-teal-600 px-6 py-3 font-semibold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? "Submitting..." : "Submit Campaign"}
+          {submitting ? "Submitting..." : submitButtonText}
         </button>
       </div>
     </div>

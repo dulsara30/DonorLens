@@ -28,3 +28,11 @@ export const getSingleCampaignApi = async (campaignId) => {
   );
   return response.data;
 };
+
+export const updateCampaignApi = async (campaignId, payload) => {
+  const response = await axiosInstance.put(
+    `/ngo/campaigns/update-campaign/${campaignId}`,
+    payload
+  );
+  return response.data;
+};
