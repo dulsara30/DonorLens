@@ -20,6 +20,7 @@ import DonatePage from "../features/payments/pages/DonatePage";
 
 import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import AdminCreateCampaignPage from "../features/campaigns/pages/AdminCreateCampaignPage";
+import UpdateCampaignPage from "../features/campaigns/pages/UpdateCampaignPage";
 import AdminExpenseTrackerPage from "../features/tracking/pages/AdminExpenseTrackerPage";
 import AdminFinalReportPage from "../features/impact/pages/AdminFinalReportPage";
 
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
       { path: "/admin/campaigns/new", element: <AdminCreateCampaignPage /> },
       { path: "/admin/campaigns", element: <CampaignListPage /> },
       { path: "/admin/campaigns/:id", element: <CampaignDetailsPage /> },
+      { path: "/admin/campaigns/:id/edit", element: <UpdateCampaignPage /> },
       { path: "/admin/tracking/:id", element: <AdminExpenseTrackerPage /> },
       { path: "/admin/impact/:id", element: <AdminFinalReportPage /> },
       // Add more NGO_ADMIN-only routes here

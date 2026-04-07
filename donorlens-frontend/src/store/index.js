@@ -9,6 +9,7 @@ import ngoRequestsReducer from "./slices/ngoRequestsSlice";
 import usersReducer from "./slices/usersSlice";
 import dashboardReducer from "./slices/dashboardSlice";
 import campaignsReducer from "./slices/campaignsSlice";
+import campaignUpdateReducer from "./slices/campaignUpdateSlice";
 
 /**
  * Configure Redux Store
@@ -38,6 +39,8 @@ const store = configureStore({
 
     // State will be accessible as: state.campaigns
     campaigns: campaignsReducer,
+
+    campaignUpdate: campaignUpdateReducer
   },
 
   // Middleware configuration (optional)
