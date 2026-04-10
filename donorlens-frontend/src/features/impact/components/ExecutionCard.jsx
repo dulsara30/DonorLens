@@ -1,4 +1,6 @@
-import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { Trash2, Eye } from "lucide-react";
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
@@ -9,6 +11,8 @@ function formatCurrency(value) {
 }
 
 const ExecutionCard = ({ execution, onDelete, onEdit, campaign }) => {
+  const { campaignId } = useParams();
+  
   // Calculate progress based on funds used vs total planned cost
   let progressPercentage = 0;
   
@@ -57,13 +61,22 @@ const ExecutionCard = ({ execution, onDelete, onEdit, campaign }) => {
 
           {/* Delete Button - Only show for real executions, not default launch */}
           {!execution.isDefault && (
-            <button
-              onClick={() => onDelete(execution._id)}
-              className="rounded-lg p-2 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
-              title="Delete execution"
-            >
-              <Trash2 size={18} />
-            </button>
+            <div className="flex gap-2">
+              <a
+                href={`/admin/campaign-executions/${campaignId}/${execution._id}`}
+                className="rounded-lg p-2 text-slate-400 transition hover:bg-teal-50 hover:text-teal-600"
+                title="View execution details"
+              >
+                <Eye size={18} />
+              </a>
+              <button
+                onClick={() => onDelete(execution._id)}
+                className="rounded-lg p-2 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                title="Delete execution"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
           )}
         </div>
 

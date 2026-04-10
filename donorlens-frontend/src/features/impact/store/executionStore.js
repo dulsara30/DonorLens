@@ -144,6 +144,33 @@ export const useExecutionStore = create(
           }
         },
 
+        updateExecution: async (campaignId, executionId, updateData) => {
+          set({ loading: true, error: null });
+          try {
+            const response = await executionApi.updateExecution(
+              campaignId,
+              executionId,
+              updateData,
+            );
+            const updatedExecution = response?.data;
+
+            set((state) => ({
+              executions: state.executions.map((exe) =>
+                exe._id === executionId ? updatedExecution : exe,
+              ),
+            }));
+
+            return updatedExecution;
+          } catch (error) {
+            const errorMsg =
+              error?.response?.data?.message || "Failed to update execution";
+            set({ error: errorMsg });
+            throw error;
+          } finally {
+            set({ loading: false });
+          }
+        },
+
         // Clear state
         clearExecutionStore: () =>
           set({

@@ -10,3 +10,9 @@ export const deleteExecution = (campaignId, executionId) =>
   axiosInstance.delete(
     `/campaign-executions/${campaignId}/executions/${executionId}`,
   );
+
+export const updateExecution = (campaignId, executionId, data) =>
+  axiosInstance.patch(
+    `/campaign-executions/${campaignId}/executions/${executionId}`,
+    data,
+  );

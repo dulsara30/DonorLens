@@ -187,7 +187,7 @@ export default function ExecutionCreateForm({ isOpen, onClose, onSubmit }) {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-800">
-              Funds Used ($) <span className="text-rose-500">*</span>
+              Funds Used (LKR) <span className="text-rose-500">*</span>
             </label>
             <input
               type="number"

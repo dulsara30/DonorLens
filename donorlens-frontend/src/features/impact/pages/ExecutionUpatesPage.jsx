@@ -120,15 +120,17 @@ export default function ExecutionUpdatesPage() {
           </div>
         )}
 
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900">Execution Updates</h2>
-            <p className="text-sm text-slate-600">
-              {executions.length} update{executions.length !== 1 ? "s" : ""} recorded
-            </p>
-          </div>
+        {/* Campaign Summary Stats Card */}
+        <div className="mb-6">
+          <ExecutionStatsCard 
+            campaign={campaign} 
+            summary={summary} 
+            executionsCount={executions.length}
+          />
+        </div>
 
+        {/* Add Button */}
+        <div className="mb-6">
           <button
             onClick={() => setIsFormOpen(true)}
             className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2.5 font-medium text-white transition hover:bg-teal-700"
@@ -136,13 +138,6 @@ export default function ExecutionUpdatesPage() {
             + Add Execution Update
           </button>
         </div>
-
-        {/* Campaign Summary Stats Card */}
-        <ExecutionStatsCard 
-          campaign={campaign} 
-          summary={summary} 
-          executionsCount={executions.length}
-        />
 
         {/* Form Modal */}
         <ExecutionCreateForm
