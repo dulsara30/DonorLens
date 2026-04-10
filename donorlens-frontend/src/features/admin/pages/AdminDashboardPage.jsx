@@ -176,12 +176,137 @@
 //   );
 // }
 
+// import AdminLayout from "../layout/AdminLayout";
+
+// export default function AdminDashboardPage() {
+//   return (
+//     <AdminLayout title="Dashboard">
+//       <div className="mx-auto max-w-4xl rounded-[24px] border border-slate-200 bg-white px-6 py-7 shadow-sm sm:px-8 sm:py-8 min-h-[500px]" />
+//     </AdminLayout>
+//   );
+// }
+
+import { useEffect, useMemo, useState } from "react";
+import {
+  FolderKanban,
+  CircleCheckBig,
+  WalletCards,
+} from "lucide-react";
 import AdminLayout from "../layout/AdminLayout";
+import DashboardStatCard from "../components/DashboardStatCard";
+import DashboardCharitySlider from "../components/DashboardCharitySlider";
+import { getMyCampaignsApi } from "../../campaigns/api";
+
+function formatCompactNumber(value) {
+  return new Intl.NumberFormat("en-LK").format(Number(value || 0));
+}
 
 export default function AdminDashboardPage() {
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState("");
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setPageError("");
+
+      const response = await getMyCampaignsApi();
+      setCampaigns(response?.data || []);
+    } catch (error) {
+      console.error(error);
+      setPageError(
+        error?.response?.data?.message || "Failed to load dashboard data"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const stats = useMemo(() => {
+    const ongoingProjects = campaigns.filter(
+      (campaign) => campaign.status === "ONGOING"
+    ).length;
+
+    const completedProjects = campaigns.filter(
+      (campaign) => campaign.status === "COMPLETED"
+    ).length;
+
+    const totalRaisedAmount = campaigns.reduce(
+      (sum, campaign) => sum + Number(campaign.raisedAmount || 0),
+      0
+    );
+
+    return {
+      ongoingProjects,
+      completedProjects,
+      totalRaisedAmount,
+    };
+  }, [campaigns]);
+
   return (
     <AdminLayout title="Dashboard">
-      <div className="mx-auto max-w-4xl rounded-[24px] border border-slate-200 bg-white px-6 py-7 shadow-sm sm:px-8 sm:py-8 min-h-[500px]" />
+      <div className="mx-auto max-w-7xl space-y-6">
+        {loading && (
+          <div className="rounded-[24px] border border-slate-200 bg-white px-6 py-8 text-sm text-slate-500 shadow-sm">
+            Loading dashboard...
+          </div>
+        )}
+
+        {!loading && pageError && (
+          <div className="rounded-[24px] border border-rose-200 bg-rose-50 px-6 py-8 text-sm text-rose-600 shadow-sm">
+            {pageError}
+          </div>
+        )}
+
+        {!loading && !pageError && (
+          <>
+            <DashboardCharitySlider />
+
+            <div className="grid gap-5 lg:grid-cols-3">
+              <DashboardStatCard
+                title="Ongoing Projects"
+                value={formatCompactNumber(stats.ongoingProjects)}
+                subtitle="Currently active campaigns"
+                icon={<FolderKanban size={26} />}
+                iconBgClass="bg-blue-100"
+                iconTextClass="text-blue-600"
+              />
+
+              <DashboardStatCard
+                title="Completed Projects"
+                value={formatCompactNumber(stats.completedProjects)}
+                subtitle="Successfully completed campaigns"
+                icon={<CircleCheckBig size={26} />}
+                iconBgClass="bg-emerald-100"
+                iconTextClass="text-emerald-600"
+              />
+
+              <DashboardStatCard
+                title="Total Raised Amount"
+                value={
+                  <>
+                    <span className="mr-1 align-top text-base font-medium text-slate-500">
+                      LKR
+                    </span>
+                    {formatCompactNumber(stats.totalRaisedAmount)}
+                  </>
+                }
+                subtitle="Raised across all your campaigns"
+                icon={<WalletCards size={26} />}
+                iconBgClass="bg-violet-100"
+                iconTextClass="text-violet-600"
+              />
+            </div>
+
+            
+          </>
+        )}
+      </div>
     </AdminLayout>
   );
 }
