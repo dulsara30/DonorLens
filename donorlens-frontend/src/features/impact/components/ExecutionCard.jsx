@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Trash2, Eye } from "lucide-react";
+import { Trash2, Eye, Lock } from "lucide-react";
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
@@ -10,22 +10,56 @@ function formatCurrency(value) {
   }).format(Number(value || 0));
 }
 
-const ExecutionCard = ({ execution, onDelete, onEdit, campaign }) => {
+// Check if execution can be edited (must be within 24 hours of creation)
+function canEditExecution(execution) {
+  if (!execution.createdAt) return false;
+  
+  const createdTime = new Date(execution.createdAt).getTime();
+  const now = new Date().getTime();
+  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+  
+  return (now - createdTime) < twentyFourHoursInMs;
+}
+
+function getTimeRemainingToEdit(execution) {
+  if (!execution.createdAt) return null;
+  
+  const createdTime = new Date(execution.createdAt).getTime();
+  const now = new Date().getTime();
+  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+  const timeRemaining = twentyFourHoursInMs - (now - createdTime);
+  
+  if (timeRemaining <= 0) return "Expired";
+  
+  const hours = Math.floor(timeRemaining / (60 * 60 * 1000));
+  const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000));
+  
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  return `${minutes}m`;
+}
+
+const ExecutionCard = ({ execution, onDelete, onEdit, campaign, cumulativeFundsUsed }) => {
   const { campaignId } = useParams();
   
-  // Calculate progress based on funds used vs total planned cost
+  // Calculate progress based on cumulative funds used vs total planned cost
   let progressPercentage = 0;
+  
+  // Use cumulative funds if provided, otherwise use individual execution funds
+  const fundsToUse = cumulativeFundsUsed !== undefined ? cumulativeFundsUsed : execution.fundsUsed;
   
   console.log("🔍 ExecutionCard Debug:", {
     executionFundsUsed: execution.fundsUsed,
+    cumulativeFundsUsed: cumulativeFundsUsed,
     campaignTotalPlannedCost: campaign?.totalPlannedCost,
     executionProgress: execution.progress,
   });
   
-  if (campaign?.totalPlannedCost && execution.fundsUsed !== undefined && execution.fundsUsed !== null) {
+  if (campaign?.totalPlannedCost && fundsToUse !== undefined && fundsToUse !== null) {
     // Calculate progress based on funds used vs total planned cost
     progressPercentage = Math.min(
-      (execution.fundsUsed / campaign.totalPlannedCost) * 100,
+      (fundsToUse / campaign.totalPlannedCost) * 100,
       100
     );
   } else {
@@ -62,26 +96,45 @@ const ExecutionCard = ({ execution, onDelete, onEdit, campaign }) => {
           {/* Delete Button - Only show for real executions, not default launch */}
           {!execution.isDefault && (
             <div className="flex gap-2">
-              <a
-                href={`/admin/campaign-executions/${campaignId}/${execution._id}`}
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-teal-50 hover:text-teal-600"
-                title="View execution details"
-              >
-                <Eye size={18} />
-              </a>
-              <button
-                onClick={() => onDelete(execution._id)}
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
-                title="Delete execution"
-              >
-                <Trash2 size={18} />
-              </button>
+              {canEditExecution(execution) ? (
+                <>
+                  <a
+                    href={`/admin/campaign-executions/${campaignId}/${execution._id}`}
+                    className="rounded-lg p-2 text-slate-400 transition hover:bg-teal-50 hover:text-teal-600"
+                    title="View & edit execution details"
+                  >
+                    <Eye size={18} />
+                  </a>
+                  <button
+                    onClick={() => onDelete(execution._id)}
+                    className="rounded-lg p-2 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                    title="Delete execution"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </>
+              ) : (
+                <div
+                  className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600"
+                  title="This update is locked - can only be edited within 24 hours of creation"
+                >
+                  <Lock size={16} />
+                  <span>Locked</span>
+                </div>
+              )}
             </div>
           )}
         </div>
 
         {/* Description */}
         <p className="mt-2 text-slate-600">{execution.description}</p>
+
+        {/* Edit Lock Warning - Show time remaining if edit window is closing */}
+        {!execution.isDefault && canEditExecution(execution) && (
+          <p className="mt-2 text-xs text-amber-600">
+            Can edit for: {getTimeRemainingToEdit(execution)}
+          </p>
+        )}
 
         {/* Progress Bar */}
         <div className="mt-4">

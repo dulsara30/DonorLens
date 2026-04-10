@@ -34,6 +34,7 @@ import SystemAdminCampaignsPage from "../features/systemAdmin/pages/SystemAdminC
 import ExecutionUpdatesPage from "../features/impact/pages/ExecutionUpatesPage";
 import ExecutionDashboardPage from "../features/impact/pages/ExecutionDashboardPage";
 import ExecutionDetailPage from "../features/impact/pages/ExecutionDetailPage";
+import ExecutionCreatePage from "../features/impact/pages/ExecutionCreatePage";
 
 export const router = createBrowserRouter([
   // AUTH ROUTES (Public)
@@ -76,6 +77,7 @@ export const router = createBrowserRouter([
       { path: "/admin/impact/:id", element: <AdminFinalReportPage /> },
       { path: "/admin/campaign-executions", element: <ExecutionDashboardPage /> },
       { path: "/admin/campaign-executions/:campaignId", element: <ExecutionUpdatesPage /> },
+      { path: "/admin/campaign-executions/:campaignId/create", element: <ExecutionCreatePage /> },
       { path: "/admin/campaign-executions/:campaignId/:executionId", element: <ExecutionDetailPage /> },
       { path: "/admin/executions", element: <ExecutionUpdatesPage /> },
     ],

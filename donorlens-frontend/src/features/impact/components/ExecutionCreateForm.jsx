@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Calendar, ImagePlus, Receipt, Save, X, AlertCircle, Loader } from "lucide-react";
+import { Calendar, ImagePlus, Receipt, Save, X, Loader } from "lucide-react";
+import { toast } from "react-toastify";
 import { useExecutionStore } from "../store/executionStore";
 
 const initialForm = {
@@ -9,7 +10,7 @@ const initialForm = {
   fundsUsed: "",
 };
 
-export default function ExecutionCreateForm({ isOpen, onClose, onSubmit }) {
+export default function ExecutionCreateForm({ isOpen, onClose, onSubmit, campaign, summary }) {
   const [formData, setFormData] = useState(initialForm);
   const [evidencePhotos, setEvidencePhotos] = useState([]);
   const [receipts, setReceipts] = useState([]);
@@ -56,27 +57,90 @@ export default function ExecutionCreateForm({ isOpen, onClose, onSubmit }) {
 
     // Validation
     if (!formData.title.trim()) {
-      setLocalError("Title is required");
+      const errorMsg = "Title is required";
+      setLocalError(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
 
     if (!formData.description.trim()) {
-      setLocalError("Description is required");
+      const errorMsg = "Description is required";
+      setLocalError(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
 
     if (!formData.fundsUsed || formData.fundsUsed < 0) {
-      setLocalError("Funds used must be a valid positive number");
+      const errorMsg = "Funds used must be a valid positive number";
+      setLocalError(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
 
     if (evidencePhotos.length === 0) {
-      setLocalError("At least one evidence photo is required");
+      const errorMsg = "At least one evidence photo is required";
+      setLocalError(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
 
+    // Date validation - cannot be in the future
+    const selectedDate = new Date(formData.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate > today) {
+      const errorMsg = "Execution date cannot be in the future";
+      setLocalError(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    // Funds validation - cannot exceed available funds
+    const raisedAmount = campaign?.raisedAmount || 0;
+    const totalFundsUsed = summary?.totalFundsUsed || 0;
+    const availableFunds = raisedAmount - totalFundsUsed;
+    const fundsUsed = parseFloat(formData.fundsUsed);
+
+    if (fundsUsed > availableFunds) {
+      const formatter = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "LKR",
+        maximumFractionDigits: 0,
+      });
+      const errorMsg = `Cannot exceed available funds of ${formatter.format(availableFunds)}`;
+      setLocalError(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    // Convert date to ISO string with UTC timezone
+    // Input format: YYYY-MM-DD, convert to: YYYY-MM-DDTHH:mm:ss.sssZ
+    const dateObj = new Date(formData.date);
+    // Adjust for timezone by adding the offset
+    const offsetDate = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000);
+    const isoDate = offsetDate.toISOString();
+
     const payload = {
       ...formData,
+      date: isoDate,
       evidencePhotos,
       receipts,
     };
@@ -118,14 +182,6 @@ export default function ExecutionCreateForm({ isOpen, onClose, onSubmit }) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Local Error */}
-          {localError && (
-            <div className="flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 p-3">
-              <AlertCircle size={18} className="mt-0.5 shrink-0 text-rose-600" />
-              <p className="text-sm text-rose-800">{localError}</p>
-            </div>
-          )}
-
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
             <div className="md:col-span-2">
               <label className="mb-2 block text-sm font-medium text-slate-800">
@@ -201,6 +257,15 @@ export default function ExecutionCreateForm({ isOpen, onClose, onSubmit }) {
               required
               disabled={isSubmitting || loading}
             />
+            {campaign && summary && (
+              <p className="mt-1 text-xs text-slate-600">
+                Available: {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "LKR",
+                  maximumFractionDigits: 0,
+                }).format((campaign.raisedAmount || 0) - (summary.totalFundsUsed || 0))}
+              </p>
+            )}
           </div>
 
           <div>
