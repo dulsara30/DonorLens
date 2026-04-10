@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { LayoutDashboard, PlusCircle, FolderKanban, Heart } from "lucide-react";
+import useAuth from "../../../state/useAuth";
 
 const navItems = [
   {
@@ -26,6 +27,9 @@ export default function AdminSidebar() {
   const location = useLocation();
   const pathname = location.pathname;
 
+  const { user } = useAuth();
+  const ngoName = user?.ngoDetails?.ngoName;
+
   const isItemActive = (key) => {
     if (key === "dashboard") {
       return pathname === "/admin" || pathname === "/admin/dashboard";
@@ -48,15 +52,19 @@ export default function AdminSidebar() {
   return (
     <aside className="flex min-h-screen w-[260px] flex-col justify-between border-r border-slate-200 bg-white">
       <div>
-        <div className="flex items-center gap-3 border-b border-slate-200 px-6 py-5">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600 text-white">
+        <div className="flex items-center gap-3 border-b border-teal-100 bg-teal-700 px-6 py-5">
+          {/* <div className="grid h-10 w-10 place-items-center rounded-xl bg-teal-600 text-white">
             <Heart size={18} />
+          </div> */}
+
+          <div>
+            <div className="text-[1.05rem] font-semibold text-teal-50">
+              {ngoName}
+            </div>
+            <p className="text-xs text-teal-400">NGO Admin</p>
           </div>
 
-          <div className="text-[1.4rem] font-semibold text-slate-800">
-            Donor<span className="text-teal-600">Lens</span>
-          </div>
-        </div>
+        </div>  
 
         <nav className="flex flex-col gap-2 px-3 py-6">
           {navItems.map((item) => {
@@ -83,7 +91,7 @@ export default function AdminSidebar() {
       <div className="border-t border-slate-200 px-5 py-4">
         <NavLink
           to="/"
-          className="text-sm text-slate-400 transition hover:text-slate-600"
+          className="text-sm text-teal-900 transition hover:text-slate-600"
         >
           ← Back to Home
         </NavLink>
