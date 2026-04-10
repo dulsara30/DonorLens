@@ -31,6 +31,8 @@ import SystemAdminOverviewPage from "../features/systemAdmin/pages/SystemAdminOv
 import SystemAdminUsersPage from "../features/systemAdmin/pages/SystemAdminUsersPage";
 import SystemAdminNgoRequestsPage from "../features/systemAdmin/pages/SystemAdminNgoRequestsPage";
 import SystemAdminCampaignsPage from "../features/systemAdmin/pages/SystemAdminCampaignsPage";
+import ExecutionUpdatesPage from "../features/impact/pages/ExecutionUpatesPage";
+import ExecutionDashboardPage from "../features/impact/pages/ExecutionDashboardPage";
 
 export const router = createBrowserRouter([
   // AUTH ROUTES (Public)
@@ -71,7 +73,9 @@ export const router = createBrowserRouter([
       { path: "/admin/campaigns/:id/edit", element: <UpdateCampaignPage /> },
       { path: "/admin/tracking/:id", element: <AdminExpenseTrackerPage /> },
       { path: "/admin/impact/:id", element: <AdminFinalReportPage /> },
-      // Add more NGO_ADMIN-only routes here
+      { path: "/admin/campaign-executions", element: <ExecutionDashboardPage /> },
+      { path: "/admin/campaign-executions/:campaignId", element: <ExecutionUpdatesPage /> },
+      { path: "/admin/executions", element: <ExecutionUpdatesPage /> },
     ],
   },
 

@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, PlusCircle, FolderKanban, Heart } from "lucide-react";
+import { LayoutDashboard, PlusCircle, FolderKanban, Heart, Zap } from "lucide-react";
 import useAuth from "../../../state/useAuth";
 
 const navItems = [
@@ -20,6 +20,12 @@ const navItems = [
     path: "/admin/campaigns",
     icon: FolderKanban,
     key: "myCampaigns",
+  },
+  {
+    label: "Campaign Executions",
+    path: "/admin/campaign-executions",
+    icon: Zap,
+    key: "campaignExecutions",
   },
 ];
 
@@ -44,6 +50,10 @@ export default function AdminSidebar() {
         pathname.startsWith("/admin/campaigns") &&
         pathname !== "/admin/campaigns/new"
       );
+    }
+
+    if (key === "campaignExecutions") {
+      return pathname.startsWith("/admin/campaign-executions");
     }
 
     return false;
