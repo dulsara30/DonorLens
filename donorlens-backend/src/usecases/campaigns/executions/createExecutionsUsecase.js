@@ -35,11 +35,11 @@ export const createExecutions = async ({ execution }) => {
   if (date) {
     const executionDate = new Date(date);
     const currentDate = new Date();
-    
+
     // Set time to start of day for comparison
     executionDate.setHours(0, 0, 0, 0);
     currentDate.setHours(0, 0, 0, 0);
-    
+
     if (executionDate > currentDate) {
       throw new ValidationError("Execution date cannot be a future date.");
     }
@@ -96,10 +96,24 @@ export const createExecutions = async ({ execution }) => {
   }
 
   //create execution update
+  // Ensure date is stored consistently (always as valid Date object)
+  let storedDate = new Date(); // Default to now
+  if (date) {
+    try {
+      const parsedDate = new Date(date);
+      // Validate the date is valid
+      if (!isNaN(parsedDate.getTime())) {
+        storedDate = parsedDate;
+      }
+    } catch (err) {
+      console.error("Error parsing date:", date, err);
+    }
+  }
+
   const executionUpdate = new ExecutionUpdate({
     campaignId,
     title,
-    date: date || new Date(),
+    date: storedDate,
     description,
     fundsUsed,
     evidencePhotos: formattedEvidencePhotos,

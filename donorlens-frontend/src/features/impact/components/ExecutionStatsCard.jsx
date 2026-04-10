@@ -1,4 +1,4 @@
-import { DollarSign, FileText, ListChecks, Target } from "lucide-react";
+import { DollarSign, FileText, ListChecks, Target, TrendingUp } from "lucide-react";
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
@@ -24,7 +24,7 @@ export default function ExecutionStatsCard({ campaign, summary, executionsCount 
   return (
     <div className="mb-6 rounded-[18px] border border-slate-200 bg-white px-6 py-4 shadow-sm">
       <h3 className="mb-4 text-lg font-semibold text-slate-900">{campaign.title}</h3>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {/* Completion Percentage */}
         <div className="flex items-center gap-3">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-teal-50">
@@ -37,6 +37,19 @@ export default function ExecutionStatsCard({ campaign, summary, executionsCount 
           <div>
             <p className="text-xs font-medium text-slate-500">COMPLETION</p>
             <p className="text-sm font-semibold text-slate-900">In Progress</p>
+          </div>
+        </div>
+
+        {/* Raised Amount */}
+        <div className="flex items-center gap-3">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-green-50">
+            <TrendingUp size={24} className="text-green-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-slate-500">RAISED</p>
+            <p className="text-sm font-semibold text-slate-900">
+              {formatCurrency(campaign?.raisedAmount || 0)}
+            </p>
           </div>
         </div>
 
@@ -72,7 +85,7 @@ export default function ExecutionStatsCard({ campaign, summary, executionsCount 
             <Target size={24} className="text-purple-600" />
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500">TARGET AMOUNT</p>
+            <p className="text-xs font-medium text-slate-500">TARGET</p>
             <p className="text-sm font-semibold text-slate-900">
               {formatCurrency(campaign?.totalPlannedCost || 0)}
             </p>

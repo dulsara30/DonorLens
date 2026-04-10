@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Calendar, DollarSign, Zap, Download, Edit2, Save, X } from "lucide-react";
+import { ArrowLeft, Calendar, DollarSign, Zap, Download, Edit2, Save, X, Lock } from "lucide-react";
+import { toast } from "react-toastify";
 import AdminLayout from "../../admin/layout/AdminLayout";
 import { useExecutionStore } from "../store/executionStore";
 
@@ -17,6 +18,36 @@ function calculateProgress(fundsUsed, totalPlannedCost) {
     return 0;
   }
   return Math.min((fundsUsed / totalPlannedCost) * 100, 100);
+}
+
+// Check if execution can be edited (must be within 24 hours of creation)
+function canEditExecution(execution) {
+  if (!execution.createdAt) return false;
+  
+  const createdTime = new Date(execution.createdAt).getTime();
+  const now = new Date().getTime();
+  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+  
+  return (now - createdTime) < twentyFourHoursInMs;
+}
+
+function getTimeRemainingToEdit(execution) {
+  if (!execution.createdAt) return null;
+  
+  const createdTime = new Date(execution.createdAt).getTime();
+  const now = new Date().getTime();
+  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+  const timeRemaining = twentyFourHoursInMs - (now - createdTime);
+  
+  if (timeRemaining <= 0) return "Expired";
+  
+  const hours = Math.floor(timeRemaining / (60 * 60 * 1000));
+  const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000));
+  
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  return `${minutes}m`;
 }
 
 export default function ExecutionDetailPage() {
@@ -49,11 +80,17 @@ export default function ExecutionDetailPage() {
         campaign: cachedCampaign,
         totalPlannedCost: cachedCampaign?.totalPlannedCost,
         fundsUsed: foundExecution.fundsUsed,
+        canEdit: canEditExecution(foundExecution),
+        createdAt: foundExecution.createdAt,
       });
     }
   }, [executionId, executions, cachedCampaign]);
 
   const handleEditClick = () => {
+    if (!canEditExecution(execution)) {
+      alert("This execution update is locked. Updates can only be edited within 24 hours of creation.");
+      return;
+    }
     setIsEditing(true);
   };
 
@@ -80,6 +117,11 @@ export default function ExecutionDetailPage() {
         fundsUsed: editedData.fundsUsed,
       });
       
+      toast.success("✓ Execution updated successfully!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      
       setIsEditing(false);
       
       // Redirect to executions list after 1 second
@@ -88,7 +130,11 @@ export default function ExecutionDetailPage() {
       }, 1000);
     } catch (error) {
       console.error("Failed to update execution:", error);
-      alert("Failed to update execution. Please try again.");
+      const errorMessage = error?.response?.data?.message || "Failed to update execution. Please try again.";
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } finally {
       setUpdatingExecution(false);
     }
@@ -155,13 +201,31 @@ export default function ExecutionDetailPage() {
                 )}
               </div>
               {!isEditing && (
-                <button
-                  onClick={handleEditClick}
-                  className="rounded-lg bg-white/20 p-2 transition hover:bg-white/30"
-                  title="Edit execution"
-                >
-                  <Edit2 size={20} className="text-white" />
-                </button>
+                <div className="flex gap-2">
+                  {canEditExecution(execution) ? (
+                    <>
+                      <button
+                        onClick={handleEditClick}
+                        className="rounded-lg bg-white/20 p-2 transition hover:bg-white/30"
+                        title="Edit execution"
+                      >
+                        <Edit2 size={20} className="text-white" />
+                      </button>
+                      <div className="rounded-lg bg-amber-500/20 px-3 py-2 text-xs font-medium text-amber-100">
+                        ⏱️ Edit for: {getTimeRemainingToEdit(execution)}
+                      </div>
+                    </>
+                  ) : (
+                    <button
+                      disabled
+                      className="inline-flex items-center gap-2 rounded-lg bg-slate-400/30 px-3 py-2 text-white cursor-not-allowed opacity-60"
+                      title="This update is locked - can only be edited within 24 hours of creation"
+                    >
+                      <Lock size={16} />
+                      <span className="text-xs font-medium">Locked</span>
+                    </button>
+                  )}
+                </div>
               )}
             </div>
             <div className="mt-4 flex flex-col gap-2 text-teal-100">
