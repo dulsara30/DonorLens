@@ -5,6 +5,8 @@ import { getMyCampaignsController } from "../../controllers/campaigns/getMyCampa
 import { getSingleCampaignController } from "../../controllers/campaigns/getSingleCampaign.controller.js";
 import { updateCampaignController } from "../../controllers/campaigns/updateCampaign.controller.js";
 import { deleteCampaignController } from "../../controllers/campaigns/deleteCampaign.controller.js";
+import { getAllCampaignsController } from "../../controllers/campaigns/getAllCampaigns.controller.js";
+import { getPublicSingleCampaignController } from "../../controllers/campaigns/getPublicSingleCampaign.controller.js";
 
 import { authenticateToken } from "../../middleware/auth.middleware.js";
 import upload, { uploadImageOnly } from "../../middleware/upload.middleware.js";
@@ -43,6 +45,10 @@ router.delete(
   authenticateToken,
   deleteCampaignController
 );
+
+router.get("/get-all-campaigns", getAllCampaignsController);
+
+router.get("/get-all-campaigns/:campaignId", getPublicSingleCampaignController);
 
 export default router;
 

@@ -13,6 +13,8 @@ import HomePage from "../pages/HomePage";
 import RegisterUserPage from "../pages/RegisterUserPage";
 import NgoRequestPage from "../pages/NgoRequestPage";
 import TermsPage from "../pages/TermsPage";
+import CampaignsPage from "../pages/CampaignsPage";
+import PublicCampaignDetailsPage from "../pages/PublicCampainDetailsPage";
 
 import CampaignListPage from "../features/campaigns/pages/CampaignListPage";
 import CampaignDetailsPage from "../features/campaigns/pages/CampaignDetailsPage";
@@ -49,8 +51,8 @@ export const router = createBrowserRouter([
 
   // PUBLIC ROUTES
   { path: "/", element: <HomePage /> },
-  { path: "/campaigns", element: <CampaignListPage /> },
-  { path: "/campaigns/:id", element: <CampaignDetailsPage /> },
+  { path: "/campaigns", element: <CampaignsPage /> },
+  { path: "/campaigns/:id", element: <PublicCampaignDetailsPage /> },
   { path: "/campaigns/:id/donate", element: <DonatePage /> },
   // { path: "/admin/campaigns/new", element: <AdminCreateCampaignPage /> },
 
