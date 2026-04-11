@@ -1,12 +1,5 @@
 import { X, Calendar, DollarSign, Zap } from "lucide-react";
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "LKR",
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
-}
+import { formatCurrency, formatDate } from "../utils/executionUtils";
 
 export default function ExecutionDetailModal({ execution, isOpen, onClose }) {
   if (!isOpen) return null;

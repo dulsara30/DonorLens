@@ -36,12 +36,15 @@ export const createExecutions = async ({ execution }) => {
     const executionDate = new Date(date);
     const currentDate = new Date();
 
-    // Set time to start of day for comparison
-    executionDate.setHours(0, 0, 0, 0);
-    currentDate.setHours(0, 0, 0, 0);
+    // Extract just the date part (YYYY-MM-DD) to avoid timezone issues
+    const executionDateStr = executionDate.toISOString().split("T")[0]; // e.g., "2026-04-11"
+    const currentDateStr = currentDate.toISOString().split("T")[0]; // e.g., "2026-04-11"
 
-    if (executionDate > currentDate) {
-      throw new ValidationError("Execution date cannot be a future date.");
+    // Compare as strings: "2026-04-11" > "2026-04-12" = false (today is allowed)
+    if (executionDateStr > currentDateStr) {
+      throw new ValidationError(
+        "Execution date cannot be in the future. Please select today or a past date.",
+      );
     }
   }
 

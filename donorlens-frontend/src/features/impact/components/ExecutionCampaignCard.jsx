@@ -1,12 +1,5 @@
 import { ChevronRight, MapPin } from "lucide-react";
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "LKR",
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
-}
+import { formatCurrency } from "../utils/executionUtils";
 
 export default function ExecutionCampaignCard({ campaign, onSelect }) {
   return (

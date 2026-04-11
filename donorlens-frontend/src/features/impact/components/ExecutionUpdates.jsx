@@ -1,24 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { FileText, X } from "lucide-react";
 import axiosInstance from "../../../lib/axios";
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("en-LK", {
-    style: "currency",
-    currency: "LKR",
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-LK", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
+import { formatCurrency, formatDate, calculateExecutionProgress } from "../utils/executionUtils";
+import ExecutionTimelineItem from "./ExecutionTimelineItem";
 
 export default function ExecutionUpdates({ campaignId, raisedAmount, totalPlannedCost }) {
   const [executions, setExecutions] = useState([]);
@@ -56,39 +40,9 @@ export default function ExecutionUpdates({ campaignId, raisedAmount, totalPlanne
     }
   };
 
-  // Calculate cumulative funds and progress
+  // Calculate cumulative funds and progress using shared utility
   const executionsWithProgress = useMemo(() => {
-    // Sort executions by date (oldest first for cumulative calculation)
-    const sorted = [...executions].sort((a, b) => {
-      return new Date(a.date) - new Date(b.date);
-    });
-
-    const plannedCost = Number(totalPlannedCost || 0);
-    let cumulativePercentage = 0;
-    
-    const withProgress = sorted.map((execution) => {
-      // Calculate percentage for this execution: (fundsUsed / totalPlannedCost) * 100
-      const executionPercentage = plannedCost > 0 
-        ? Math.round((Number(execution.fundsUsed || 0) / plannedCost) * 100)
-        : 0;
-      
-      // Add to cumulative percentage
-      cumulativePercentage += executionPercentage;
-      
-      // Cap at 100%
-      const progressPercentage = Math.min(cumulativePercentage, 100);
-
-      return {
-        ...execution,
-        cumulativeFundsUsed: cumulativePercentage,
-        progressPercentage,
-      };
-    });
-
-    // Sort back to most recent first for display
-    return withProgress.sort((a, b) => {
-      return new Date(b.date) - new Date(a.date);
-    });
+    return calculateExecutionProgress(executions, totalPlannedCost);
   }, [executions, totalPlannedCost]);
 
   if (loading) {
