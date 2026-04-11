@@ -1,12 +1,10 @@
 {
-<<<<<<< HEAD
   "status": "failed",
   "failedTests": [
-    "972e94717137ffec3ddc-2ab7138c42372f741286",
-    "972e94717137ffec3ddc-b220aca236ec7e45ed7a"
+    "b5eed5ad766f3a7c814e-a652d6a4ee3f13429bbd",
+    "b5eed5ad766f3a7c814e-7b07432a87a4869a092b",
+    "b5eed5ad766f3a7c814e-7242ef50c94f62ccf446",
+    "b5eed5ad766f3a7c814e-2d45a8c3451fdbc86a03",
+    "b5eed5ad766f3a7c814e-5501cab39b38993b1781"
   ]
-=======
-  "status": "passed",
-  "failedTests": []
->>>>>>> 8ab3d72 (new changes in campaign executions backend and api testing)
 }

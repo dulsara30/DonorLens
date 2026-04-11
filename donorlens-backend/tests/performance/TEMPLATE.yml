@@ -1,0 +1,87 @@
+# Artillery.io Performance Test Template
+# Copy this file and customize for your component's API endpoints
+# Example: payment-api-load-test.yml, auth-api-load-test.yml, etc.
+
+config:
+  target: "http://localhost:5000" # TODO: Update to your API base URL
+  phases:
+    # Warm-up: gradually increase load
+    - duration: 60
+      arrivalRate: 5
+      rampUp: 60
+      name: "Warm up"
+
+    # Sustained load: consistent traffic
+    - duration: 120
+      arrivalRate: 10
+      name: "Sustained load"
+
+    # Peak load: high traffic
+    - duration: 60
+      arrivalRate: 20
+      name: "Peak load"
+
+    # Cool down: gradually reduce load
+    - duration: 60
+      arrivalRate: 5
+      rampUp: 60
+      name: "Cool down"
+
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      # TODO: Replace with valid auth token for your component
+      Authorization: "Bearer YOUR_AUTH_TOKEN_HERE"
+
+scenarios:
+  # TODO: Update these scenarios with your API endpoints
+  # Keep the weight distribution in mind (total should equal 100%)
+
+  # Scenario 1: Read/GET operations (Most common)
+  - name: "Read Operations"
+    weight: 40 # 40% of traffic
+    flow:
+      - get:
+          url: "/api/your-endpoint" # TODO: Replace with your endpoint
+          expect:
+            - statusCode: 200
+
+  # Scenario 2: Create/POST operations (Less common)
+  - name: "Create Operations"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/your-endpoint" # TODO: Replace with your endpoint
+          json:
+            # TODO: Add your request body fields
+            field1: "value {{ $randomNumber(1, 100) }}"
+            field2: "test data"
+          expect:
+            - statusCode: [201, 400]
+
+  # Scenario 3: Update/PATCH operations (Medium frequency)
+  - name: "Update Operations"
+    weight: 20
+    flow:
+      - patch:
+          url: "/api/your-endpoint/ID" # TODO: Replace with your endpoint
+          json:
+            # TODO: Add your update fields
+            field1: "updated {{ $randomNumber(1, 100) }}"
+          expect:
+            - statusCode: [200, 400, 404]
+
+  # Scenario 4: Delete/DELETE operations (Least common)
+  - name: "Delete Operations"
+    weight: 10
+    flow:
+      - delete:
+          url: "/api/your-endpoint/ID" # TODO: Replace with your endpoint
+          expect:
+            - statusCode: [200, 400, 404]
+
+# After customizing:
+# 1. Run: npx artillery run TEMPLATE.yml
+# 2. Check results
+# 3. Adjust phases if needed
+# 4. Document findings in RESULTS.md
