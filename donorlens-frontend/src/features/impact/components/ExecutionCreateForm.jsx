@@ -97,10 +97,12 @@ export default function ExecutionCreateForm({ isOpen, onClose, onSubmit, campaig
     }
 
     // Date validation - cannot be in the future
-    const selectedDate = new Date(formData.date);
+    // Compare date strings (YYYY-MM-DD) to avoid timezone issues
+    const selectedDateStr = formData.date; // e.g., "2026-04-11"
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (selectedDate > today) {
+    const todayStr = today.toISOString().split('T')[0]; // e.g., "2026-04-11"
+    
+    if (selectedDateStr > todayStr) {
       const errorMsg = "Execution date cannot be in the future";
       setLocalError(errorMsg);
       toast.error(errorMsg, {
@@ -131,12 +133,10 @@ export default function ExecutionCreateForm({ isOpen, onClose, onSubmit, campaig
       return;
     }
 
-    // Convert date to ISO string with UTC timezone
-    // Input format: YYYY-MM-DD, convert to: YYYY-MM-DDTHH:mm:ss.sssZ
-    const dateObj = new Date(formData.date);
-    // Adjust for timezone by adding the offset
-    const offsetDate = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000);
-    const isoDate = offsetDate.toISOString();
+    // Convert date string to ISO format
+    // Input format: YYYY-MM-DD, convert to: YYYY-MM-DDTHH:mm:ss.000Z (at midnight UTC)
+    const dateString = formData.date; // e.g., "2026-04-11"
+    const isoDate = `${dateString}T00:00:00.000Z`;
 
     const payload = {
       ...formData,

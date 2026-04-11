@@ -1,44 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Trash2, Eye, Lock } from "lucide-react";
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "LKR",
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
-}
-
-// Check if execution can be edited (must be within 24 hours of creation)
-function canEditExecution(execution) {
-  if (!execution.createdAt) return false;
-  
-  const createdTime = new Date(execution.createdAt).getTime();
-  const now = new Date().getTime();
-  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
-  
-  return (now - createdTime) < twentyFourHoursInMs;
-}
-
-function getTimeRemainingToEdit(execution) {
-  if (!execution.createdAt) return null;
-  
-  const createdTime = new Date(execution.createdAt).getTime();
-  const now = new Date().getTime();
-  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
-  const timeRemaining = twentyFourHoursInMs - (now - createdTime);
-  
-  if (timeRemaining <= 0) return "Expired";
-  
-  const hours = Math.floor(timeRemaining / (60 * 60 * 1000));
-  const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000));
-  
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  return `${minutes}m`;
-}
+import { formatCurrency, canEditExecution, extractPhotoUrl } from "../utils/executionUtils";
 
 const ExecutionCard = ({ execution, onDelete, onEdit, campaign, cumulativeFundsUsed }) => {
   const { campaignId } = useParams();
@@ -147,7 +110,7 @@ const ExecutionCard = ({ execution, onDelete, onEdit, campaign, cumulativeFundsU
               {execution.evidencePhotos.slice(0, 3).map((photo, index) => (
                 <img
                   key={`${photo.public_id || index}`}
-                  src={photo.secure_url}
+                  src={extractPhotoUrl(photo)}
                   alt={`Evidence ${index + 1}`}
                   className="h-16 w-16 rounded-lg border border-slate-200 object-cover"
                 />

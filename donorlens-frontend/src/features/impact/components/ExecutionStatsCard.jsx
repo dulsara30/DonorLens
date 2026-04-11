@@ -1,19 +1,5 @@
 import { DollarSign, FileText, ListChecks, Target, TrendingUp } from "lucide-react";
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "LKR",
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
-}
-
-function calculateProgress(fundsUsed, totalPlannedCost) {
-  if (!totalPlannedCost || fundsUsed === undefined || fundsUsed === null) {
-    return 0;
-  }
-  return Math.min((fundsUsed / totalPlannedCost) * 100, 100);
-}
+import { formatCurrency, calculateProgress } from "../utils/executionUtils";
 
 export default function ExecutionStatsCard({ campaign, summary, executionsCount }) {
   if (!campaign) return null;

@@ -4,51 +4,7 @@ import { ArrowLeft, Calendar, DollarSign, Zap, Download, Edit2, Save, X, Lock } 
 import { toast } from "react-toastify";
 import AdminLayout from "../../admin/layout/AdminLayout";
 import { useExecutionStore } from "../store/executionStore";
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "LKR",
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
-}
-
-function calculateProgress(fundsUsed, totalPlannedCost) {
-  if (!totalPlannedCost || fundsUsed === undefined || fundsUsed === null) {
-    return 0;
-  }
-  return Math.min((fundsUsed / totalPlannedCost) * 100, 100);
-}
-
-// Check if execution can be edited (must be within 24 hours of creation)
-function canEditExecution(execution) {
-  if (!execution.createdAt) return false;
-  
-  const createdTime = new Date(execution.createdAt).getTime();
-  const now = new Date().getTime();
-  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
-  
-  return (now - createdTime) < twentyFourHoursInMs;
-}
-
-function getTimeRemainingToEdit(execution) {
-  if (!execution.createdAt) return null;
-  
-  const createdTime = new Date(execution.createdAt).getTime();
-  const now = new Date().getTime();
-  const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
-  const timeRemaining = twentyFourHoursInMs - (now - createdTime);
-  
-  if (timeRemaining <= 0) return "Expired";
-  
-  const hours = Math.floor(timeRemaining / (60 * 60 * 1000));
-  const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000));
-  
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  return `${minutes}m`;
-}
+import { formatCurrency, calculateProgress, canEditExecution } from "../utils/executionUtils";
 
 export default function ExecutionDetailPage() {
   const { campaignId, executionId } = useParams();
