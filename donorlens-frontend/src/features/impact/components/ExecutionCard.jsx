@@ -129,13 +129,6 @@ const ExecutionCard = ({ execution, onDelete, onEdit, campaign, cumulativeFundsU
         {/* Description */}
         <p className="mt-2 text-slate-600">{execution.description}</p>
 
-        {/* Edit Lock Warning - Show time remaining if edit window is closing */}
-        {!execution.isDefault && canEditExecution(execution) && (
-          <p className="mt-2 text-xs text-amber-600">
-            Can edit for: {getTimeRemainingToEdit(execution)}
-          </p>
-        )}
-
         {/* Progress Bar */}
         <div className="mt-4">
           <div className="h-2 rounded-full bg-slate-200">

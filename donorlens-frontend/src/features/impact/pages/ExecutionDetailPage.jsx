@@ -203,18 +203,13 @@ export default function ExecutionDetailPage() {
               {!isEditing && (
                 <div className="flex gap-2">
                   {canEditExecution(execution) ? (
-                    <>
-                      <button
-                        onClick={handleEditClick}
-                        className="rounded-lg bg-white/20 p-2 transition hover:bg-white/30"
-                        title="Edit execution"
-                      >
-                        <Edit2 size={20} className="text-white" />
-                      </button>
-                      <div className="rounded-lg bg-amber-500/20 px-3 py-2 text-xs font-medium text-amber-100">
-                        ⏱️ Edit for: {getTimeRemainingToEdit(execution)}
-                      </div>
-                    </>
+                    <button
+                      onClick={handleEditClick}
+                      className="rounded-lg bg-white/20 p-2 transition hover:bg-white/30"
+                      title="Edit execution"
+                    >
+                      <Edit2 size={20} className="text-white" />
+                    </button>
                   ) : (
                     <button
                       disabled
