@@ -223,10 +223,7 @@ export default function UpdateCampaignPage() {
 
       {currentStep === 4 && (
         <CampaignReviewStep
-          form={{
-            ...form,
-            coverImage: form.coverImage?.secure_url ? { name: "Existing image" } : null,
-          }}
+          form={form}
           submitting={submitting}
           submitError={submitError}
           onPrev={() => setCurrentStep(3)}

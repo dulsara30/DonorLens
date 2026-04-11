@@ -5,6 +5,7 @@ import AdminLayout from "../../admin/layout/AdminLayout";
 import { deleteCampaignApi, getMyCampaignsApi } from "../api";
 import MyCampaignListHeader from "../components/CampaignsListHeader";
 import MyCampaignCard from "../components/CampaignCard";
+import { toast } from "react-toastify";
 
 export default function CampaignListPage() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export default function CampaignListPage() {
   const [pageError, setPageError] = useState("");
   const [deletingId, setDeletingId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   useEffect(() => {
     fetchCampaigns();
@@ -60,12 +62,6 @@ export default function CampaignListPage() {
   );
 
   const handleDeleteCampaign = async (campaignId) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this campaign?"
-    );
-
-    if (!confirmed) return;
-
     try {
       setDeletingId(campaignId);
       await deleteCampaignApi(campaignId);
@@ -73,7 +69,9 @@ export default function CampaignListPage() {
       setCampaigns((prev) => prev.filter((item) => item._id !== campaignId));
     } catch (error) {
       console.error(error);
-      alert(error?.response?.data?.message || "Failed to delete campaign");
+      toast.error(
+        error?.response?.data?.message || "Failed to delete campaign"
+      );
     } finally {
       setDeletingId("");
     }
@@ -132,12 +130,48 @@ export default function CampaignListPage() {
                 onEdit={() =>
                   navigate(`/admin/campaigns/${campaign._id}/edit`)
                 }
-                onDelete={() => handleDeleteCampaign(campaign._id)}
+                onDelete={() => setConfirmDeleteId(campaign._id)}
               />
             ))}
           </div>
         )}
       </div>
+
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-slate-900">
+              Delete Campaign?
+            </h3>
+
+            <p className="mt-2 text-sm text-slate-500">
+              This action cannot be undone. Are you sure you want to delete this campaign?
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  handleDeleteCampaign(confirmDeleteId);
+                  setConfirmDeleteId(null);
+                }}
+                className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      
+      )}
     </AdminLayout>
+
+    
   );
 }
