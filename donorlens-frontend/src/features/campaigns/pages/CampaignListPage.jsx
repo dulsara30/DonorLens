@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 import AdminLayout from "../../admin/layout/AdminLayout";
 import { deleteCampaignApi, getMyCampaignsApi } from "../api";
 import MyCampaignListHeader from "../components/CampaignsListHeader";
@@ -12,8 +13,7 @@ export default function CampaignListPage() {
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
   const [deletingId, setDeletingId] = useState("");
-
-  const campaignCount = useMemo(() => campaigns.length, [campaigns.length]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchCampaigns();
@@ -35,6 +35,29 @@ export default function CampaignListPage() {
       setLoading(false);
     }
   };
+
+  const filteredCampaigns = useMemo(() => {
+    const keyword = searchTerm.trim().toLowerCase();
+
+    if (!keyword) return campaigns;
+
+    return campaigns.filter((campaign) => {
+      const title = campaign.title?.toLowerCase() || "";
+      const description = campaign.description?.toLowerCase() || "";
+      const location = campaign.location?.locationName?.toLowerCase() || "";
+
+      return (
+        title.includes(keyword) ||
+        description.includes(keyword) ||
+        location.includes(keyword)
+      );
+    });
+  }, [campaigns, searchTerm]);
+
+  const campaignCount = useMemo(
+    () => filteredCampaigns.length,
+    [filteredCampaigns.length]
+  );
 
   const handleDeleteCampaign = async (campaignId) => {
     const confirmed = window.confirm(
@@ -64,6 +87,22 @@ export default function CampaignListPage() {
           onCreateNew={() => navigate("/admin/campaigns/new")}
         />
 
+        <div className="mb-6">
+          <div className="relative">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+            />
+            <input
+              type="text"
+              placeholder="Search campaigns..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-12 pr-4 text-sm text-slate-700 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+            />
+          </div>
+        </div>
+
         {loading && (
           <div className="rounded-[24px] border border-slate-200 bg-white px-6 py-8 text-sm text-slate-500 shadow-sm">
             Loading campaigns...
@@ -76,9 +115,15 @@ export default function CampaignListPage() {
           </div>
         )}
 
-        {!loading && !pageError && campaigns.length > 0 && (
+        {!loading && !pageError && filteredCampaigns.length === 0 && (
+          <div className="rounded-[24px] border border-slate-200 bg-white px-6 py-8 text-sm text-slate-500 shadow-sm">
+            No campaigns found.
+          </div>
+        )}
+
+        {!loading && !pageError && filteredCampaigns.length > 0 && (
           <div className="space-y-5">
-            {campaigns.map((campaign) => (
+            {filteredCampaigns.map((campaign) => (
               <MyCampaignCard
                 key={campaign._id}
                 campaign={campaign}
