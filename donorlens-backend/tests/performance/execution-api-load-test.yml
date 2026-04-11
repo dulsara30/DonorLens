@@ -1,0 +1,83 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    # Ramp up phase: gradually increase load
+    - duration: 60
+      arrivalRate: 5
+      rampUp: 60
+      name: "Warm up"
+    # Sustained load phase: consistent traffic
+    - duration: 120
+      arrivalRate: 10
+      name: "Sustained load"
+    # Peak load phase: high traffic
+    - duration: 60
+      arrivalRate: 20
+      name: "Peak load"
+    # Cool down phase: gradually reduce load
+    - duration: 60
+      arrivalRate: 5
+      rampUp: 60
+      name: "Cool down"
+
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OThlMWYzY2IzMDhlMDE4ZDVkMjE4NmYiLCJyb2xlIjoiTkdPX0FETUlOIiwiaWF0IjoxNzc1MDIyMDEzLCJleHAiOjE3NzUxMDg0MTN9.1LtW1plsWrm0lUa6UkvF08yWMkxIM5jQonfuytYJeSw"
+
+scenarios:
+  # Scenario 1: Read operations (GET execution updates)
+  - name: "Read Execution Updates"
+    flow:
+      - get:
+          url: "/api/campaign-executions/69abdbf32a26012295630f48/executions"
+          expect:
+            - statusCode: 200
+
+  # Scenario 2: Create execution (with simulated data)
+  - name: "Create Execution Updates"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/campaign-executions/69abdbf32a26012295630f48/executions"
+          json:
+            title: "Performance Test {{ $randomNumber(1, 100) }}"
+            date: "2026-04-11"
+            description: "Load test execution update"
+            fundsUsed: "{{ $randomNumber(1000, 50000) }}"
+          expect:
+            - statusCode: [201, 400]
+          capture:
+            - json: "$.data.executionUpdate._id"
+              as: "executionId"
+
+  # Scenario 3: Get specific execution
+  - name: "Get Specific Execution"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/campaign-executions/69abdbf32a26012295630f48/executions/69abdbf32a26012295630f48"
+          expect:
+            - statusCode: [200, 404]
+
+  # Scenario 4: Update execution
+  - name: "Update Execution"
+    weight: 20
+    flow:
+      - patch:
+          url: "/api/campaign-executions/69abdbf32a26012295630f48/executions/69abdbf32a26012295630f48"
+          json:
+            title: "Updated Title {{ $randomNumber(1, 100) }}"
+            description: "Updated description"
+            fundsUsed: "{{ $randomNumber(1000, 50000) }}"
+          expect:
+            - statusCode: [200, 400, 404]
+
+  # Scenario 5: Delete execution
+  - name: "Delete Execution"
+    weight: 10
+    flow:
+      - delete:
+          url: "/api/campaign-executions/69abdbf32a26012295630f48/executions/69abdbf32a26012295630f48"
+          expect:
+            - statusCode: [200, 400, 404]
