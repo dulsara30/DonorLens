@@ -4,9 +4,9 @@ import { PayHereHiddenForm } from '../components/PaymentForm';
 import Header from '../../../components/layout/Header';
 import Footer from '../../../components/layout/Footer';
 import DonateStepIndicator from '../../../components/donate/DonateStepIndicator';
-import DonateStepAmount    from '../../../components/donate/DonateStepAmount';
-import DonateStepDetails   from '../../../components/donate/DonateStepDetails';
-import DonateStepReview    from '../../../components/donate/DonateStepReview';
+import DonateStepAmount from '../../../components/donate/DonateStepAmount';
+import DonateStepDetails from '../../../components/donate/DonateStepDetails';
+import DonateStepReview from '../../../components/donate/DonateStepReview';
 import { getSingleCampaignApi } from '../../campaigns/api';
 
 export default function DonatePage() {
@@ -14,12 +14,12 @@ export default function DonatePage() {
   const formRef = useRef(null);
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [campaign, setCampaign]       = useState(null);
+  const [campaign, setCampaign] = useState(null);
 
   // Step 1 – amount
   const [selectedAmount, setSelectedAmount] = useState(1000);
-  const [customAmount, setCustomAmount]     = useState('');
-  const [useCustom, setUseCustom]           = useState(false);
+  const [customAmount, setCustomAmount] = useState('');
+  const [useCustom, setUseCustom] = useState(false);
 
   // Step 2 – donor info
   const [donorInfo, setDonorInfo] = useState({
@@ -27,7 +27,7 @@ export default function DonatePage() {
     phone: '', address: '', city: '',
   });
 
-  const [errors, setErrors]         = useState({});
+  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderId] = useState(() => `DL-${campaignId?.slice(-6)}-${Date.now()}`);
 
@@ -54,12 +54,12 @@ export default function DonatePage() {
   const validateStep2 = () => {
     const e = {};
     if (!donorInfo.firstName.trim()) e.firstName = 'First name is required';
-    if (!donorInfo.lastName.trim())  e.lastName  = 'Last name is required';
-    if (!donorInfo.email.trim())     e.email     = 'Email is required';
+    if (!donorInfo.lastName.trim()) e.lastName = 'Last name is required';
+    if (!donorInfo.email.trim()) e.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(donorInfo.email)) e.email = 'Enter a valid email';
-    if (!donorInfo.phone.trim())     e.phone    = 'Phone number is required';
-    if (!donorInfo.address.trim())   e.address  = 'Address is required';
-    if (!donorInfo.city.trim())      e.city     = 'City is required';
+    if (!donorInfo.phone.trim()) e.phone = 'Phone number is required';
+    if (!donorInfo.address.trim()) e.address = 'Address is required';
+    if (!donorInfo.city.trim()) e.city = 'City is required';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -76,6 +76,17 @@ export default function DonatePage() {
   };
 
   const handleProceedToPayment = () => {
+    sessionStorage.setItem(
+      'dl_pending_donation',
+      JSON.stringify({
+        campaignId,
+        amount: finalAmount,
+        currency: 'LKR',
+        paymentMethod: 'ONLINE',
+        campaignTitle: campaign?.title || '',
+        orderId,
+      })
+    );
     setIsSubmitting(true);
     setTimeout(() => formRef.current?.submit(), 300);
   };

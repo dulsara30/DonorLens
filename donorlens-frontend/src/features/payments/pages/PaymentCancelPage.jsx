@@ -1,19 +1,9 @@
-// PaymentCancelPage.jsx
-// Shown when PayHere redirects to cancel_url.
-//
-// Per PayHere docs, cancel_url is triggered for ALL non-success outcomes:
-//   - User clicked Cancel on the PayHere checkout page
-//   - Payment failed (insufficient funds, card declined, network error, etc.)
-//   - Session expired
-//
-// ⚠️  status_code is only sent to notify_url (server callback), NOT to cancel_url.
-//     So we cannot distinguish the exact reason here — we treat all cases as
-//     "payment not completed" and guide the user to try again.
-
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Header from '../../../components/layout/Header';
 import Footer from '../../../components/layout/Footer';
+
+const PENDING_KEY = 'dl_pending_donation';
 
 // Animated warning / not-completed icon
 function NotCompletedIcon() {
@@ -47,13 +37,23 @@ function ReasonCard({ icon, title, description }) {
 
 export default function PaymentCancelPage() {
   const [searchParams] = useSearchParams();
-  // PayHere may optionally pass order_id to cancel_url
   const orderId = searchParams.get('order_id') || null;
   const [show, setShow] = useState(false);
+  const [donation, setDonation] = useState(null);
 
   useEffect(() => {
     const t = setTimeout(() => setShow(true), 100);
     return () => clearTimeout(t);
+  }, []);
+
+  // Read and clear the pending donation so it doesn't carry over
+  useEffect(() => {
+    const raw = sessionStorage.getItem(PENDING_KEY);
+    if (raw) {
+      try { setDonation(JSON.parse(raw)); } catch { }
+      // Clear it — payment was not completed
+      sessionStorage.removeItem(PENDING_KEY);
+    }
   }, []);
 
   return (
@@ -70,9 +70,8 @@ export default function PaymentCancelPage() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-20 md:py-28">
         <div
-          className={`max-w-lg w-full transition-all duration-700 ${
-            show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
+          className={`max-w-lg w-full transition-all duration-700 ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
         >
           {/* Main card */}
           <div className="bg-white rounded-3xl shadow-2xl shadow-orange-100/60 border border-slate-100 overflow-hidden">
@@ -193,7 +192,7 @@ export default function PaymentCancelPage() {
               {/* CTA actions */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
-                  to="/campaigns"
+                  to={donation?.campaignId ? `/campaigns/${donation.campaignId}/donate` : '/campaigns'}
                   id="try-again-btn"
                   className="flex-1 px-6 py-3.5 bg-gradient-to-r from-teal-600 to-cyan-600 text-white text-sm font-bold rounded-2xl text-center hover:from-teal-700 hover:to-cyan-700 shadow-lg shadow-teal-200 hover:shadow-xl transition-all duration-200 no-underline"
                 >
