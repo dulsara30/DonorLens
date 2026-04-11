@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { getPublicSingleCampaignApi } from "../features/campaigns/api";
+import CampaignSideCard from "../components/layout/CampaignSideCard";
 
 const sdgGoals = {
   1: "No Poverty",
@@ -272,24 +273,7 @@ export default function PublicCampaignDetailsPage() {
           </div>
 
           <div>
-            <div className="sticky top-8 rounded-[28px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
-              <div className="rounded-[22px] border border-dashed border-slate-200 bg-slate-50 px-6 py-16 text-center">
-                <p className="text-lg font-medium text-slate-500">
-                  Donation area
-                </p>
-                <p className="mt-2 text-sm leading-6 text-slate-400">
-                  You can add donation fields or payment integrations here later.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-6 py-4 text-md font-semibold text-white transition hover:bg-teal-700"
-              >
-                <Heart size={20} />
-                <span>Donate Now</span>
-              </button>
-            </div>
+            <CampaignSideCard campaign={campaign} />
           </div>
         </div>
       </div>
