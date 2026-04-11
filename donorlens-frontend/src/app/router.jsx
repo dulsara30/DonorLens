@@ -19,6 +19,8 @@ import PublicCampaignDetailsPage from "../pages/PublicCampainDetailsPage";
 import CampaignListPage from "../features/campaigns/pages/CampaignListPage";
 import CampaignDetailsPage from "../features/campaigns/pages/CampaignDetailsPage";
 import DonatePage from "../features/payments/pages/DonatePage";
+import PaymentSuccessPage from "../features/payments/pages/PaymentSuccessPage";
+import PaymentCancelPage from "../features/payments/pages/PaymentCancelPage";
 
 import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import AdminCreateCampaignPage from "../features/campaigns/pages/AdminCreateCampaignPage";
@@ -54,6 +56,8 @@ export const router = createBrowserRouter([
   { path: "/campaigns", element: <CampaignsPage /> },
   { path: "/campaigns/:id", element: <PublicCampaignDetailsPage /> },
   { path: "/campaigns/:id/donate", element: <DonatePage /> },
+  { path: "/payment/return",        element: <PaymentSuccessPage /> },
+  { path: "/payment/cancel",        element: <PaymentCancelPage /> },
   // { path: "/admin/campaigns/new", element: <AdminCreateCampaignPage /> },
 
   // USER ONLY ROUTES (Donors)
