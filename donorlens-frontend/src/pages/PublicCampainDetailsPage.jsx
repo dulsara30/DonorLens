@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { getPublicSingleCampaignApi } from "../features/campaigns/api";
 import CampaignSideCard from "../components/layout/CampaignSideCard";
+import ExecutionUpdates from "../features/impact/components/ExecutionUpdates";
 
 const sdgGoals = {
   1: "No Poverty",
@@ -269,6 +270,14 @@ export default function PublicCampaignDetailsPage() {
                   )}
                 </div>
               </div>
+            </div>
+
+            <div className="rounded-[28px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
+              <ExecutionUpdates 
+                campaignId={id} 
+                raisedAmount={campaign.raisedAmount} 
+                totalPlannedCost={campaign.totalPlannedCost}
+              />
             </div>
           </div>
 
