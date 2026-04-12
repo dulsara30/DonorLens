@@ -525,8 +525,8 @@ These URLs were not stored in the repository, so fill them in after deployment.
 
 | Service                       | URL |
 | ----------------------------- | --- |
-| Deployed backend API          | ![Backend URL](https://donorlens-production.up.railway.app/health) |
-| Deployed frontend application | ![Frontend URL](https://donor-lens.vercel.app/) |
+| Deployed backend API          | [Backend URL](https://donorlens-production.up.railway.app/health) |
+| Deployed frontend application | [Frontend URL](https://donor-lens.vercel.app/) |
 
 ### Deployment Evidence
 
