@@ -534,8 +534,10 @@ Add the following to your submission after deployment:
 
 1. Screenshot of the Railway service showing the backend is live.
     ![BackendDeploymentEvidence](donorlens-frontend/src/assets/BackendDeploymentEvidence.png)
+
 4. Screenshot of the Vercel deployment dashboard showing the frontend deployment succeeded.
     ![FrontendDeploymentEvidence](donorlens-frontend/src/assets/FrontendDeploymentEvidence.png)
+
 6. Screenshot of the live frontend opening in a browser.
     ![BrowserDeploymentEvidence](donorlens-frontend/src/assets/BrowserDeploymentEvidence.png)
 
