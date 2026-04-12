@@ -1,1 +1,7 @@
-//All API calls related to campaigns will be defined here. This includes creating a campaign, updating a campaign, deleting a campaign, and fetching campaign details.
+// API calls related to the user profile
+import api from "../../lib/axios";
+
+export const getUserDonations = async () => {
+  const response = await api.get("/payment/my");
+  return response.data;
+};
