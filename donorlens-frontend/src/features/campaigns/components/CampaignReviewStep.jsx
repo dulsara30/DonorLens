@@ -23,7 +23,7 @@ const sdgGoals = [
 function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "LKR",
     maximumFractionDigits: 0,
   }).format(value || 0);
 }
@@ -34,15 +34,15 @@ export default function CampaignReviewStep({
   submitError,
   onPrev,
   onSubmit,
-  submitButtonText="Submit Campaign"
+  submitButtonText = "Submit Campaign",
 }) {
   const total = form.financialBreakdown.reduce(
     (sum, item) => sum + Number(item.cost || 0),
-    0
+    0,
   );
 
   const selectedGoal = sdgGoals.find(
-    (goal) => goal.number === Number(form.sdgGoalNumber)
+    (goal) => goal.number === Number(form.sdgGoalNumber),
   );
 
   const coverPreviewUrl = useMemo(() => {
@@ -54,10 +54,7 @@ export default function CampaignReviewStep({
     }
 
     // Existing image object from backend
-    if (
-      typeof form.coverImage === "object" &&
-      form.coverImage?.secure_url
-    ) {
+    if (typeof form.coverImage === "object" && form.coverImage?.secure_url) {
       return form.coverImage.secure_url;
     }
 
@@ -68,7 +65,6 @@ export default function CampaignReviewStep({
 
     return null;
   }, [form.coverImage]);
-
 
   return (
     <div className="mx-auto max-w-4xl rounded-[24px] border border-slate-200 bg-white px-6 py-7 shadow-sm sm:px-8 sm:py-8">
@@ -109,7 +105,9 @@ export default function CampaignReviewStep({
         </div>
 
         <div className="rounded-3xl border border-slate-200 p-5">
-          <h3 className="mb-3 text-md font-semibold text-slate-900">Description</h3>
+          <h3 className="mb-3 text-md font-semibold text-slate-900">
+            Description
+          </h3>
           <p className="leading-7 text-slate-700">{form.description || "-"}</p>
         </div>
 
@@ -125,7 +123,7 @@ export default function CampaignReviewStep({
               />
             </div>
           ) : (
-          <p className="text-slate-700">No cover image selected</p>
+            <p className="text-slate-700">No cover image selected</p>
           )}
         </div>
 

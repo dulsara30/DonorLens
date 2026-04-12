@@ -4,11 +4,8 @@
 // Modal for reviewing campaign details and taking actions
 
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import {
-  toggleCampaignStatus,
-  sendCampaignWarningEmail,
-} from "../../../store/slices/campaignsSlice";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCampaignExecutionsAPI } from "../api";
 
 /**
  * SDG GOALS DATA (same as parent component)
@@ -43,88 +40,19 @@ const SDG_GOALS = [
  * - Deactivate campaign
  */
 export default function CampaignReviewModal({ campaign, onClose }) {
-  const dispatch = useDispatch();
-
-  // State for email modal
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [emailSubject, setEmailSubject] = useState("");
-  const [emailMessage, setEmailMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-
   // State for active tab
   const [activeTab, setActiveTab] = useState("details"); // 'details', 'financials', 'updates'
 
-  /**
-   * Handle Send Warning Email
-   */
-  const handleSendEmail = async (e) => {
-    e.preventDefault();
-
-    if (!emailSubject.trim() || !emailMessage.trim()) {
-      alert("Please fill in both subject and message");
-      return;
-    }
-
-    if (
-      !confirm(
-        `Send warning email to ${campaign.createdBy?.ngoDetails?.ngoName}?`,
-      )
-    ) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // TODO: Integrate with backend
-      await dispatch(
-        sendCampaignWarningEmail({
-          campaignId: campaign._id,
-          subject: emailSubject,
-          message: emailMessage,
-        }),
-      ).unwrap();
-
-      alert("Warning email sent successfully!");
-      setShowEmailModal(false);
-      setEmailSubject("");
-      setEmailMessage("");
-    } catch (error) {
-      alert("Failed to send email: " + error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
-   * Handle Deactivate Campaign
-   */
-  const handleDeactivate = async () => {
-    if (
-      !confirm(
-        `Are you sure you want to deactivate "${campaign.title}"? The NGO will be notified.`,
-      )
-    ) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // TODO: Integrate with backend
-      await dispatch(
-        toggleCampaignStatus({
-          campaignId: campaign._id,
-          action: "DEACTIVATE",
-        }),
-      ).unwrap();
-
-      alert("Campaign deactivated successfully!");
-      onClose();
-    } catch (error) {
-      alert("Failed to deactivate campaign: " + error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data: executionsPayload,
+    isLoading: isExecutionLoading,
+    isError: isExecutionError,
+    error: executionError,
+  } = useQuery({
+    queryKey: ["system-admin", "campaign-executions", campaign?._id],
+    queryFn: () => fetchCampaignExecutionsAPI(campaign._id),
+    enabled: activeTab === "updates" && Boolean(campaign?._id),
+  });
 
   /**
    * Format currency
@@ -157,6 +85,19 @@ export default function CampaignReviewModal({ campaign, onClose }) {
   const calculateProgress = (raised, total) => {
     if (!total || total === 0) return 0;
     return Math.min((raised / total) * 100, 100);
+  };
+
+  const formatExecutionDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const formatLkr = (amount) => {
+    return `LKR ${new Intl.NumberFormat("en-US").format(Number(amount) || 0)}`;
   };
 
   /**
@@ -535,207 +476,154 @@ export default function CampaignReviewModal({ campaign, onClose }) {
                   Execution Updates
                 </h3>
 
-                {/* TODO: Backend should add executionUpdates array to Campaign model */}
-                {/* For now, show placeholder */}
-                <div className="bg-slate-50 p-8 rounded-lg text-center text-slate-600">
-                  <svg
-                    className="w-12 h-12 text-slate-400 mx-auto mb-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                  <p className="font-medium mb-1">No execution updates yet</p>
-                  <p className="text-sm">
-                    Execution updates will be shown here once the NGO starts
-                    posting progress
-                  </p>
-                </div>
+                {isExecutionLoading ? (
+                  <div className="flex items-center justify-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600"></div>
+                  </div>
+                ) : isExecutionError ? (
+                  <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+                    Failed to load execution updates:{" "}
+                    {executionError?.message || "Unknown error"}
+                  </div>
+                ) : (executionsPayload?.executions || []).length === 0 ? (
+                  <div className="bg-slate-50 p-8 rounded-lg text-center text-slate-600">
+                    <p className="font-medium mb-1">No execution updates yet</p>
+                    <p className="text-sm">
+                      This campaign has no posted execution updates.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-5">
+                    {(executionsPayload?.executions || []).map(
+                      (update, index) => {
+                        const totalBudget =
+                          Number(
+                            executionsPayload?.campaign?.totalPlannedCost,
+                          ) ||
+                          Number(campaign?.totalPlannedCost) ||
+                          0;
+                        const percent = totalBudget
+                          ? Math.min(
+                              Math.round(
+                                (Number(update?.fundsUsed || 0) / totalBudget) *
+                                  100,
+                              ),
+                              100,
+                            )
+                          : 0;
 
-                {/* TODO: When backend adds executionUpdates, use this structure:
-                <div className="space-y-4">
-                  {campaign.executionUpdates?.map((update, index) => (
-                    <div key={index} className="bg-slate-50 p-4 rounded-lg">
-                      <div className="flex items-start gap-3">
-                        <img src={update.image} className="w-16 h-16 rounded" />
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{update.title}</h4>
-                          <p className="text-sm text-slate-600">{update.description}</p>
-                          <div className="text-xs text-slate-500 mt-2">
-                            {update.percentage}% complete • ${update.amountUsed} used
+                        return (
+                          <div
+                            key={update._id || index}
+                            className="flex items-start gap-4"
+                          >
+                            <div className="flex flex-col items-center">
+                              <div className="w-14 h-14 rounded-full bg-teal-600 text-white text-sm font-bold flex items-center justify-center shadow">
+                                {percent}%
+                              </div>
+                              {index !==
+                                (executionsPayload?.executions || []).length -
+                                  1 && (
+                                <div className="w-0.5 h-24 bg-slate-300 mt-2"></div>
+                              )}
+                            </div>
+
+                            <div className="flex-1 rounded-xl border border-slate-200 bg-slate-50 p-5">
+                              <div className="flex items-start justify-between gap-4">
+                                <h4 className="text-2xl font-semibold text-slate-900">
+                                  {update.title}
+                                </h4>
+                                <span className="text-sm text-slate-500">
+                                  {formatExecutionDate(update.date)}
+                                </span>
+                              </div>
+
+                              <p className="text-slate-600 mt-2">
+                                {update.description || "No description"}
+                              </p>
+
+                              <p className="text-teal-700 font-semibold mt-3">
+                                {formatLkr(update.fundsUsed)} used
+                              </p>
+
+                              <div className="mt-4">
+                                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                                  Photos ({update?.evidencePhotos?.length || 0})
+                                </p>
+                                {(update?.evidencePhotos || []).length > 0 ? (
+                                  <div className="flex flex-wrap gap-2">
+                                    {update.evidencePhotos.map(
+                                      (photo, photoIndex) => (
+                                        <a
+                                          key={`${update._id}-photo-${photoIndex}`}
+                                          href={photo.secure_url}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="block"
+                                        >
+                                          <img
+                                            src={photo.secure_url}
+                                            alt={`Execution evidence ${photoIndex + 1}`}
+                                            className="h-16 w-16 rounded-md object-cover border border-slate-200"
+                                          />
+                                        </a>
+                                      ),
+                                    )}
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-slate-500">
+                                    No photos attached
+                                  </p>
+                                )}
+                              </div>
+
+                              {(update?.receipts || []).length > 0 && (
+                                <div className="mt-4">
+                                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                                    Receipts ({update.receipts.length})
+                                  </p>
+                                  <div className="flex flex-wrap gap-2">
+                                    {update.receipts.map(
+                                      (receipt, receiptIndex) => (
+                                        <a
+                                          key={`${update._id}-receipt-${receiptIndex}`}
+                                          href={receipt.secure_url}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="text-sm text-emerald-700 hover:text-emerald-900 underline"
+                                        >
+                                          {receipt.fileName ||
+                                            `Receipt ${receiptIndex + 1}`}
+                                        </a>
+                                      ),
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <div className="text-xs text-slate-500">
-                            {formatDate(update.createdAt)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                */}
+                        );
+                      },
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {/* Modal Footer (Action Buttons) */}
           <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-xl">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-end">
               <button
                 onClick={onClose}
                 className="px-4 py-2 text-slate-600 hover:text-slate-900 font-medium"
               >
                 Close
               </button>
-
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowEmailModal(true)}
-                  disabled={loading}
-                  className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium disabled:opacity-50"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                  Send Warning Email
-                </button>
-
-                <button
-                  onClick={handleDeactivate}
-                  disabled={loading}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                    />
-                  </svg>
-                  Deactivate Campaign
-                </button>
-              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Email Modal (Nested) */}
-      {showEmailModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900">
-                Send Warning Email to {campaign.createdBy?.ngoDetails?.ngoName}
-              </h3>
-              <button
-                onClick={() => setShowEmailModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                <svg
-                  className="w-5 h-5 text-slate-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <form onSubmit={handleSendEmail} className="p-6 space-y-4">
-              {/* Subject */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Email Subject *
-                </label>
-                <input
-                  type="text"
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                  placeholder="e.g., Terms & Conditions Violation Alert"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              {/* Message */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Message *
-                </label>
-                <textarea
-                  value={emailMessage}
-                  onChange={(e) => setEmailMessage(e.target.value)}
-                  placeholder="Describe the issue or violation..."
-                  rows={8}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent resize-none"
-                  required
-                ></textarea>
-              </div>
-
-              {/* Campaign Info Display */}
-              <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <div className="text-sm font-medium text-yellow-900 mb-2">
-                  Campaign Details:
-                </div>
-                <div className="text-sm text-yellow-800 space-y-1">
-                  <div>Title: {campaign.title}</div>
-                  <div>Status: {campaign.status}</div>
-                  <div>
-                    Raised: {formatCurrency(campaign.raisedAmount)} of{" "}
-                    {formatCurrency(campaign.totalPlannedCost)}
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowEmailModal(false)}
-                  className="px-4 py-2 text-slate-600 hover:text-slate-900 font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? "Sending..." : "Send Email"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </>
   );
 }

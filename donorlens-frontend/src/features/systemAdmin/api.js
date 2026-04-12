@@ -473,6 +473,25 @@ export const deleteCampaignAPI = async (campaignId) => {
   }
 };
 
+/**
+ * Fetch execution updates for a specific campaign
+ * @param {string} campaignId - Campaign ID
+ * @returns {Promise} Execution payload with campaign, summary, executions
+ */
+export const fetchCampaignExecutionsAPI = async (campaignId) => {
+  try {
+    const response = await api.get(
+      `/campaign-executions/${campaignId}/executions`,
+    );
+    return (
+      response?.data?.data || { campaign: null, summary: null, executions: [] }
+    );
+  } catch (error) {
+    console.error("Failed to fetch campaign executions:", error);
+    throw error;
+  }
+};
+
 // Export everything as default
 export default {
   // Dashboard
@@ -498,6 +517,7 @@ export default {
 
   // Campaigns
   fetchAllCampaignsAPI,
+  fetchCampaignExecutionsAPI,
   toggleCampaignStatusAPI,
   sendCampaignWarningEmailAPI,
   deleteCampaignAPI,
