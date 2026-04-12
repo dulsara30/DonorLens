@@ -1,13 +1,13 @@
-import { useRef, useEffect } from 'react';
-import { generatePayHereHash } from '../helpers';
+import { useRef, useEffect } from "react";
+import { generatePayHereHash } from "../helpers";
 
-const PAYHERE_CHECKOUT_URL = 'https://sandbox.payhere.lk/pay/checkout';
+const PAYHERE_CHECKOUT_URL = "https://sandbox.payhere.lk/pay/checkout";
 
 export default function PaymentForm({
   orderId,
   items,
   amount,
-  currency = 'LKR',
+  currency = "LKR",
   firstName,
   lastName,
   email,
@@ -37,14 +37,22 @@ export default function PaymentForm({
     }
   };
 
-  return { formRef, merchantId, returnUrl, cancelUrl, notifyUrl, hash, handleSubmit };
+  return {
+    formRef,
+    merchantId,
+    returnUrl,
+    cancelUrl,
+    notifyUrl,
+    hash,
+    handleSubmit,
+  };
 }
 
 export function PayHereHiddenForm({
   orderId,
   items,
   amount,
-  currency = 'LKR',
+  currency = "LKR",
   firstName,
   lastName,
   email,
@@ -64,7 +72,7 @@ export function PayHereHiddenForm({
       ref={formRef}
       method="post"
       action={PAYHERE_CHECKOUT_URL}
-      style={{ display: 'none' }}
+      style={{ display: "none" }}
     >
       <input type="hidden" name="merchant_id" value={merchantId} />
       <input type="hidden" name="return_url" value={returnUrl} />
@@ -73,7 +81,11 @@ export function PayHereHiddenForm({
       <input type="hidden" name="order_id" value={orderId} />
       <input type="hidden" name="items" value={items} />
       <input type="hidden" name="currency" value={currency} />
-      <input type="hidden" name="amount" value={parseFloat(amount).toFixed(2)} />
+      <input
+        type="hidden"
+        name="amount"
+        value={parseFloat(amount).toFixed(2)}
+      />
       <input type="hidden" name="first_name" value={firstName} />
       <input type="hidden" name="last_name" value={lastName} />
       <input type="hidden" name="email" value={email} />
