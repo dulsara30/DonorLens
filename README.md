@@ -532,10 +532,12 @@ These URLs were not stored in the repository, so fill them in after deployment.
 
 Add the following to your submission after deployment:
 
-1. Screenshot of the Render service showing the backend is live.
-2. Screenshot of the `/health` endpoint returning success.
-3. Screenshot of the Vercel deployment dashboard showing the frontend deployment succeeded.
-4. Screenshot of the live frontend opening in a browser.
+1. Screenshot of the Railway service showing the backend is live.
+    ![BackendDeploymentEvidence](donorlens-frontend/src/assets/BackendDeploymentEvidence.png)
+4. Screenshot of the Vercel deployment dashboard showing the frontend deployment succeeded.
+    ![FrontendDeploymentEvidence](donorlens-frontend/src/assets/FrontendDeploymentEvidence.png)
+6. Screenshot of the live frontend opening in a browser.
+    ![BrowserDeploymentEvidence](donorlens-frontend/src/assets/BrowserDeploymentEvidence.png)
 
 For this repository state, the frontend build has been verified locally with `npm run build`.
 
@@ -620,13 +622,3 @@ npx artillery run tests/performance/execution-api-load-test.yml
 - The app uses JWT access tokens plus refresh token cookies for auth.
 - Media uploads go through Cloudinary.
 - Payment and notification features rely on external services and environment variables.
-
-## Contact and Submission Checklist
-
-Before final submission, make sure you have:
-
-1. Filled in the live backend URL.
-2. Filled in the live frontend URL.
-3. Attached deployment screenshots or evidence.
-4. Verified environment variables in Render and Vercel.
-5. Confirmed the `/health` endpoint works in production.
