@@ -1,5 +1,5 @@
 import { Heart, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 function formatNumber(value) {
   return new Intl.NumberFormat("en-LK").format(Number(value || 0));
@@ -7,6 +7,8 @@ function formatNumber(value) {
 
 export default function CampaignSideCard({ campaign }) {
   const isCompleted = campaign?.status === "COMPLETED";
+
+  const { id } = useParams();
 
   if (isCompleted) {
     return (
@@ -61,19 +63,19 @@ export default function CampaignSideCard({ campaign }) {
           You can add donation fields or payment integrations here later.
         </p>
       </div>
-
-      <button
-        type="button"
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-6 py-4 text-md font-semibold text-white transition hover:bg-teal-700"
+      <Link
+        to={`/campaigns/${id}/donate`}
+        className="text-white hover:text-blue-200"
       >
-        <Heart size={20} />
-        <Link
-          to={`/campaigns/${campaign?.id}/donate`}
-          className="text-white hover:text-blue-200"
+        <button
+          type="button"
+          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-6 py-4 text-md font-semibold text-white transition hover:bg-teal-700"
         >
+          <Heart size={20} />
+
           <span>Donate Now</span>
-        </Link>
-      </button>
+        </button>
+      </Link>
     </div>
   );
 }
