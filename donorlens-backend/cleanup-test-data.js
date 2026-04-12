@@ -1,7 +1,9 @@
 /**
  * ⚠️  ONE-TIME CLEANUP SCRIPT
- * Deletes ALL test NGO data from database
- * This targets all email patterns used in ngo-registration.spec.js
+ * Deletes test NGO + mock normal users from database
+ * Targets:
+ * 1) NGO registration test email patterns
+ * 2) Auth/Campaign test users (fullName: Test User, Campaign User)
  * Usage: node cleanup-test-data.js
  */
 
@@ -20,7 +22,7 @@ const cleanupTestData = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ Connected to MongoDB");
 
-    // Email patterns from ngo-registration.spec.js tests
+    // Email patterns from ngo-registration.spec.js + auth/campaign tests
     const testEmailPatterns = [
       "testngo", // POSITIVE TEST 1
       "completengo", // POSITIVE TEST 2
@@ -28,17 +30,29 @@ const cleanupTestData = async () => {
       "duplicate", // NEGATIVE TEST 2
       "edgecase", // EDGE CASE
       "pwsetup", // MOCKING test
+      "testuser", // auth.spec.js
+      "campaign.user", // campaigns.spec.js
     ];
+
+    // Mock user full names used in automated tests
+    const testFullNames = ["Test User", "Campaign User"];
 
     console.log(
       "🗑️  Finding test users with patterns:",
       testEmailPatterns.join(", "),
     );
 
-    // Create regex to match ANY of these patterns
+    // Create regex to match ANY email pattern
     const regexPattern = testEmailPatterns.join("|");
+    const cleanupFilter = {
+      $or: [
+        { email: { $regex: regexPattern, $options: "i" } },
+        { fullName: { $in: testFullNames } },
+      ],
+    };
+
     const testUsers = await User.find({
-      email: { $regex: regexPattern, $options: "i" },
+      ...cleanupFilter,
     });
 
     console.log(`📊 Found ${testUsers.length} test users to delete`);
@@ -60,18 +74,14 @@ const cleanupTestData = async () => {
 
     // Delete test users
     console.log("\n🗑️  Deleting all test users...");
-    const result = await User.deleteMany({
-      email: { $regex: regexPattern, $options: "i" },
-    });
+    const result = await User.deleteMany(cleanupFilter);
 
     console.log(
       `✅ Successfully deleted ${result.deletedCount} test users from database!`,
     );
 
     // Verify deletion
-    const remaining = await User.countDocuments({
-      email: { $regex: regexPattern, $options: "i" },
-    });
+    const remaining = await User.countDocuments(cleanupFilter);
 
     console.log(`\n✔️  Verification: ${remaining} test users remaining`);
 

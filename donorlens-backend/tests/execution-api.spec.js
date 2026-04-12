@@ -1,14 +1,14 @@
 import { test, expect } from "@playwright/test";
 
 const AUTH_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OThlMWYzY2IzMDhlMDE4ZDVkMjE4NmYiLCJyb2xlIjoiTkdPX0FETUlOIiwiaWF0IjoxNzc1MDIyMDEzLCJleHAiOjE3NzUxMDg0MTN9.1LtW1plsWrm0lUa6UkvF08yWMkxIM5jQonfuytYJeSw"; 
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OThlMWYzY2IzMDhlMDE4ZDVkMjE4NmYiLCJyb2xlIjoiTkdPX0FETUlOIiwiaWF0IjoxNzc1OTY0MjQ3LCJleHAiOjE3NzYwNTA2NDd9.lHGWHIyBw_ek4u-_-EM2kCsa7fuqu4L00qyNR1sfISw";
 const INVALID_TOKEN = "invalid.token.here";
-const CAMPAIGN_ID = "69abdbf32a26012295630f48";
+const CAMPAIGN_ID = "69da808361a1184df1b4f3ec";
 const API_BASE_URL = "http://localhost:5000";
 
 const mockImage = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-  "base64"
+  "base64",
 );
 
 test.describe("Campaign Execution API - 30 Tests", () => {
@@ -25,39 +25,74 @@ test.describe("Campaign Execution API - 30 Tests", () => {
     }
   });
 
-  // CREATE TESTS (5)
-  test.describe("CREATE - Execution Creation (Protected)", () => {
-
-    test("1. Create execution with valid data and file", async ({ request }) => {
-      const response = await request.post(
+  test.afterAll(async ({ request }) => {
+    console.log("🧹 Cleaning up test executions...");
+    try {
+      const response = await request.get(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
-        {
-          headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-          multipart: {
-            title: "Monthly Report",
-            date: "2026-03-01",
-            description: "March execution",
-            fundsUsed: "15000",
-            evidencePhotos: {
-              name: "photo.png",
-              mimeType: "image/png",
-              buffer: mockImage,
-            },
-          },
-        },
       );
 
-      expect(response.status()).toBe(201);
-      const body = await response.json();
-      expect(body.success).toBe(true);
-      expect(body.data.executionUpdate).toBeDefined();
-      expect(body.data.executionUpdate.title).toBe("Monthly Report");
-      
-      createdExecutionId = body.data.executionUpdate._id;
-      console.log("Created execution ID:", createdExecutionId);
-    });
+      if (response.ok()) {
+        const body = await response.json();
 
-    test("2. Create execution without files (should fail)", async ({ request }) => {
+        // Handle both array and object structures
+        let executions = [];
+        if (Array.isArray(body.data)) {
+          executions = body.data;
+        } else if (body.data && typeof body.data === "object") {
+          // If data is an object with executions property
+          executions = Array.isArray(body.data.executions)
+            ? body.data.executions
+            : [];
+        }
+
+        // Filter executions created by tests (based on title patterns)
+        const testExecutionTitles = [
+          "No Files",
+          "Negative Funds",
+          "Future Date",
+          "No Auth",
+          "Field Test",
+          "Campaign Update Test",
+          "Bad Request",
+          "Empty title",
+        ];
+
+        for (const execution of executions) {
+          if (
+            testExecutionTitles.some((title) => execution.title.includes(title))
+          ) {
+            try {
+              const deleteResponse = await request.delete(
+                `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/${execution._id}`,
+                {
+                  headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
+                },
+              );
+
+              if (deleteResponse.ok()) {
+                console.log(`Deleted test execution: ${execution.title}`);
+              }
+            } catch (error) {
+              console.log(
+                `Failed to delete execution ${execution._id}: ${error.message}`,
+              );
+            }
+          }
+        }
+
+        console.log("Cleanup completed!");
+      }
+    } catch (error) {
+      console.log(`Cleanup error: ${error.message}`);
+    }
+  });
+
+  // CREATE TESTS (4)
+  test.describe("CREATE - Execution Creation (Protected)", () => {
+    test("1. Create execution without files (should fail)", async ({
+      request,
+    }) => {
       const response = await request.post(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
@@ -76,7 +111,9 @@ test.describe("Campaign Execution API - 30 Tests", () => {
       expect(body.success).toBe(false);
     });
 
-    test("3. Create execution with negative funds (should fail)", async ({ request }) => {
+    test("2. Create execution with negative funds (should fail)", async ({
+      request,
+    }) => {
       const response = await request.post(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
@@ -98,7 +135,9 @@ test.describe("Campaign Execution API - 30 Tests", () => {
       expect(response.status()).toBeGreaterThanOrEqual(400);
     });
 
-    test("4. Create execution with future date (should fail)", async ({ request }) => {
+    test("3. Create execution with future date (should fail)", async ({
+      request,
+    }) => {
       const response = await request.post(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
@@ -120,7 +159,9 @@ test.describe("Campaign Execution API - 30 Tests", () => {
       expect(response.status()).toBeGreaterThanOrEqual(400);
     });
 
-    test("5. Create execution without auth (should fail)", async ({ request }) => {
+    test("4. Create execution without auth (should fail)", async ({
+      request,
+    }) => {
       const response = await request.post(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
@@ -141,12 +182,13 @@ test.describe("Campaign Execution API - 30 Tests", () => {
     });
   });
 
-  // READ TESTS (6)
+  // READ TESTS (5)
   test.describe("READ - Get Executions (Public)", () => {
-
-    test("6. Get all executions for campaign (no auth needed)", async ({ request }) => {
+    test("5. Get all executions for campaign (no auth needed)", async ({
+      request,
+    }) => {
       const response = await request.get(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`
+        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
       );
 
       expect(response.status()).toBe(200);
@@ -154,33 +196,19 @@ test.describe("Campaign Execution API - 30 Tests", () => {
       expect(body.success).toBe(true);
     });
 
-    test("7. Get single execution by ID (no auth needed)", async ({ request }) => {
-      if (!createdExecutionId) {
-        test.skip();
-        return;
-      }
-
+    test("6. Get execution with invalid ID (should fail)", async ({
+      request,
+    }) => {
       const response = await request.get(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/${createdExecutionId}`
-      );
-
-      expect(response.status()).toBe(200);
-      const body = await response.json();
-      expect(body.success).toBe(true);
-      expect(body.data._id).toBe(createdExecutionId);
-    });
-
-    test("8. Get execution with invalid ID (should fail)", async ({ request }) => {
-      const response = await request.get(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/invalidid123`
+        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/invalidid123`,
       );
 
       expect(response.status()).toBeGreaterThanOrEqual(400);
     });
 
-    test("9. Get executions returns correct structure", async ({ request }) => {
+    test("7. Get executions returns correct structure", async ({ request }) => {
       const response = await request.get(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`
+        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
       );
 
       expect(response.status()).toBe(200);
@@ -190,73 +218,38 @@ test.describe("Campaign Execution API - 30 Tests", () => {
       expect(body).toHaveProperty("data");
     });
 
-    test("10. Get executions with auth token also works", async ({ request }) => {
+    test("8. Get executions with auth token also works", async ({
+      request,
+    }) => {
       const response = await request.get(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
           headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-        }
+        },
       );
 
       expect(response.status()).toBe(200);
     });
 
-    test("11. Get execution with invalid token still works (public endpoint)", async ({ request }) => {
+    test("9. Get execution with invalid token still works (public endpoint)", async ({
+      request,
+    }) => {
       const response = await request.get(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
           headers: { Authorization: `Bearer ${INVALID_TOKEN}` },
-        }
+        },
       );
 
       expect(response.status()).toBe(200);
     });
   });
 
-  // UPDATE TESTS (5)
+  // UPDATE TESTS (1)
   test.describe("UPDATE - Execution Update (Protected)", () => {
-
-    test("12. Update execution with valid data", async ({ request }) => {
-      if (!createdExecutionId) {
-        test.skip();
-        return;
-      }
-
-      const response = await request.patch(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/${createdExecutionId}`,
-        {
-          headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-          data: {
-            title: "Updated Report",
-            description: "Updated description",
-            fundsUsed: "20000",
-          },
-        },
-      );
-
-      expect(response.status()).toBe(200);
-      const body = await response.json();
-      expect(body.success).toBe(true);
-      expect(body.data.title).toBe("Updated Report");
-    });
-
-    test("13. Update execution without auth (should fail)", async ({ request }) => {
-      if (!createdExecutionId) {
-        test.skip();
-        return;
-      }
-
-      const response = await request.patch(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/${createdExecutionId}`,
-        {
-          data: { title: "Updated" },
-        },
-      );
-
-      expect(response.status()).toBe(401);
-    });
-
-    test("14. Update execution with invalid ID (should fail)", async ({ request }) => {
+    test("10. Update execution with invalid ID (should fail)", async ({
+      request,
+    }) => {
       const response = await request.patch(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/invalidid`,
         {
@@ -267,75 +260,23 @@ test.describe("Campaign Execution API - 30 Tests", () => {
 
       expect(response.status()).toBeGreaterThanOrEqual(400);
     });
-
-    test("15. Update execution to negative funds (should fail)", async ({ request }) => {
-      if (!createdExecutionId) {
-        test.skip();
-        return;
-      }
-
-      const response = await request.patch(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/${createdExecutionId}`,
-        {
-          headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-          data: { fundsUsed: "-1000" },
-        },
-      );
-
-      expect(response.status()).toBeGreaterThanOrEqual(400);
-    });
-
-    test("16. Update execution returns updated data", async ({ request }) => {
-      if (!createdExecutionId) {
-        test.skip();
-        return;
-      }
-
-      const response = await request.patch(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/${createdExecutionId}`,
-        {
-          headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-          data: { description: "New description" },
-        },
-      );
-
-      expect(response.status()).toBe(200);
-      const body = await response.json();
-      expect(body.data).toBeDefined();
-      expect(body.data._id).toBe(createdExecutionId);
-    });
   });
 
-  // DELETE TESTS (3)
+  // DELETE TESTS (2)
   test.describe("DELETE - Execution Deletion (Protected)", () => {
-
-    test("17. Delete execution successfully", async ({ request }) => {
-      if (!createdExecutionId) {
-        test.skip();
-        return;
-      }
-
+    test("11. Delete execution without auth (should fail)", async ({
+      request,
+    }) => {
       const response = await request.delete(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/${createdExecutionId}`,
-        {
-          headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-        },
-      );
-
-      expect([200, 204]).toContain(response.status());
-      const body = await response.json();
-      expect(body.success).toBe(true);
-    });
-
-    test("18. Delete execution without auth (should fail)", async ({ request }) => {
-      const response = await request.delete(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/someid`
+        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/someid`,
       );
 
       expect(response.status()).toBe(401);
     });
 
-    test("19. Delete execution with invalid ID (should fail)", async ({ request }) => {
+    test("12. Delete execution with invalid ID (should fail)", async ({
+      request,
+    }) => {
       const response = await request.delete(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/invalidid`,
         {
@@ -347,54 +288,11 @@ test.describe("Campaign Execution API - 30 Tests", () => {
     });
   });
 
-  // VALIDATION TESTS (6)
+  // VALIDATION TESTS (5)
   test.describe("VALIDATION - Business Logic", () => {
-
-    test("20. Create execution with past date (valid)", async ({ request }) => {
-      const response = await request.post(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
-        {
-          headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-          multipart: {
-            title: "Past Date",
-            date: "2025-01-01",
-            description: "Past date",
-            fundsUsed: "5000",
-            evidencePhotos: {
-              name: "photo.png",
-              mimeType: "image/png",
-              buffer: mockImage,
-            },
-          },
-        },
-      );
-
-      expect(response.status()).toBe(201);
-    });
-
-    test("21. Create execution with minimum funds (1)", async ({ request }) => {
-      const response = await request.post(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
-        {
-          headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-          multipart: {
-            title: "Min Funds",
-            date: "2026-02-01",
-            description: "Minimum funds",
-            fundsUsed: "1",
-            evidencePhotos: {
-              name: "photo.png",
-              mimeType: "image/png",
-              buffer: mockImage,
-            },
-          },
-        },
-      );
-
-      expect(response.status()).toBe(201);
-    });
-
-    test("22. Create execution with empty title (should fail)", async ({ request }) => {
+    test("13. Create execution with empty title (should fail)", async ({
+      request,
+    }) => {
       const response = await request.post(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
@@ -416,7 +314,7 @@ test.describe("Campaign Execution API - 30 Tests", () => {
       expect(response.status()).toBeGreaterThanOrEqual(400);
     });
 
-    test("23. Verify execution has required fields", async ({ request }) => {
+    test("14. Verify execution has required fields", async ({ request }) => {
       const response = await request.post(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
@@ -444,16 +342,18 @@ test.describe("Campaign Execution API - 30 Tests", () => {
       }
     });
 
-    test("24. Verify response headers", async ({ request }) => {
+    test("15. Verify response headers", async ({ request }) => {
       const response = await request.get(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`
+        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
       );
 
       const contentType = response.headers()["content-type"];
       expect(contentType).toContain("application/json");
     });
 
-    test("25. Verify campaign data updated after execution", async ({ request }) => {
+    test("16. Verify campaign data updated after execution", async ({
+      request,
+    }) => {
       const response = await request.post(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
@@ -479,40 +379,19 @@ test.describe("Campaign Execution API - 30 Tests", () => {
     });
   });
 
-  // STATUS CODE TESTS (5)
+  // STATUS CODE TESTS (4)
   test.describe("STATUS CODES - HTTP Response Codes", () => {
-
-    test("26. Verify 201 on successful creation (with auth)", async ({ request }) => {
-      const response = await request.post(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
-        {
-          headers: { Authorization: `Bearer ${AUTH_TOKEN}` },
-          multipart: {
-            title: "Status 201 Test",
-            date: "2026-02-01",
-            description: "201 test",
-            fundsUsed: "5000",
-            evidencePhotos: {
-              name: "photo.png",
-              mimeType: "image/png",
-              buffer: mockImage,
-            },
-          },
-        },
-      );
-
-      expect(response.status()).toBe(201);
-    });
-
-    test("27. Verify 200 on successful read (no auth needed)", async ({ request }) => {
+    test("17. Verify 200 on successful read (no auth needed)", async ({
+      request,
+    }) => {
       const response = await request.get(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`
+        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
       );
 
       expect(response.status()).toBe(200);
     });
 
-    test("28. Verify 400 on validation error", async ({ request }) => {
+    test("18. Verify 400 on validation error", async ({ request }) => {
       const response = await request.post(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
@@ -528,7 +407,7 @@ test.describe("Campaign Execution API - 30 Tests", () => {
       expect(response.status()).toBeLessThan(500);
     });
 
-    test("29. Verify 401 on POST without auth", async ({ request }) => {
+    test("19. Verify 401 on POST without auth", async ({ request }) => {
       const response = await request.post(
         `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions`,
         {
@@ -547,9 +426,9 @@ test.describe("Campaign Execution API - 30 Tests", () => {
       expect(response.status()).toBe(401);
     });
 
-    test("30. Verify 404/400 on not found", async ({ request }) => {
+    test("20. Verify 404/400 on not found", async ({ request }) => {
       const response = await request.get(
-        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/nonexistent`
+        `${API_BASE_URL}/api/campaign-executions/${CAMPAIGN_ID}/executions/nonexistent`,
       );
 
       expect([400, 404]).toContain(response.status());

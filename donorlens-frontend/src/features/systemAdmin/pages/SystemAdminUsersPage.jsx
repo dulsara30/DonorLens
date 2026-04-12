@@ -3,86 +3,74 @@
 // ============================================
 // Manage all registered users with advanced filtering
 
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import SystemAdminLayout from "../layout/SystemAdminLayout";
-import {
-  fetchAllUsers,
-  setSelectedUser,
-  clearSelectedUser,
-  setSearchQuery,
-  setRoleFilter,
-  selectFilteredUsers,
-  selectUsersCountByRole,
-  selectSelectedUser,
-  selectUsersLoading,
-} from "../../../store/slices/usersSlice";
 import UserDetailsModal from "../components/UserDetailsModal";
+import { fetchAllUsersAPI } from "../api";
 
 /**
  * SystemAdminUsersPage Component
  * Features:
  * - User list with search and filters
  * - View user details and donation history
- * - Activate/deactivate accounts
- * - Send custom emails
+ * - Export filtered users as CSV
  */
 export default function SystemAdminUsersPage() {
-  const dispatch = useDispatch();
-
-  // Get data from Redux store
-  const users = useSelector(selectFilteredUsers);
-  const userCounts = useSelector(selectUsersCountByRole);
-  const selectedUser = useSelector(selectSelectedUser);
-  const loading = useSelector(selectUsersLoading);
-
-  // Local state for search input
   const [searchInput, setSearchInput] = useState("");
   const [activeRoleFilter, setActiveRoleFilter] = useState("ALL");
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  /**
-   * Fetch users on component mount
-   */
-  useEffect(() => {
-    dispatch(fetchAllUsers());
-  }, [dispatch]);
+  const {
+    data: usersData = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
+    queryKey: ["system-admin", "users"],
+    queryFn: fetchAllUsersAPI,
+  });
 
-  /**
-   * Handle search input change (debounced)
-   */
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch(setSearchQuery(searchInput));
-    }, 300); // 300ms debounce
+  const allUsers = useMemo(() => {
+    return Array.isArray(usersData) ? usersData : [];
+  }, [usersData]);
 
-    return () => clearTimeout(timer);
-  }, [searchInput, dispatch]);
+  const userCounts = useMemo(() => {
+    const total = allUsers.length;
+    const donors = allUsers.filter((u) => u.role === "USER").length;
+    const ngoAdmins = allUsers.filter((u) => u.role === "NGO_ADMIN").length;
+    const active = allUsers.filter((u) => u.isActive).length;
+    const inactive = total - active;
 
-  /**
-   * Handle role filter change
-   */
-  const handleRoleFilterChange = (role) => {
-    setActiveRoleFilter(role);
-    dispatch(setRoleFilter(role));
-  };
+    return { total, donors, ngoAdmins, active, inactive };
+  }, [allUsers]);
 
-  /**
-   * Open user details modal
-   */
+  const filteredUsers = useMemo(() => {
+    const query = searchInput.trim().toLowerCase();
+
+    return allUsers.filter((user) => {
+      const matchesSearch =
+        !query ||
+        user.fullName?.toLowerCase().includes(query) ||
+        user.email?.toLowerCase().includes(query);
+
+      const matchesRole =
+        activeRoleFilter === "ALL" || user.role === activeRoleFilter;
+
+      return matchesSearch && matchesRole;
+    });
+  }, [allUsers, searchInput, activeRoleFilter]);
+
   const handleViewUser = (user) => {
-    dispatch(setSelectedUser(user));
+    setSelectedUser(user);
   };
 
-  /**
-   * Close user details modal
-   */
   const handleCloseModal = () => {
-    dispatch(clearSelectedUser());
+    setSelectedUser(null);
   };
 
-  /**
-   * Format date
-   */
   const formatDate = (dateString) => {
     if (!dateString) return "Never";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -90,6 +78,52 @@ export default function SystemAdminUsersPage() {
       month: "short",
       day: "numeric",
     });
+  };
+
+  const toCsvValue = (value) => {
+    const safeValue = value ?? "";
+    const stringValue = String(safeValue).replace(/"/g, '""');
+    return `"${stringValue}"`;
+  };
+
+  const handleExportCsv = () => {
+    const headers = [
+      "Full Name",
+      "Email",
+      "Role",
+      "Account Status",
+      "NGO Status",
+      "NGO Name",
+      "Created At",
+      "Last Login",
+    ];
+
+    const rows = filteredUsers.map((user) => [
+      user.fullName,
+      user.email,
+      user.role,
+      user.isActive ? "Active" : "Inactive",
+      user.ngoDetails?.status || "N/A",
+      user.ngoDetails?.ngoName || "N/A",
+      user.createdAt,
+      user.lastLoginAt || "",
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map(toCsvValue).join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const datePart = new Date().toISOString().split("T")[0];
+
+    link.href = url;
+    link.download = `system-admin-users-${datePart}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   return (
@@ -106,8 +140,10 @@ export default function SystemAdminUsersPage() {
             </p>
           </div>
 
-          {/* Export Users Button (Optional) */}
-          <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2">
+          <button
+            onClick={handleExportCsv}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2"
+          >
             <svg
               className="w-5 h-5"
               fill="none"
@@ -131,38 +167,37 @@ export default function SystemAdminUsersPage() {
             label="Total Users"
             value={userCounts.total}
             color="blue"
-            loading={loading}
+            loading={isLoading}
           />
           <StatCard
             label="Donors"
             value={userCounts.donors}
             color="green"
-            loading={loading}
+            loading={isLoading}
           />
           <StatCard
             label="NGO Admins"
             value={userCounts.ngoAdmins}
             color="purple"
-            loading={loading}
+            loading={isLoading}
           />
           <StatCard
             label="Active"
             value={userCounts.active}
             color="emerald"
-            loading={loading}
+            loading={isLoading}
           />
           <StatCard
             label="Inactive"
             value={userCounts.inactive}
             color="red"
-            loading={loading}
+            loading={isLoading}
           />
         </div>
 
         {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search Bar */}
             <div className="flex-1">
               <div className="relative">
                 <input
@@ -188,12 +223,11 @@ export default function SystemAdminUsersPage() {
               </div>
             </div>
 
-            {/* Role Filter */}
             <div className="flex gap-2">
               {["ALL", "USER", "NGO_ADMIN"].map((role) => (
                 <button
                   key={role}
-                  onClick={() => handleRoleFilterChange(role)}
+                  onClick={() => setActiveRoleFilter(role)}
                   className={`px-4 py-2.5 rounded-lg font-medium transition-colors ${
                     activeRoleFilter === role
                       ? "bg-emerald-600 text-white"
@@ -211,14 +245,32 @@ export default function SystemAdminUsersPage() {
           </div>
         </div>
 
+        {isError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+            <p className="font-semibold">Failed to load users</p>
+            <p className="text-sm mt-1">{error?.message || "Unknown error"}</p>
+            <button
+              onClick={() => refetch()}
+              className="mt-3 px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        <div className="text-sm text-slate-600">
+          Showing {filteredUsers.length} of {allUsers.length} users
+          {isFetching && !isLoading ? " (refreshing...)" : ""}
+        </div>
+
         {/* Users Table */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          {loading ? (
+          {isLoading ? (
             <div className="p-12 text-center">
               <div className="inline-block w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
               <p className="text-slate-600 mt-4">Loading users...</p>
             </div>
-          ) : users.length === 0 ? (
+          ) : filteredUsers.length === 0 ? (
             <div className="p-12 text-center">
               <svg
                 className="w-16 h-16 text-slate-300 mx-auto mb-4"
@@ -264,16 +316,15 @@ export default function SystemAdminUsersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {users.map((user) => (
+                  {filteredUsers.map((user) => (
                     <tr
                       key={user._id}
                       className="hover:bg-slate-50 transition-colors"
                     >
-                      {/* User Info */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-semibold">
-                            {user.fullName.charAt(0).toUpperCase()}
+                            {user.fullName?.charAt(0)?.toUpperCase() || "U"}
                           </div>
                           <div>
                             <p className="font-medium text-slate-900">
@@ -286,7 +337,6 @@ export default function SystemAdminUsersPage() {
                         </div>
                       </td>
 
-                      {/* Role */}
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -305,7 +355,6 @@ export default function SystemAdminUsersPage() {
                         </span>
                       </td>
 
-                      {/* Status */}
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -323,17 +372,14 @@ export default function SystemAdminUsersPage() {
                         </span>
                       </td>
 
-                      {/* Last Login */}
                       <td className="px-6 py-4 text-sm text-slate-600">
                         {formatDate(user.lastLoginAt)}
                       </td>
 
-                      {/* Joined Date */}
                       <td className="px-6 py-4 text-sm text-slate-600">
                         {formatDate(user.createdAt)}
                       </td>
 
-                      {/* Actions */}
                       <td className="px-6 py-4 text-right">
                         <button
                           onClick={() => handleViewUser(user)}
@@ -351,7 +397,6 @@ export default function SystemAdminUsersPage() {
         </div>
       </div>
 
-      {/* User Details Modal */}
       {selectedUser && (
         <UserDetailsModal user={selectedUser} onClose={handleCloseModal} />
       )}
@@ -359,9 +404,6 @@ export default function SystemAdminUsersPage() {
   );
 }
 
-/**
- * StatCard Component
- */
 function StatCard({ label, value, color, loading }) {
   const colorClasses = {
     blue: "border-blue-200 bg-blue-50",

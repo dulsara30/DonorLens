@@ -3,13 +3,7 @@
 // ============================================
 // Modal to view user details, donations, and perform actions
 
-import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import {
-  toggleUserStatus,
-  sendEmailToUser,
-  fetchUserDonations,
-} from "../../../store/slices/usersSlice";
+import { useState } from "react";
 
 /**
  * UserDetailsModal Component
@@ -19,91 +13,9 @@ import {
  * - Actions: Activate/Deactivate, Send Email
  */
 export default function UserDetailsModal({ user, onClose }) {
-  const dispatch = useDispatch();
-
   // Local state
   const [activeTab, setActiveTab] = useState("details"); // 'details' or 'donations'
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [emailSubject, setEmailSubject] = useState("");
-  const [emailMessage, setEmailMessage] = useState("");
-  const [donations, setDonations] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  /**
-   * Fetch user donations when modal opens
-   * TODO: Replace with actual API call
-   */
-  useEffect(() => {
-    if (user) {
-      // dispatch(fetchUserDonations(user._id));
-      // For now, set empty array
-      setDonations([]);
-    }
-  }, [user]);
-
-  /**
-   * Handle activate/deactivate user
-   */
-  const handleToggleStatus = async () => {
-    if (
-      !confirm(
-        `Are you sure you want to ${user.isActive ? "deactivate" : "activate"} this user?`,
-      )
-    ) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await dispatch(
-        toggleUserStatus({
-          userId: user._id,
-          isActive: !user.isActive,
-        }),
-      ).unwrap();
-
-      alert(
-        `User ${user.isActive ? "deactivated" : "activated"} successfully!`,
-      );
-      onClose();
-    } catch (error) {
-      alert("Failed to update user status: " + error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
-   * Handle send email
-   */
-  const handleSendEmail = async (e) => {
-    e.preventDefault();
-
-    if (!emailSubject.trim() || !emailMessage.trim()) {
-      alert("Please fill in both subject and message");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await dispatch(
-        sendEmailToUser({
-          userId: user._id,
-          subject: emailSubject,
-          message: emailMessage,
-        }),
-      ).unwrap();
-
-      alert("Email sent successfully!");
-      setShowEmailModal(false);
-      setEmailSubject("");
-      setEmailMessage("");
-    } catch (error) {
-      alert("Failed to send email: " + error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [donations] = useState([]);
 
   /**
    * Format currency
@@ -144,7 +56,7 @@ export default function UserDetailsModal({ user, onClose }) {
           <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
             <div className="flex items-center gap-4">
               {/* User Avatar */}
-              <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+              <div className="w-12 h-12 bg-linear-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
                 {user.fullName.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -413,169 +325,16 @@ export default function UserDetailsModal({ user, onClose }) {
           </div>
 
           {/* Modal Footer (Actions) */}
-          <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between bg-slate-50">
+          <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-end bg-slate-50">
             <button
               onClick={onClose}
               className="px-4 py-2 text-slate-700 hover:bg-slate-200 rounded-lg transition-colors"
             >
               Close
             </button>
-
-            <div className="flex items-center gap-3">
-              {/* Send Email Button */}
-              <button
-                onClick={() => setShowEmailModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                Send Email
-              </button>
-
-              {/* Activate/Deactivate Button */}
-              <button
-                onClick={handleToggleStatus}
-                disabled={loading}
-                className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                  user.isActive
-                    ? "bg-red-600 hover:bg-red-700 text-white"
-                    : "bg-green-600 hover:bg-green-700 text-white"
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
-                {loading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Processing...
-                  </>
-                ) : user.isActive ? (
-                  <>
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                      />
-                    </svg>
-                    Deactivate Account
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    Activate Account
-                  </>
-                )}
-              </button>
-            </div>
           </div>
         </div>
       </div>
-
-      {/* Email Modal */}
-      {showEmailModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900">
-                Send Email to {user.fullName}
-              </h3>
-              <button
-                onClick={() => setShowEmailModal(false)}
-                className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                <svg
-                  className="w-5 h-5 text-slate-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <form onSubmit={handleSendEmail} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Subject <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                  placeholder="Email subject..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Message <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={emailMessage}
-                  onChange={(e) => setEmailMessage(e.target.value)}
-                  placeholder="Type your message here..."
-                  rows={6}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
-                  required
-                />
-              </div>
-
-              <div className="flex items-center gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowEmailModal(false)}
-                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? "Sending..." : "Send Email"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </>
   );
 }
