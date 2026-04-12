@@ -13,7 +13,7 @@
 //       <Header />
 //       <HeroSection />
 //       <CampaignGrid />
-      
+
 //       {/* See More Campaigns CTA Section */}
 //       <section className="py-16 text-center bg-white transition-all duration-700 ease-in-out animate-slide-in-up [animation-delay:0.4s]">
 //         <button className="px-10 py-3.5 bg-transparent text-teal-600 border-2 border-teal-600 rounded-lg font-semibold text-base cursor-pointer transition-all duration-200 hover:bg-teal-600 hover:text-white hover:shadow-md">
@@ -65,7 +65,7 @@ const HomePage = () => {
     } catch (error) {
       console.error(error);
       setPageError(
-        error?.response?.data?.message || "Failed to load campaigns"
+        error?.response?.data?.message || "Failed to load campaigns",
       );
     } finally {
       setLoading(false);
@@ -94,7 +94,7 @@ const HomePage = () => {
         </button>
       </section>
 
-      <ImpactSection />
+      {/* <ImpactSection /> */}
       <AboutSection />
       <Footer />
     </div>
