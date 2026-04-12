@@ -1,5 +1,5 @@
 export const userLoginAndGetToken = async (request, { email, password }) => {
-  const response = await request.post("auth/login", {
+  const response = await request.post("api/auth/login", {
     data: { email, password },
   });
   const body = await response.json();
