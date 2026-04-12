@@ -1,0 +1,66 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampUp: 60
+      name: "Warm up"
+
+    - duration: 120
+      arrivalRate: 10
+      name: "Sustained load"
+
+    - duration: 60
+      arrivalRate: 20
+      name: "Peak load"
+
+    - duration: 60
+      arrivalRate: 5
+      rampUp: 60
+      name: "Cool down"
+
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bearer YOUR_AUTH_TOKEN_HERE"
+
+scenarios:
+  - name: "Health Check Operation"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/payment/health"
+          expect:
+            - statusCode: 200
+
+  - name: "Read Payment History"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/payment/my"
+          expect:
+            - statusCode: [200, 401]
+
+  - name: "Create Payment Operation"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/payment/"
+          json:
+            campaignId: "69ac148f96c25e1fdad7a3ee" 
+            amount: 500
+            paymentMethod: "CARD"
+          expect:
+            - statusCode: [201, 400, 401, 404]
+
+  - name: "Admin Read Logs and All Payments"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/payment/"
+          expect:
+            - statusCode: [200, 401, 403]
+      - get:
+          url: "/api/payment/logs/"
+          expect:
+            - statusCode: [200, 401, 403]

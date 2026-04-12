@@ -31,7 +31,7 @@ export default defineConfig({
     baseURL: "http://localhost:5000",
     // Note: Don't set Content-Type globally - let Playwright set it automatically 
     // based on the request type (JSON, multipart, etc.)
-    
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },
