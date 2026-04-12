@@ -13,6 +13,7 @@ import HomePage from "../pages/HomePage";
 import RegisterUserPage from "../pages/RegisterUserPage";
 import NgoRequestPage from "../pages/NgoRequestPage";
 import TermsPage from "../pages/TermsPage";
+import TransparencyPage from "../pages/TransparencyPage";
 import CampaignsPage from "../pages/CampaignsPage";
 import PublicCampaignDetailsPage from "../pages/PublicCampainDetailsPage";
 
@@ -56,8 +57,9 @@ export const router = createBrowserRouter([
   { path: "/campaigns", element: <CampaignsPage /> },
   { path: "/campaigns/:id", element: <PublicCampaignDetailsPage /> },
   { path: "/campaigns/:id/donate", element: <DonatePage /> },
-  { path: "/payment/return",        element: <PaymentSuccessPage /> },
-  { path: "/payment/cancel",        element: <PaymentCancelPage /> },
+  { path: "/transparency", element: <TransparencyPage /> },
+  { path: "/payment/return", element: <PaymentSuccessPage /> },
+  { path: "/payment/cancel", element: <PaymentCancelPage /> },
   // { path: "/admin/campaigns/new", element: <AdminCreateCampaignPage /> },
 
   // USER ONLY ROUTES (Donors)
@@ -81,10 +83,22 @@ export const router = createBrowserRouter([
       { path: "/admin/campaigns/:id/edit", element: <UpdateCampaignPage /> },
       { path: "/admin/tracking/:id", element: <AdminExpenseTrackerPage /> },
       { path: "/admin/impact/:id", element: <AdminFinalReportPage /> },
-      { path: "/admin/campaign-executions", element: <ExecutionDashboardPage /> },
-      { path: "/admin/campaign-executions/:campaignId", element: <ExecutionUpdatesPage /> },
-      { path: "/admin/campaign-executions/:campaignId/create", element: <ExecutionCreatePage /> },
-      { path: "/admin/campaign-executions/:campaignId/:executionId", element: <ExecutionDetailPage /> },
+      {
+        path: "/admin/campaign-executions",
+        element: <ExecutionDashboardPage />,
+      },
+      {
+        path: "/admin/campaign-executions/:campaignId",
+        element: <ExecutionUpdatesPage />,
+      },
+      {
+        path: "/admin/campaign-executions/:campaignId/create",
+        element: <ExecutionCreatePage />,
+      },
+      {
+        path: "/admin/campaign-executions/:campaignId/:executionId",
+        element: <ExecutionDetailPage />,
+      },
       { path: "/admin/executions", element: <ExecutionUpdatesPage /> },
     ],
   },
@@ -93,7 +107,7 @@ export const router = createBrowserRouter([
   {
     element: <AdminRoute />,
     children: [
-      { path: "/sys-admin", element: <SystemAdminLayout /> },
+      { path: "/sys-admin", element: <SystemAdminOverviewPage /> },
       { path: "/sys-admin/dashboard", element: <SystemAdminOverviewPage /> },
       { path: "/sys-admin/users", element: <SystemAdminUsersPage /> },
       {

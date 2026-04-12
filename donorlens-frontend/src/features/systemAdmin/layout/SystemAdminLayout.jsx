@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import {
-  selectRequestsCountByStatus,
-  
-} from "../../../store/slices/ngoRequestsSlice";
+import { selectRequestsCountByStatus } from "../../../store/slices/ngoRequestsSlice";
 
 /**
  * SystemAdminLayout Component
@@ -32,7 +29,7 @@ export default function SystemAdminLayout({ children }) {
     {
       id: "overview",
       name: "Overview",
-      path: "/sys-admin/dashboard",
+      path: "/sys-admin",
       icon: (
         <svg
           className="w-5 h-5"
@@ -188,7 +185,7 @@ export default function SystemAdminLayout({ children }) {
                   : "text-slate-300 hover:bg-slate-800 hover:text-white"
               }`}
             >
-              <span className="flex-shrink-0">{item.icon}</span>
+              <span className="shrink-0">{item.icon}</span>
 
               {sidebarOpen && (
                 <>
