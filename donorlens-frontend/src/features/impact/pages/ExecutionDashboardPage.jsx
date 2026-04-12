@@ -13,7 +13,6 @@ const CAMPAIGN_STATUS_OPTIONS = [
   { value: "", label: "All Statuses" },
   { value: "ongoing", label: "Ongoing" },
   { value: "completed", label: "Completed" },
-  { value: "draft", label: "Draft" },
 ];
 
 export default function ExecutionDashboardPage() {
@@ -39,9 +38,7 @@ export default function ExecutionDashboardPage() {
       setCampaigns(response?.data || []);
     } catch (err) {
       console.error(err);
-      setError(
-        err?.response?.data?.message || "Failed to load campaigns"
-      );
+      setError(err?.response?.data?.message || "Failed to load campaigns");
     } finally {
       setLoading(false);
     }
@@ -51,11 +48,14 @@ export default function ExecutionDashboardPage() {
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((campaign) => {
       // Search filter
-      const matchesSearch = campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const matchesSearch =
+        campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         campaign.description.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Status filter
-      const matchesStatus = !statusFilter || (campaign.status?.toLowerCase() === statusFilter.toLowerCase());
+      const matchesStatus =
+        !statusFilter ||
+        campaign.status?.toLowerCase() === statusFilter.toLowerCase();
 
       return matchesSearch && matchesStatus;
     });
@@ -82,10 +82,7 @@ export default function ExecutionDashboardPage() {
         {loading && <ExecutionDashboardLoading />}
 
         {!loading && error && (
-          <ExecutionDashboardError
-            error={error}
-            onRetry={fetchCampaigns}
-          />
+          <ExecutionDashboardError error={error} onRetry={fetchCampaigns} />
         )}
 
         {!loading && !error && campaigns.length === 0 && (
@@ -100,7 +97,10 @@ export default function ExecutionDashboardPage() {
             <div className="mb-6 space-y-4">
               {/* Search Bar */}
               <div className="relative">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Search
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                />
                 <input
                   type="text"
                   placeholder="Search campaigns by name or description..."
@@ -120,7 +120,9 @@ export default function ExecutionDashboardPage() {
 
               {/* Status Filter */}
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-sm font-medium text-slate-600">Filter by Status:</span>
+                <span className="text-sm font-medium text-slate-600">
+                  Filter by Status:
+                </span>
                 <div className="flex flex-wrap gap-2">
                   {CAMPAIGN_STATUS_OPTIONS.map((option) => (
                     <button
@@ -142,7 +144,11 @@ export default function ExecutionDashboardPage() {
               {(searchQuery || statusFilter) && (
                 <div className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-2">
                   <p className="text-sm text-slate-600">
-                    Found <span className="font-semibold text-slate-900">{filteredCampaigns.length}</span> campaign{filteredCampaigns.length !== 1 ? "s" : ""}
+                    Found{" "}
+                    <span className="font-semibold text-slate-900">
+                      {filteredCampaigns.length}
+                    </span>{" "}
+                    campaign{filteredCampaigns.length !== 1 ? "s" : ""}
                   </p>
                   {(searchQuery || statusFilter) && (
                     <button
