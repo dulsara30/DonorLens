@@ -1,4 +1,5 @@
 import { Heart, CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function formatNumber(value) {
   return new Intl.NumberFormat("en-LK").format(Number(value || 0));
@@ -66,7 +67,12 @@ export default function CampaignSideCard({ campaign }) {
         className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-6 py-4 text-md font-semibold text-white transition hover:bg-teal-700"
       >
         <Heart size={20} />
-        <span>Donate Now</span>
+        <Link
+          to={`/campaigns/${campaign?.id}/donate`}
+          className="text-white hover:text-blue-200"
+        >
+          <span>Donate Now</span>
+        </Link>
       </button>
     </div>
   );
