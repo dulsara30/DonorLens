@@ -36,3 +36,16 @@ export const updateCampaignApi = async (campaignId, payload) => {
   );
   return response.data;
 };
+
+export const getPublicCampaignsApi = async (params = {}) => {
+  const response = await axiosInstance.get("/ngo/campaigns/get-all-campaigns", { params });
+  return response.data;
+};
+
+export const getPublicSingleCampaignApi = async (campaignId) => {
+  const response = await axiosInstance.get(
+    `/ngo/campaigns/get-all-campaigns/${campaignId}`
+  );
+  return response.data;
+};
+

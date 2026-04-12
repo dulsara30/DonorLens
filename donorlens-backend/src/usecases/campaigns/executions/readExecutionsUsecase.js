@@ -21,8 +21,19 @@ export const getAllExecutionsUsecase = async (campaignId) => {
 
     // Fetch all execution updates for this campaign
     const executions = await ExecutionUpdate.find({ campaignId })
-      .sort({ date: -1 }) 
-      .lean(); 
+      .sort({ date: -1 })
+      .lean();
+
+    // Debug logging for sort order
+    console.log("📊 Backend Executions Retrieved:", {
+      campaignId,
+      count: executions.length,
+      sortedDates: executions.map((e) => ({
+        title: e.title,
+        date: e.date?.toISOString?.() || e.date,
+        timestamp: e.date?.getTime?.() || new Date(e.date).getTime(),
+      })),
+    });
 
     // Calculate summary statistics
     const summary = {

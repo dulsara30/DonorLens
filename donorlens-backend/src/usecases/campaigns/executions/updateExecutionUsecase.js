@@ -79,7 +79,22 @@ export const updateExecutionUsecase = async (updateData) => {
     }
 
     if (date !== undefined) {
-      updates.date = date;
+      try {
+        const parsedDate = new Date(date);
+        // Validate the date is valid
+        if (!isNaN(parsedDate.getTime())) {
+          updates.date = parsedDate;
+          console.log("📅 Date updated:", {
+            original: date,
+            stored: parsedDate.toISOString(),
+          });
+        } else {
+          throw new ValidationError("Invalid date format");
+        }
+      } catch (err) {
+        console.error("Error parsing date:", date, err);
+        throw new ValidationError("Invalid date format");
+      }
     }
 
     if (description !== undefined) {
@@ -96,7 +111,10 @@ export const updateExecutionUsecase = async (updateData) => {
     // Handle new file uploads
     if (executionFile) {
       // Upload new evidence photos if provided
-      if (executionFile.evidencePhotos && executionFile.evidencePhotos.length > 0) {
+      if (
+        executionFile.evidencePhotos &&
+        executionFile.evidencePhotos.length > 0
+      ) {
         const newEvidencePhotos = await uploadMultipleToCloudinary(
           executionFile.evidencePhotos,
           "donorlens/execution-updates/photos",
@@ -113,9 +131,7 @@ export const updateExecutionUsecase = async (updateData) => {
           ...formattedNewPhotos,
         ];
 
-        console.log(
-          `Added ${newEvidencePhotos.length} new evidence photos`,
-        );
+        console.log(`Added ${newEvidencePhotos.length} new evidence photos`);
       }
 
       // Upload new receipts if provided
@@ -128,8 +144,7 @@ export const updateExecutionUsecase = async (updateData) => {
         const formattedNewReceipts = newReceipts.map((receipt, index) => ({
           public_id: receipt.publicId,
           secure_url: receipt.url,
-          fileName:
-            executionFile.receipts[index]?.originalname || "receipt",
+          fileName: executionFile.receipts[index]?.originalname || "receipt",
         }));
 
         // Add new receipts to existing ones

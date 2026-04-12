@@ -7,6 +7,7 @@ import { AuthProvider } from "./state/AuthContext.jsx";
 import { Provider } from "react-redux";
 import store from "./store";
 import "leaflet/dist/leaflet.css";
+import "react-toastify/dist/ReactToastify.css";
 
 import L from "leaflet";
 

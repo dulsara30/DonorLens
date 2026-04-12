@@ -23,7 +23,7 @@ export default function AdminLayout({ title, children }) {
 
       <div className="flex-1">
         <header className="flex h-[74px] items-center border-b border-slate-200 bg-white px-6 lg:px-8">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-3xl font-bold tracking-tight text-teal-800">
             {title}
           </h1>
         </header>
