@@ -38,10 +38,31 @@ test.describe("NGO Registration API Tests", () => {
     console.log("Test fixtures ready!");
   });
 
-  test.afterAll(() => {
-    console.log("Test cleanup completed!");
+  test.afterAll(async ({ request }) => {
+    console.log("Starting test cleanup...");
     console.log(
-      `Total tests executed with ${createdEmails.length} NGO registrations`,
+      `Cleaning up ${createdEmails.length} NGO registrations from database...`,
+    );
+
+    // Delete each test NGO created during tests
+    for (const email of createdEmails) {
+      try {
+        const deleteResponse = await request.delete(
+          `${API_URL}/test/cleanup/user/${email}`,
+        );
+        if (deleteResponse.ok) {
+          console.log(` Deleted test user: ${email}`);
+        } else {
+          console.warn(` Failed to delete: ${email}`);
+        }
+      } catch (error) {
+        console.error(` Error deleting ${email}:`, error.message);
+      }
+    }
+
+    console.log(" Test cleanup completed!");
+    console.log(
+      `Total tests executed: ${createdEmails.length} NGO registrations`,
     );
   });
 

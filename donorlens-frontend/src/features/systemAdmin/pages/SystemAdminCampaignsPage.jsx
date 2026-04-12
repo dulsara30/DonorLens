@@ -3,30 +3,11 @@
 // ============================================
 // Review and manage all campaigns across the platform
 
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import SystemAdminLayout from "../layout/SystemAdminLayout";
-import {
-  fetchAllCampaigns,
-  setSelectedCampaign,
-  clearSelectedCampaign,
-  setSearchQuery,
-  setStatusFilter,
-  setSdgFilter,
-  clearFilters,
-  setCurrentPage,
-  selectPaginatedCampaigns,
-  selectFilteredCampaigns,
-  selectLoading,
-  selectSearchQuery,
-  selectStatusFilter,
-  selectSdgFilter,
-  selectCurrentPage,
-  selectTotalPages,
-  selectCampaignStats,
-  selectSelectedCampaign,
-} from "../../../store/slices/campaignsSlice";
 import CampaignReviewModal from "../components/CampaignReviewModal";
+import { fetchAllCampaignsAPI } from "../api";
 
 /**
  * SDG GOALS DATA
@@ -52,87 +33,106 @@ const SDG_GOALS = [
   { number: 17, name: "Partnerships", color: "#19486A" },
 ];
 
+const ITEMS_PER_PAGE = 10;
+
 /**
  * SystemAdminCampaignsPage Component
  * Features:
  * - Search campaigns by title/NGO name
- * - Filter by status (Ongoing/Completed) and SDG Goal
- * - Row-based card layout with campaign details
- * - Review button to open detailed modal
- * - Send warning email and deactivate options
+ * - Filter by status and SDG Goal
+ * - View campaign-level summary stats
+ * - Pagination and campaign review modal
  */
 export default function SystemAdminCampaignsPage() {
-  const dispatch = useDispatch();
+  const [searchInput, setSearchInput] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [sdgFilter, setSdgFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
 
-  // Redux state
-  const campaigns = useSelector(selectPaginatedCampaigns);
-  const allFilteredCampaigns = useSelector(selectFilteredCampaigns);
-  const loading = useSelector(selectLoading);
-  const searchQuery = useSelector(selectSearchQuery);
-  const statusFilter = useSelector(selectStatusFilter);
-  const sdgFilter = useSelector(selectSdgFilter);
-  const currentPage = useSelector(selectCurrentPage);
-  const totalPages = useSelector(selectTotalPages);
-  const stats = useSelector(selectCampaignStats);
-  const selectedCampaign = useSelector(selectSelectedCampaign);
+  const {
+    data: campaignsData = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
+    queryKey: ["system-admin", "campaigns"],
+    queryFn: fetchAllCampaignsAPI,
+  });
 
-  // Local state for debounced search
-  const [searchInput, setSearchInput] = useState(searchQuery);
+  const allCampaigns = useMemo(() => {
+    return Array.isArray(campaignsData) ? campaignsData : [];
+  }, [campaignsData]);
 
-  /**
-   * Fetch campaigns on component mount
-   */
+  const stats = useMemo(() => {
+    const total = allCampaigns.length;
+    const ongoing = allCampaigns.filter((c) => c?.status === "ONGOING").length;
+    const completed = allCampaigns.filter(
+      (c) => c?.status === "COMPLETED",
+    ).length;
+    const totalRaised = allCampaigns.reduce(
+      (sum, c) => sum + (Number(c?.raisedAmount) || 0),
+      0,
+    );
+
+    return { total, ongoing, completed, totalRaised };
+  }, [allCampaigns]);
+
+  const filteredCampaigns = useMemo(() => {
+    const query = searchInput.trim().toLowerCase();
+
+    return allCampaigns.filter((campaign) => {
+      const ngoName = campaign?.createdBy?.ngoDetails?.ngoName || "";
+      const title = campaign?.title || "";
+
+      const matchesSearch =
+        !query ||
+        title.toLowerCase().includes(query) ||
+        ngoName.toLowerCase().includes(query);
+
+      const matchesStatus =
+        statusFilter === "ALL" || campaign?.status === statusFilter;
+
+      const matchesSdg =
+        sdgFilter === "ALL" ||
+        Number(campaign?.sdgGoalNumber) === Number(sdgFilter);
+
+      return matchesSearch && matchesStatus && matchesSdg;
+    });
+  }, [allCampaigns, searchInput, statusFilter, sdgFilter]);
+
+  const totalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(filteredCampaigns.length / ITEMS_PER_PAGE));
+  }, [filteredCampaigns.length]);
+
+  const paginatedCampaigns = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredCampaigns.slice(startIndex, endIndex);
+  }, [filteredCampaigns, currentPage]);
+
   useEffect(() => {
-    dispatch(fetchAllCampaigns());
-  }, [dispatch]);
+    setCurrentPage(1);
+  }, [searchInput, statusFilter, sdgFilter]);
 
-  /**
-   * Debounce search input (300ms delay)
-   */
   useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch(setSearchQuery(searchInput));
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchInput, dispatch]);
-
-  /**
-   * Handle filter changes
-   */
-  const handleStatusFilterChange = (status) => {
-    dispatch(setStatusFilter(status));
-  };
-
-  const handleSdgFilterChange = (sdg) => {
-    dispatch(setSdgFilter(sdg));
-  };
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const handleClearFilters = () => {
     setSearchInput("");
-    dispatch(clearFilters());
+    setStatusFilter("ALL");
+    setSdgFilter("ALL");
+    setCurrentPage(1);
   };
 
-  /**
-   * Handle pagination
-   */
   const handlePageChange = (page) => {
-    dispatch(setCurrentPage(page));
+    setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  /**
-   * Open review modal
-   */
-  const handleReviewCampaign = (campaign) => {
-    dispatch(setSelectedCampaign(campaign));
-  };
-
-  /**
-   * Close review modal
-   */
-  const handleCloseModal = () => {
-    dispatch(clearSelectedCampaign());
   };
 
   /**
@@ -170,7 +170,7 @@ export default function SystemAdminCampaignsPage() {
    * Get SDG info by number
    */
   const getSDGInfo = (number) => {
-    return SDG_GOALS.find((goal) => goal.number === number) || {};
+    return SDG_GOALS.find((goal) => goal.number === Number(number)) || {};
   };
 
   /**
@@ -265,7 +265,7 @@ export default function SystemAdminCampaignsPage() {
               </label>
               <select
                 value={statusFilter}
-                onChange={(e) => handleStatusFilterChange(e.target.value)}
+                onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="ALL">All Status</option>
@@ -281,7 +281,7 @@ export default function SystemAdminCampaignsPage() {
               </label>
               <select
                 value={sdgFilter}
-                onChange={(e) => handleSdgFilterChange(e.target.value)}
+                onChange={(e) => setSdgFilter(e.target.value)}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="ALL">All Goals</option>
@@ -295,12 +295,12 @@ export default function SystemAdminCampaignsPage() {
           </div>
 
           {/* Active Filters Display */}
-          {(searchQuery || statusFilter !== "ALL" || sdgFilter !== "ALL") && (
+          {(searchInput || statusFilter !== "ALL" || sdgFilter !== "ALL") && (
             <div className="mt-4 flex items-center gap-2 flex-wrap">
               <span className="text-sm text-slate-600">Active filters:</span>
-              {searchQuery && (
+              {searchInput && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-emerald-100 text-emerald-800">
-                  Search: "{searchQuery}"
+                  Search: "{searchInput}"
                 </span>
               )}
               {statusFilter !== "ALL" && (
@@ -310,7 +310,7 @@ export default function SystemAdminCampaignsPage() {
               )}
               {sdgFilter !== "ALL" && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
-                  SDG: {getSDGInfo(parseInt(sdgFilter)).name}
+                  SDG: {getSDGInfo(sdgFilter).name}
                 </span>
               )}
               <button
@@ -323,18 +323,33 @@ export default function SystemAdminCampaignsPage() {
           )}
         </div>
 
+        {isError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+            <p className="font-semibold">Failed to load campaigns</p>
+            <p className="text-sm mt-1">{error?.message || "Unknown error"}</p>
+            <button
+              onClick={() => refetch()}
+              className="mt-3 px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* Results Count */}
         <div className="text-sm text-slate-600">
-          Showing {campaigns.length} of {allFilteredCampaigns.length} campaigns
+          Showing {paginatedCampaigns.length} of {filteredCampaigns.length}{" "}
+          campaigns
+          {isFetching && !isLoading ? " (refreshing...)" : ""}
         </div>
 
         {/* Campaign Cards (Row Layout) */}
         <div className="space-y-4">
-          {loading ? (
+          {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
             </div>
-          ) : campaigns.length === 0 ? (
+          ) : paginatedCampaigns.length === 0 ? (
             <div className="bg-white p-12 rounded-lg shadow-sm border border-slate-200 text-center">
               <svg
                 className="w-16 h-16 text-slate-300 mx-auto mb-4"
@@ -353,13 +368,13 @@ export default function SystemAdminCampaignsPage() {
                 No campaigns found
               </h3>
               <p className="text-slate-600">
-                {searchQuery || statusFilter !== "ALL" || sdgFilter !== "ALL"
+                {searchInput || statusFilter !== "ALL" || sdgFilter !== "ALL"
                   ? "Try adjusting your filters"
                   : "No campaigns have been created yet"}
               </p>
             </div>
           ) : (
-            campaigns.map((campaign) => {
+            paginatedCampaigns.map((campaign) => {
               const progress = calculateProgress(
                 campaign.raisedAmount,
                 campaign.totalPlannedCost,
@@ -471,7 +486,7 @@ export default function SystemAdminCampaignsPage() {
                         {/* Action Buttons */}
                         <div className="flex items-center gap-3">
                           <button
-                            onClick={() => handleReviewCampaign(campaign)}
+                            onClick={() => setSelectedCampaign(campaign)}
                             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
                           >
                             <svg
@@ -552,7 +567,7 @@ export default function SystemAdminCampaignsPage() {
       {selectedCampaign && (
         <CampaignReviewModal
           campaign={selectedCampaign}
-          onClose={handleCloseModal}
+          onClose={() => setSelectedCampaign(null)}
         />
       )}
     </SystemAdminLayout>
