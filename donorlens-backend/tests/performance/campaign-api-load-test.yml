@@ -1,0 +1,54 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampUp: 60
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 10
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 20
+      name: "Peak load"
+    - duration: 60
+      arrivalRate: 5
+      rampUp: 60
+      name: "Cool down"
+
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "List all public campaigns"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/campaigns/get-all-campaigns"
+          expect:
+            - statusCode: 200
+
+  - name: "List ongoing campaigns"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/campaigns/get-all-campaigns?status=ONGOING"
+          expect:
+            - statusCode: 200
+
+  - name: "List completed campaigns"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/campaigns/get-all-campaigns?status=COMPLETED"
+          expect:
+            - statusCode: 200
+
+  - name: "Fetch campaign details by ID"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/campaigns/get-all-campaigns/69da808361a1184df1b4f3ec"
+          expect:
+            - statusCode: [200, 404]
