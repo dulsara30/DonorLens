@@ -44,11 +44,7 @@ router.delete(
   deleteCampaignController,
 );
 
-router.get(
-  "/get-all-campaigns",
-  authorizeRoles("ADMIN"),
-  getAllCampaignsController,
-);
+router.get("/get-all-campaigns", getAllCampaignsController);
 
 router.get("/get-all-campaigns/:campaignId", getPublicSingleCampaignController);
 

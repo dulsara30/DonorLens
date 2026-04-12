@@ -10,6 +10,8 @@ import RejectNgoRequestController from "../../controllers/admin/RejectNgoRequest
 import DeleteNgoRegistrationRequestController from "../../controllers/admin/DeleteNgoRegistrationRequestController.js";
 import ResubmissionRequiredController from "../../controllers/admin/ResubmissionRequiredController.js";
 import DeactivateNgoRequestController from "../../controllers/admin/DeactivateNgoRequestController.js";
+import FetchAllUsersController from "../../controllers/admin/FetchAllUsersController.js";
+import GetUserByIdController from "../../controllers/admin/GetUserByIdController.js";
 
 const adminRoutes = Router();
 
@@ -60,6 +62,20 @@ adminRoutes.delete(
   authenticateToken,
   authorizeRoles("ADMIN"),
   DeleteNgoRegistrationRequestController,
+);
+
+adminRoutes.get(
+  "/users",
+  authenticateToken,
+  authorizeRoles("ADMIN"),
+  FetchAllUsersController,
+);
+
+adminRoutes.get(
+  "/users/:userId",
+  authenticateToken,
+  authorizeRoles("ADMIN"),
+  GetUserByIdController,
 );
 
 export default adminRoutes;
