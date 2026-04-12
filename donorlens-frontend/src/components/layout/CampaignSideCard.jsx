@@ -10,6 +10,11 @@ export default function CampaignSideCard({ campaign }) {
 
   const { id } = useParams();
 
+  const raised = Number(campaign?.raisedAmount || 0);
+  const goal = Number(campaign?.totalPlannedCost || 0);
+  const progressPercent =
+    goal > 0 ? Math.min(Math.round((raised / goal) * 100), 100) : 0;
+
   if (isCompleted) {
     return (
       <div className="sticky top-8 rounded-[28px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
@@ -56,26 +61,63 @@ export default function CampaignSideCard({ campaign }) {
   }
 
   return (
-    <div className="sticky top-8 rounded-[28px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
-      <div className="rounded-[22px] border border-dashed border-slate-200 bg-slate-50 px-6 py-16 text-center">
-        <p className="text-lg font-medium text-slate-500">Donation area</p>
-        <p className="mt-2 text-sm leading-6 text-slate-400">
-          You can add donation fields or payment integrations here later.
+    <div className="sticky top-8 rounded-[28px] border border-slate-200 bg-white px-8 py-8 shadow-sm text-center">
+      <div className="rounded-[22px] bg-[#f2fbf8] px-6 py-8 text-left border border-teal-50">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#0e8a71] mb-4">
+          Fundraising Goal
         </p>
+
+        <div className="flex items-baseline gap-1">
+          <span className="text-sm font-semibold text-[#0e8a71]">LKR</span>
+          <span className="text-5xl font-semibold tracking-tight text-slate-900">
+            {formatNumber(raised)}
+          </span>
+        </div>
+
+        <p className="mt-2 text-sm text-slate-500">
+          raised of{" "}
+          <span className="font-bold text-slate-700">
+            LKR {formatNumber(goal)}
+          </span>
+        </p>
+
+        <div className="mt-5">
+          <div className="h-[10px] w-full overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-inset ring-slate-100">
+            <div
+              className="h-full rounded-full bg-[#0e8a71]"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <div className="mt-2 flex justify-end">
+            <span className="text-[13px] font-bold text-[#0e8a71]">
+              {progressPercent}%
+            </span>
+          </div>
+        </div>
       </div>
-      <Link
-        to={`/campaigns/${id}/donate`}
-        className="text-white hover:text-blue-200"
-      >
+
+      <p className="mt-6 px-4 text-[13px] text-slate-500">
+        Every contribution makes a real difference.
+      </p>
+
+      {campaign?._id ? (
+        <Link
+          to={`/campaigns/${id}/donate`}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-[20px] bg-[#008f7a] px-6 py-[18px] text-[15px] font-semibold text-white transition shadow-sm hover:bg-[#007a68] no-underline"
+        >
+          <Heart size={20} className="fill-transparent stroke-[2.5]" />
+          <span>Donate Now</span>
+        </Link>
+      ) : (
         <button
           type="button"
-          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-6 py-4 text-md font-semibold text-white transition hover:bg-teal-700"
+          disabled
+          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-300 px-6 py-4 text-md font-semibold text-white opacity-70"
         >
           <Heart size={20} />
-
           <span>Donate Now</span>
         </button>
-      </Link>
+      )}
     </div>
   );
 }
