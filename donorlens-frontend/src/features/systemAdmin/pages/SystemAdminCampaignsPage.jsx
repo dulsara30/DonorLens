@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import SystemAdminLayout from "../layout/SystemAdminLayout";
 import CampaignReviewModal from "../components/CampaignReviewModal";
-import { fetchAllCampaignsAPI } from "../api";
+import { fetchAllCampaignsAPI, fetchUserDetailsAPI } from "../api";
 
 /**
  * SDG GOALS DATA
@@ -62,9 +62,78 @@ export default function SystemAdminCampaignsPage() {
     queryFn: fetchAllCampaignsAPI,
   });
 
-  const allCampaigns = useMemo(() => {
-    return Array.isArray(campaignsData) ? campaignsData : [];
+  const creatorIds = useMemo(() => {
+    const campaigns = Array.isArray(campaignsData) ? campaignsData : [];
+
+    return [
+      ...new Set(
+        campaigns
+          .map((campaign) => {
+            if (typeof campaign?.createdBy === "string") {
+              return campaign.createdBy;
+            }
+            return campaign?.createdBy?._id;
+          })
+          .filter(Boolean),
+      ),
+    ];
   }, [campaignsData]);
+
+  const { data: userDetailsById = {}, isFetching: isFetchingCreators } =
+    useQuery({
+      queryKey: ["system-admin", "campaign-creators", creatorIds],
+      enabled: creatorIds.length > 0,
+      queryFn: async () => {
+        const users = await Promise.all(
+          creatorIds.map(async (creatorId) => {
+            try {
+              const user = await fetchUserDetailsAPI(creatorId);
+              return [creatorId, user];
+            } catch (fetchError) {
+              return [creatorId, null];
+            }
+          }),
+        );
+
+        return Object.fromEntries(users);
+      },
+    });
+
+  const allCampaigns = useMemo(() => {
+    const campaigns = Array.isArray(campaignsData) ? campaignsData : [];
+
+    return campaigns.map((campaign) => {
+      const creatorId =
+        typeof campaign?.createdBy === "string"
+          ? campaign.createdBy
+          : campaign?.createdBy?._id;
+
+      const creatorDetails = creatorId ? userDetailsById[creatorId] : null;
+
+      if (!creatorDetails) {
+        return campaign;
+      }
+
+      if (typeof campaign?.createdBy === "string") {
+        return {
+          ...campaign,
+          createdBy: creatorDetails,
+        };
+      }
+
+      return {
+        ...campaign,
+        createdBy: {
+          ...creatorDetails,
+          ...campaign.createdBy,
+          ngoDetails: {
+            ...creatorDetails?.ngoDetails,
+            ...campaign.createdBy?.ngoDetails,
+          },
+        },
+      };
+    });
+  }, [campaignsData, userDetailsById]);
 
   const stats = useMemo(() => {
     const total = allCampaigns.length;
@@ -340,7 +409,7 @@ export default function SystemAdminCampaignsPage() {
         <div className="text-sm text-slate-600">
           Showing {paginatedCampaigns.length} of {filteredCampaigns.length}{" "}
           campaigns
-          {isFetching && !isLoading ? " (refreshing...)" : ""}
+          {isFetching || isFetchingCreators ? " (refreshing...)" : ""}
         </div>
 
         {/* Campaign Cards (Row Layout) */}
