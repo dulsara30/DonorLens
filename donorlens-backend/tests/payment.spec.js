@@ -37,16 +37,10 @@ async function loginAsAdmin(request) {
   return body.data?.accessToken;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Test Suite
-// ─────────────────────────────────────────────────────────────────────────────
-
 test.describe("Payment API Tests", () => {
   let donorToken;
   let adminToken;
 
-  // A real campaign ID should exist in the test DB.
-  // Update this value with a valid ONGOING campaign ObjectId if needed.
   let validCampaignId;
 
   test.beforeAll(async ({ request }) => {
@@ -69,10 +63,6 @@ test.describe("Payment API Tests", () => {
     console.log("Payment tests ready. campaign:", validCampaignId);
   });
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // HEALTH CHECK
-  // ───────────────────────────────────────────────────────────────────────────
-
   test("paument_health_check - payment route should be healthy", async ({
     request,
   }) => {
@@ -85,10 +75,6 @@ test.describe("Payment API Tests", () => {
 
     console.log("Health check passed");
   });
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // CREATE PAYMENT — POSITIVE TESTS
-  // ───────────────────────────────────────────────────────────────────────────
 
   test("paument_create_success_with_valid_data - should create payment with all valid fields", async ({
     request,
@@ -215,10 +201,6 @@ test.describe("Payment API Tests", () => {
       `raisedAmount updated: ${raisedBefore} → ${raisedAfter}`,
     );
   });
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // CREATE PAYMENT — NEGATIVE TESTS
-  // ───────────────────────────────────────────────────────────────────────────
 
   test("paument_create_fail_missing_campaign_id - should return 400 when campaignId is missing", async ({
     request,
@@ -392,10 +374,6 @@ test.describe("Payment API Tests", () => {
     expect(body.success).toBe(false);
   });
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // CREATE PAYMENT — EDGE CASES
-  // ───────────────────────────────────────────────────────────────────────────
-
   test("paument_edge_very_large_amount - should accept a very large valid amount", async ({
     request,
   }) => {
@@ -462,10 +440,6 @@ test.describe("Payment API Tests", () => {
     expect(body.data.currency).toBe("LKR");
   });
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // GET PAYMENT HISTORY — AUTHENTICATED USER
-  // ───────────────────────────────────────────────────────────────────────────
-
   test("paument_get_my_history_success - should return authenticated donor payment history", async ({
     request,
   }) => {
@@ -507,10 +481,6 @@ test.describe("Payment API Tests", () => {
     expect(body.data).toHaveLength(0);
   });
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // GET ALL PAYMENTS — ADMIN ONLY
-  // ───────────────────────────────────────────────────────────────────────────
-
   test("paument_admin_get_all_payments_success - admin should fetch all payment records", async ({
     request,
   }) => {
@@ -543,10 +513,6 @@ test.describe("Payment API Tests", () => {
     const res = await request.get(`${API_URL}/payment`);
     expect(res.status()).toBe(401);
   });
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // PAYMENT LOGS — ADMIN
-  // ───────────────────────────────────────────────────────────────────────────
 
   test("paument_logs_get_all_success - should return all payment logs", async ({
     request,
