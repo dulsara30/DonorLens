@@ -400,9 +400,8 @@ export const handleExportNgoRequests = async () => {
  */
 export const fetchAllCampaignsAPI = async () => {
   try {
-    // TODO: Backend endpoint should return campaigns with populated createdBy.ngoDetails
-    const response = await api.get("/admin/campaigns");
-    return response.data.data;
+    const response = await api.get("/campaigns/get-all-campaigns");
+    return response?.data?.data || [];
   } catch (error) {
     console.error("Failed to fetch campaigns:", error);
     throw error;

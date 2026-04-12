@@ -14,6 +14,7 @@ import adminRoutes from "./routes/admin/systemAdmin.route.js";
 import paymentRoutes from "./routes/payment/payment.route.js";
 import campaignCommentRoutes from "./routes/campaigns/campaignComment.routes.js";
 import paymentLogRoutes from "./routes/payment/paymentLogs.route.js";
+import testRoutes from "./routes/test/test.route.js";
 
 const createApp = () => {
   dotenv.config();
@@ -53,7 +54,6 @@ const createApp = () => {
   //Auth routes (login, register, refresh token, logout, get current user)
   app.use("/api/auth", authRouter);
 
-
   //app.use("/api/ngo/campaigns", campaignRoutes);
 
   app.use("/api/campaigns", campaignRoutes);
@@ -72,6 +72,10 @@ const createApp = () => {
   app.use("/api/payment", paymentRoutes);
   app.use("/api/payment/logs", paymentLogRoutes);
 
+  // Test cleanup routes (⚠️ DEVELOPMENT/TESTING ONLY - disable in production!)
+  if (process.env.NODE_ENV !== "production") {
+    app.use("/api/test", testRoutes);
+  }
 
   // 404 handler for undefined routes (must be before error handler)
   app.use((req, res, next) => {
