@@ -35,11 +35,11 @@ export const createExecutions = async ({ execution }) => {
   if (date) {
     const executionDate = new Date(date);
     const currentDate = new Date();
-    
+
     // Set time to start of day for comparison
     executionDate.setHours(0, 0, 0, 0);
     currentDate.setHours(0, 0, 0, 0);
-    
+
     if (executionDate > currentDate) {
       throw new ValidationError("Execution date cannot be a future date.");
     }
@@ -47,9 +47,6 @@ export const createExecutions = async ({ execution }) => {
 
   //check if campaign exists
   const campaign = await Campaign.findById(campaignId);
-
-  console.log("Campaign found:", campaign.createdBy.toString());
-  console.log("Campaign found:", userId); // Debug log
 
   if (!campaign) {
     throw new NotFoundError("Campaign not found.");

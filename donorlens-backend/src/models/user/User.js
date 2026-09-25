@@ -195,13 +195,13 @@ userSchema.pre("save", async function () {
     typeof this.passwordHash === "string" &&
     this.passwordHash.match(/^\$2[aby]\$/)
   ) {
-    console.log("⏭Password already hashed, skipping for:", this.email);
+    console.log("⏭Password already hashed");
     return;
   }
 
   // Only hash plain text passwords
   if (typeof this.passwordHash === "string" && this.passwordHash.length > 0) {
-    console.log("Hashing password for user:", this.email);
+    console.log("Successfully create the hashed password");
     const salt = await bcrypt.genSalt(10);
     this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
   }
@@ -218,7 +218,7 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   try {
     return await bcrypt.compare(candidatePassword, this.passwordHash);
   } catch (error) {
-    console.error("Password comparison error:", error);
+    console.error("Password is missmatch :", error);
     return false;
   }
 };

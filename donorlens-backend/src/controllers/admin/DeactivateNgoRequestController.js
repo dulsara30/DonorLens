@@ -3,7 +3,6 @@ import { ApiResponse } from "../../utils/apiResponse.js";
 
 export default async function DeactivateNgoRequestController(req, res, next) {
   try {
-    console.log("Deactivating NGO Request with details", req.body);
     const { ngoId } = req.params;
     const { note } = req.body;
     const adminId = req.user.userId;

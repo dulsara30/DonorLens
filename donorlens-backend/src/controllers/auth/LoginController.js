@@ -25,7 +25,7 @@ export const loginController = async (req, res) => {
 
     const { accessToken, refreshToken, user } = result.data;
 
-    console.log("Access Token", accessToken);
+    console.log("Logging process successfull..",);
 
     res.cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
 

@@ -4,8 +4,6 @@ import User from "../../models/user/User.js";
 
 export default async function ResubmissionTokenVerificationUsecase(token) {
   try {
-    console.log("Verifying resubmission with token....");
-
     if (!token || typeof token !== "string" || !token.trim()) {
       throw new ValidationError(
         "Token is required and must be a non-empty string",

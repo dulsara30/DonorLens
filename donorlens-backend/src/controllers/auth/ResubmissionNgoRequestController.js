@@ -4,8 +4,6 @@ import { FileValidationError } from "../../utils/errors.js";
 
 export default async function ResubmissionNgoRequestController(req, res, next) {
   try {
-    console.log("Received resubmission request with body:", req.body);
-
     const {
       ngoId,
       ngoName,

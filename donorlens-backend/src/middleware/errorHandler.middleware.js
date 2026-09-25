@@ -495,9 +495,6 @@ export const errorHandler = (err, req, res, next) => {
   // ============================================
   // 1️⃣4️⃣ UNKNOWN/PROGRAMMING ERRORS
   // ============================================
-  console.error("💥 UNHANDLED ERROR:", err);
-
-  // In production, don't leak error details
   res.status(500).json({
     success: false,
     error: "Internal server error",

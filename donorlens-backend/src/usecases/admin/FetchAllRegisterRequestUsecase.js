@@ -2,7 +2,6 @@ import User from "../../models/user/User.js";
 import { NotFoundError } from "../../utils/errors.js";
 
 export default async function FetchAllRegisterRequest() {
-  console.log("Fetching all NGO registration requests...");
   try {
     const user = await User.find({
       role: "NGO_ADMIN",

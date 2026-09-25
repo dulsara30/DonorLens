@@ -15,8 +15,6 @@ export const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    // console.log("Authenticating request. Authorization header:", authHeader);
-
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
@@ -51,7 +49,7 @@ export const authenticateToken = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Authentication middleware error:", error);
+    console.error("Authentication occurs trouble in authentication process.");
     return res.status(500).json({
       success: false,
       message: "Authentication failed",

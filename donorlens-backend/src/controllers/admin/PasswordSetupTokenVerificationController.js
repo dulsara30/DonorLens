@@ -6,7 +6,6 @@ export default async function PasswordSetupTokenVerificationController(
   res,
   next,
 ) {
-  console.log("verifying password setup token...");
   try {
     const { token } = req.query;
 
@@ -19,7 +18,7 @@ export default async function PasswordSetupTokenVerificationController(
       });
     }
   } catch (error) {
-    console.error("Error in PasswordSetupTokenVerificationController:", error);
+    console.error("Something went wrong in the password verification process... ", error);
     next(error);
   }
 }

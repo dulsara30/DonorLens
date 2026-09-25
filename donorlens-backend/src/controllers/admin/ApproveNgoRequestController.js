@@ -3,7 +3,6 @@ import { ApiResponse } from "../../utils/apiResponse.js";
 
 export default async function ApproveNgoRequestController(req, res, next) {
   try {
-    console.log("Approving NGO registration request");
     const { ngoId } = req.params;
     const { note } = req.body;
     const adminId = req.user.userId;

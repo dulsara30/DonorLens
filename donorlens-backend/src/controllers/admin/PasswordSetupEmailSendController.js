@@ -3,8 +3,6 @@ import { ApiResponse } from "../../utils/apiResponse.js";
 
 export default async function PasswordSetupEmailSendController(req, res, next) {
   try {
-    console.log("Sending password setup email");
-
     const { ngoId } = req.params;
     const result = await PasswordSetupEmailSendUsecase(ngoId);
 

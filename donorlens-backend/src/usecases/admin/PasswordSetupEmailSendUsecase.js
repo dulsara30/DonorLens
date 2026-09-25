@@ -8,7 +8,6 @@ import SendEmailUsecase from "../email/SendEmailUsecase.js";
 
 export default async function PasswordSetupEmailSendUsecase(ngoId) {
   try {
-    console.log("Initiating password setup email send for NGO ID:", ngoId);
     if (!ngoId?.trim()) {
       throw new ValidationError("NGO ID is required");
     }
@@ -80,7 +79,7 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
       };
     }
 
-    console.log("Password setup email sent successfully to:", ngo.email);
+    console.log("Password setup email sent successful:");
 
     return {
       success: true,

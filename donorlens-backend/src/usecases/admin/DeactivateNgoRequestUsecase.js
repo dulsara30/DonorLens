@@ -12,7 +12,6 @@ export default async function DeactivateNgoRequestUsecase(
   note,
   adminId,
 ) {
-  console.log("Deactivating NGO registration request!");
   try {
     const error = {};
     if (!ngoId?.trim() || !mongoose.Types.ObjectId.isValid(ngoId))

@@ -4,10 +4,6 @@ import { ApiResponse } from "../../utils/apiResponse.js";
 
 export const adminRegisterController = async (req, res, next) => {
   try {
-    console.log("AdminRegisterController called");
-    console.log("Body:", req.body);
-    console.log("Files:", req.files);
-
     const {
       ngoName,
       registrationNumber,
@@ -47,8 +43,6 @@ export const adminRegisterController = async (req, res, next) => {
       },
       files, // Pass files to usecase
     );
-
-    console.log("NGO admin registered:", userData.email);
 
     return ApiResponse.created(res, {
       message:

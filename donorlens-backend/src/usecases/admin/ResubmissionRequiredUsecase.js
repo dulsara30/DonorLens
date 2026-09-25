@@ -12,7 +12,6 @@ export default async function ResubmissionRequiredUsecase(
   adminId,
 ) {
   try {
-    console.log("Initiating resubmission required process for NGO ID:", ngoId);
     if (!ngoId || !ngoId.trim()) {
       throw new ValidationError("NGO ID is required");
     }
