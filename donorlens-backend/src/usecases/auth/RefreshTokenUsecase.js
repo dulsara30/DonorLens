@@ -24,7 +24,9 @@ export default async function RefreshTokenUsecase(refreshToken) {
 
     const decoded = verifyRefreshToken(refreshToken);
 
-    if (!decoded || !decoded.userId) {
+    const userId = decoded.userId || decoded.id;
+
+    if (!decoded || !userId) {
       return {
         success: false,
         status: 401,
@@ -32,7 +34,7 @@ export default async function RefreshTokenUsecase(refreshToken) {
       };
     }
 
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(userId);
 
     if (!user) {
       return {
@@ -50,9 +52,18 @@ export default async function RefreshTokenUsecase(refreshToken) {
       };
     }
 
+    if (decoded.tv === undefined || decoded.tv !== (user.tokenVersion || 0)) {
+      return {
+        success: false,
+        status: 401,
+        message: "Session expired. Please log in again.",
+      };
+    }
+
     const accessToken = generateAccessToken({
       userId: user._id.toString(),
       role: user.role,
+      tv: user.tokenVersion || 0,
     });
 
     return {

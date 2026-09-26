@@ -68,10 +68,12 @@ export default async function LoginUsecase(email, password) {
     const accessToken = generateAccessToken({
       userId: user._id.toString(),
       role: user.role,
+      tv: user.tokenVersion || 0,
     });
 
     const refreshToken = generateRefreshToken({
       userId: user._id.toString(),
+      tv: user.tokenVersion || 0,
     });
 
     return {

@@ -34,7 +34,9 @@ export const authenticateToken = async (req, res, next) => {
       });
     }
 
-    const user = await User.findById(decoded.userId);
+    const userId = decoded.userId || decoded.id;
+
+    const user = await User.findById(userId);
 
     if (!user || !user.isActive) {
       return res.status(401).json({
@@ -43,9 +45,16 @@ export const authenticateToken = async (req, res, next) => {
       });
     }
 
+    if (decoded.tv === undefined || decoded.tv !== (user.tokenVersion || 0)) {
+      return res.status(401).json({
+        success: false,
+        message: "Session expired. Please log in again.",
+      });
+    }
+
     req.user = {
-      userId: decoded.userId,
-      role: decoded.role,
+      userId: user._id.toString(),
+      role: decoded.role || user.role,
     };
 
     next();

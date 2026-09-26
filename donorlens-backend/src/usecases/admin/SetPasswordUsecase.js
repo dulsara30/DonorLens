@@ -72,6 +72,7 @@ export default async function SetPasswordUsecase(
 
     ngoUser.passwordHash = password;
     ngoUser.isActive = true;
+    ngoUser.tokenVersion = (ngoUser.tokenVersion || 0) + 1;
     ngoUser.ngoDetails.passwordSetupTokenUsed = true;
 
     await ngoUser.save();

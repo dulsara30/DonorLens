@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
+    tokenVersion: {
+      type: Number,
+      default: 0,
+    },
+
     ngoDetails: {
       ngoName: {
         type: String,

@@ -4,29 +4,36 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import loggerService from "../services/logger.service.js";
 
+const ALG = "HS256";
+
 /**
  * Generate JWT Access Token (short-lived)
- * @param {Object} payload - Token payload containing userId and role
+ * @param {Object} payload - Token payload containing userId/id, role, and tv/tokenVersion
  * @returns {string} JWT access token
  */
 export const generateAccessToken = (payload) => {
-  const { userId, role } = payload;
+  const userId = payload.userId || payload.id;
+  const role = payload.role;
+  const tv = payload.tv ?? payload.tokenVersion ?? 0;
 
-  return jwt.sign({ userId, role }, process.env.JWT_ACCESS_SECRET, {
+  return jwt.sign({ userId, id: userId, role, tv }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: process.env.JWT_ACCESS_EXPIRY || "15m",
+    algorithm: ALG,
   });
 };
 
 /**
  * Generate JWT Refresh Token (long-lived)
- * @param {Object} payload - Token payload containing userId
+ * @param {Object} payload - Token payload containing userId/id and tv/tokenVersion
  * @returns {string} JWT refresh token
  */
 export const generateRefreshToken = (payload) => {
-  const { userId } = payload;
+  const userId = payload.userId || payload.id;
+  const tv = payload.tv ?? payload.tokenVersion ?? 0;
 
-  return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, {
+  return jwt.sign({ userId, id: userId, tv }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: process.env.JWT_REFRESH_EXPIRY || "14d",
+    algorithm: ALG,
   });
 };
 
@@ -37,7 +44,7 @@ export const generateRefreshToken = (payload) => {
  */
 export const verifyAccessToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    return jwt.verify(token, process.env.JWT_ACCESS_SECRET, { algorithms: [ALG] });
   } catch (error) {
     loggerService.warn("Access token verification failed:", { error: error.message });
     return null;
@@ -51,7 +58,7 @@ export const verifyAccessToken = (token) => {
  */
 export const verifyRefreshToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    return jwt.verify(token, process.env.JWT_REFRESH_SECRET, { algorithms: [ALG] });
   } catch (error) {
     loggerService.warn("Refresh token verification failed:", { error: error.message });
     return null;
@@ -69,6 +76,7 @@ export const generatePasswordSetupToken = (ngoData) => {
 
   const token = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
     expiresIn: "24h",
+    algorithm: ALG,
   });
 
   return token;
@@ -76,7 +84,7 @@ export const generatePasswordSetupToken = (ngoData) => {
 
 export const verifyPasswordSetupToken = (token) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET, { algorithms: [ALG] });
 
     if (decoded.type !== "PASSWORD_SETUP") {
       return null;
@@ -104,6 +112,7 @@ export const generateResubmissionToken = (ngoData) => {
 
   const token = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
     expiresIn: "24h",
+    algorithm: ALG,
   });
 
   return token;
@@ -111,7 +120,7 @@ export const generateResubmissionToken = (ngoData) => {
 
 export const verifyResubmissionToken = (token) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET, { algorithms: [ALG] });
 
     if (decoded.type !== "RESUBMISSION_REQUIRED") {
       return null;
@@ -123,3 +132,4 @@ export const verifyResubmissionToken = (token) => {
     return null;
   }
 };
+
