@@ -1,5 +1,6 @@
 import ApproveNgoRequestUsecase from "../../usecases/admin/ApproveNgoRequestUsecase.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function ApproveNgoRequestController(req, res, next) {
   try {
@@ -7,9 +8,7 @@ export default async function ApproveNgoRequestController(req, res, next) {
     const { note } = req.body;
     const adminId = req.user.userId;
 
-    console.log("Received NGO ID:", ngoId);
-    console.log("Received Note:", note);
-    console.log("Admin ID:", adminId);
+    loggerService.info("Approving NGO Request", { ngoId, note, adminId });
 
     const ngoData = await ApproveNgoRequestUsecase(ngoId, note, adminId);
 
@@ -19,7 +18,7 @@ export default async function ApproveNgoRequestController(req, res, next) {
       });
     }
   } catch (error) {
-    console.error("Error in ApproveNgoRequestController:", error);
+    loggerService.error("Error in ApproveNgoRequestController:", error);
     next(error);
   }
 }

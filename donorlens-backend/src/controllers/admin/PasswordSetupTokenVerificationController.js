@@ -1,5 +1,6 @@
 import PasswordSetupTokenVerificationUsecase from "../../usecases/admin/PasswordSetupTokenVerificationUsecase.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function PasswordSetupTokenVerificationController(
   req,
@@ -18,7 +19,7 @@ export default async function PasswordSetupTokenVerificationController(
       });
     }
   } catch (error) {
-    console.error("Something went wrong in the password verification process... ", error);
+    loggerService.error("Something went wrong in the password verification process... ", error);
     next(error);
   }
 }

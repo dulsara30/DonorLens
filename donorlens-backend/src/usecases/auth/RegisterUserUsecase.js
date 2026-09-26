@@ -1,6 +1,7 @@
 // Business logic for normal user (donor) registration
 
 import User from "../../models/user/User.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Register User Usecase - Handles normal user (donor) registration business logic
@@ -83,7 +84,7 @@ export default async function RegisterUserUsecase(userData) {
       },
     };
   } catch (error) {
-    console.error("RegisterUserUsecase error:", error);
+    loggerService.error("RegisterUserUsecase error:", error);
 
    
     if (error.code === 11000) {

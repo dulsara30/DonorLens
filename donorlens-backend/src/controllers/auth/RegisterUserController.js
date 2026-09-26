@@ -1,6 +1,7 @@
 // HTTP Controller for normal user (donor) registration endpoint
 
 import RegisterUserUsecase from "../../usecases/auth/RegisterUserUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Register User Controller - Handles HTTP user registration request
@@ -14,7 +15,7 @@ export const registerUserController = async (req, res) => {
       
     const { fullName, email, password } = req.body;
 
-    console.log("RegisterUserController received data:", { fullName, email });
+    loggerService.logAuth("RegisterUserController received data for email: " + email);
     const result = await RegisterUserUsecase({
       fullName,
       email,
@@ -36,7 +37,7 @@ export const registerUserController = async (req, res) => {
       data: result.data,
     });
   } catch (error) {
-    console.error("RegisterUserController error:", error);
+    loggerService.error("RegisterUserController error:", error);
 
     
     return res.status(500).json({

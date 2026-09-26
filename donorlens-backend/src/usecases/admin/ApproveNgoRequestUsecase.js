@@ -7,9 +7,10 @@ import {
 } from "../../utils/errors.js";
 import SendEmailUsecase from "../email/SendEmailUsecase.js";
 import PasswordSetupEmailSendUsecase from "./PasswordSetupEmailSendUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function ApproveNgoRequestUsecase(ngoId, note, adminId) {
-  console.log("Approving NGO registration Request!");
+  loggerService.info("Approving NGO registration Request!");
 
   try {
     const error = {};
@@ -66,7 +67,7 @@ export default async function ApproveNgoRequestUsecase(ngoId, note, adminId) {
     const sendEmail = await SendEmailUsecase({ type, data });
 
     if (!sendEmail.success) {
-      console.error("Failed to send approval email:", sendEmail.error);
+      loggerService.error("Failed to send approval email:", sendEmail.error);
     }
 
     const passwordEmailesult = await PasswordSetupEmailSendUsecase(
@@ -74,13 +75,13 @@ export default async function ApproveNgoRequestUsecase(ngoId, note, adminId) {
     );
 
     if (!passwordEmailesult.success) {
-      console.error(
+      loggerService.error(
         "Failed to send password setup email:",
         passwordEmailesult.error,
       );
     }
 
-    console.log("NGO registration request approved successfully");
+    loggerService.info("NGO registration request approved successfully");
 
     return {
       success: true,
@@ -88,7 +89,7 @@ export default async function ApproveNgoRequestUsecase(ngoId, note, adminId) {
       passwordSetupEmail: passwordEmailesult,
     };
   } catch (error) {
-    console.error("Error in ApproveNgoRequestUsecase:", error);
+    loggerService.error("Error in ApproveNgoRequestUsecase:", error);
     throw error;
   }
 }

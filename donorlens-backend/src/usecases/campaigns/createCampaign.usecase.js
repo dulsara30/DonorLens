@@ -7,6 +7,7 @@ import {
 } from "../../utils/errors.js";
 
 import emailService from "../../services/email.service.js";
+import loggerService from "../../services/logger.service.js";
 
 
 export const createCampaignUsecase = async ({
@@ -60,13 +61,10 @@ export const createCampaignUsecase = async ({
       campaignTitle: campaign.title,
       campaignId: campaign._id.toString(),
     });
-    console.log(" Campaign creation email sent to:", user.email);
+    loggerService.logEmail("Campaign creation email sent to: " + user.email);
   } catch (emailError) {
     // Log error but don't fail campaign creation
-    console.error(
-      "Failed to send campaign creation email:",
-      emailError.message,
-    );
+    loggerService.error("Failed to send campaign creation email:", emailError);
   }
 
   return campaign;

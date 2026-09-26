@@ -1,5 +1,6 @@
 import { FileValidationError } from "../utils/errors.js";
 import { FILE_SIZE_LIMITS, getFileCategory } from "../utils/fileHelpers.js";
+import loggerService from "../services/logger.service.js";
 
 export const validateFiles = (options = {}) => {
   // Fixed typo: validatteFiles → validateFiles
@@ -23,7 +24,7 @@ export const validateFiles = (options = {}) => {
         filesArray = [req.file];
       }
 
-      console.log("Files to validate:", filesArray.length);
+      loggerService.debug("Files to validate count: " + filesArray.length);
 
       // Check minimum files requirement
       if (options.minFiles && filesArray.length < options.minFiles) {
@@ -74,7 +75,7 @@ export const validateFiles = (options = {}) => {
 
       next();
     } catch (error) {
-      console.error("File validation error:", error);
+      loggerService.error("File validation error:", error);
       next(error);
     }
   };

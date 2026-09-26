@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import hbs from "nodemailer-express-handlebars";
 import path from "path";
 import { fileURLToPath } from "url";
+import loggerService from "../services/logger.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,9 +40,9 @@ transporter.use("compile", hbs(handlebarOptions));
 // Verify transporter configuration
 transporter.verify(function (error, success) {
   if (error) {
-    console.error("Email configuration error:", error);
+    loggerService.error("Email configuration error:", error);
   } else {
-    console.log("Email server is ready to send messages");
+    loggerService.logEmail("Email server is ready to send messages");
   }
 });
 

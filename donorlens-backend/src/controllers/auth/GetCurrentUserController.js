@@ -1,5 +1,6 @@
 // HTTP Controller for getting current authenticated user
 import GetCurrentUserUsecase from "../../usecases/auth/GetCurrentUserUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Get Current User Controller - Returns current user info
@@ -30,7 +31,7 @@ export const getCurrentUserController = async (req, res) => {
       data: result.data,
     });
   } catch (error) {
-    console.error("GetCurrentUserController error:", error);
+    loggerService.error("GetCurrentUserController error:", error);
 
     return res.status(500).json({
       success: false,

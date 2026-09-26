@@ -8,6 +8,7 @@ import {
 } from "../../../utils/errors.js";
 import { deleteFromCloudinary } from "../../../services/cloudinary.service.js";
 import mongoose from "mongoose";
+import loggerService from "../../../services/logger.service.js";
 
 export const deleteExecutionUsecase = async ({
   userId,
@@ -67,7 +68,7 @@ export const deleteExecutionUsecase = async ({
           deleteFromCloudinary(photo.public_id),
         );
         await Promise.all(photoDeletePromises);
-        console.log(
+        loggerService.info(
           `Deleted ${execution.evidencePhotos.length} evidence photos from Cloudinary`,
         );
       }
@@ -78,26 +79,26 @@ export const deleteExecutionUsecase = async ({
           deleteFromCloudinary(receipt.public_id),
         );
         await Promise.all(receiptDeletePromises);
-        console.log(
+        loggerService.info(
           `Deleted ${execution.receipts.length} receipts from Cloudinary`,
         );
       }
     } catch (cloudinaryError) {
-      console.error(
+      loggerService.error(
         "Failed to delete some files from Cloudinary:",
-        cloudinaryError.message,
+        cloudinaryError,
       );
     }
 
     // Delete the execution update from database
     await ExecutionUpdate.findByIdAndDelete(executionId);
 
-    console.log(`Execution update deleted from database: ${executionId}`);
+    loggerService.info(`Execution update deleted from database: ${executionId}`);
 
     // Recalculate campaign progress after deletion
     const updatedCampaign = await recalculateCampaignProgress(campaignId);
 
-    console.log(
+    loggerService.info(
       `Campaign progress recalculated after deletion. New totalUsedAmount: ${updatedCampaign.totalUsedAmount}, progressPercentage: ${updatedCampaign.progressPercentage}%`,
     );
 
@@ -114,7 +115,7 @@ export const deleteExecutionUsecase = async ({
       },
     };
   } catch (error) {
-    console.error("Error in deleteExecutionUsecase:", error);
+    loggerService.error("Error in deleteExecutionUsecase:", error);
     throw error;
   }
 };

@@ -1,6 +1,7 @@
 // HTTP Controller for refresh token endpoint
 
 import RefreshTokenUsecase from "../../usecases/auth/RefreshTokenUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Refresh Token Controller - Handles refresh token request
@@ -34,7 +35,7 @@ export const refreshTokenController = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("RefreshTokenController error:", error);
+    loggerService.error("RefreshTokenController error:", error);
 
     return res.status(500).json({
       success: false,

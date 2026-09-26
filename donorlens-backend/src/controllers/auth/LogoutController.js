@@ -1,4 +1,5 @@
 // HTTP Controller for logout endpoint
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Logout Controller - Clears refresh token cookie
@@ -17,14 +18,14 @@ export const logoutController = async (req, res) => {
       path: "/",
     });
 
-    console.log("User logged out, refresh token cookie cleared");
+    loggerService.logAuth("User logged out, refresh token cookie cleared");
 
     return res.status(200).json({
       success: true,
       message: "Logged out successfully",
     });
   } catch (error) {
-    console.error("LogoutController error:", error);
+    loggerService.error("LogoutController error:", error);
 
     return res.status(500).json({
       success: false,

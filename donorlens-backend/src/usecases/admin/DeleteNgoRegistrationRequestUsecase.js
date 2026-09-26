@@ -1,6 +1,7 @@
 import User from "../../models/user/User.js";
 import { ValidationError } from "../../utils/errors.js";
 import SendEmailUsecase from "../email/SendEmailUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function DeleteNgoRegistrationRequestUsecase(ngoId) {
   try {
@@ -38,7 +39,7 @@ export default async function DeleteNgoRegistrationRequestUsecase(ngoId) {
       message: "NGO registration request deleted successfully",
     };
   } catch (error) {
-    console.error("Error in DeleteNgoRegistrationRequestUsecase:", error);
+    loggerService.error("Error in DeleteNgoRegistrationRequestUsecase:", error);
     throw error;
   }
 }

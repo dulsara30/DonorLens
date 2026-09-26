@@ -5,6 +5,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../../utils/jwt.util.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Login Usecase - Handles the complete login business logic
@@ -83,7 +84,7 @@ export default async function LoginUsecase(email, password) {
       },
     };
   } catch (error) {
-    console.error("LoginUsecase error:", error);
+    loggerService.error("LoginUsecase error:", error);
 
     return {
       success: false,

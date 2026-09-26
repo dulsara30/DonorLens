@@ -2,6 +2,7 @@ import User from "../../models/user/User.js";
 import { ValidationError } from "../../utils/errors.js";
 import VerifyIdentityUsecase from "./VerifyIdentityUsecase.js";
 import SendEmailUsecase from "../email/SendEmailUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function SetPasswordUsecase(
   token,
@@ -89,13 +90,13 @@ export default async function SetPasswordUsecase(
     try {
       const emailResult = await SendEmailUsecase({ type, data });
       if (!emailResult.success) {
-        console.error(
+        loggerService.error(
           "Failed to send password setup confirmation email:",
           emailResult.error,
         );
       }
     } catch (emailError) {
-      console.error(
+      loggerService.error(
         "Failed to send password setup confirmation email:",
         emailError,
       );
@@ -106,7 +107,7 @@ export default async function SetPasswordUsecase(
       message: "Password has been set successfully",
     };
   } catch (error) {
-    console.error("Error in SetPasswordUsecase:", error);
+    loggerService.error("Error in SetPasswordUsecase:", error);
     throw error;
   }
 }

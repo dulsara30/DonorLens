@@ -1,6 +1,7 @@
 import { NotFoundError, ValidationError } from "../../utils/errors.js";
 import { verifyPasswordSetupToken } from "../../utils/jwt.util.js";
 import User from "../../models/user/User.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function PasswordSetupTokenVerificationUsecase(token) {
   try {
@@ -64,7 +65,7 @@ export default async function PasswordSetupTokenVerificationUsecase(token) {
       },
     };
   } catch (error) {
-    console.error("Error in PasswordSetupTokenVerificationUsecase:", error);
+    loggerService.error("Error in PasswordSetupTokenVerificationUsecase:", error);
     throw error;
   }
 }

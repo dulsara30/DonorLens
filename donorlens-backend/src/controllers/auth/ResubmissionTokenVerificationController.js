@@ -1,5 +1,6 @@
 import ResubmissionTokenVerificationUsecase from "../../usecases/admin/ResubmissionTokenVerificationUsecase.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function ResubmissionTokenVerificationController(
   req,
@@ -7,7 +8,7 @@ export default async function ResubmissionTokenVerificationController(
   next,
 ) {
   try {
-    console.log("Received request to verify resubmission token...");
+    loggerService.info("Received request to verify resubmission token...");
     const { token } = req.query;
     const result = await ResubmissionTokenVerificationUsecase(token);
 
@@ -18,7 +19,7 @@ export default async function ResubmissionTokenVerificationController(
       });
     }
   } catch (error) {
-    console.error("Error in ResubmissionTokenVerificationController:", error);
+    loggerService.error("Error in ResubmissionTokenVerificationController:", error);
     next(error);
   }
 }

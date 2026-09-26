@@ -1,5 +1,6 @@
 import cloudinary from "../config/cloudinary.config.js";
 import { CloudinaryError } from "../utils/errors.js";
+import loggerService from "./logger.service.js";
 import {
   generateUniqueFilename,
   getFileCategory,
@@ -127,7 +128,7 @@ export const generatePdfPreviewUrl = (pdfUrl, page = 1) => {
 
     return previewUrl;
   } catch (error) {
-    console.error("Error generating PDF preview URL:", error);
+    loggerService.error("Error generating PDF preview URL:", error);
     return pdfUrl;
   }
 };
@@ -150,7 +151,7 @@ export const generateDownloadUrl = (fileUrl) => {
 
     return downloadUrl;
   } catch (error) {
-    console.error("Error generating download URL:", error);
+    loggerService.error("Error generating download URL:", error);
     return fileUrl;
   }
 };

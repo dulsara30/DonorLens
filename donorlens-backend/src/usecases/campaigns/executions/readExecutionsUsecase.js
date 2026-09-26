@@ -2,6 +2,7 @@ import ExecutionUpdate from "../../../models/campaigns/executions/executions.js"
 import Campaign from "../../../models/campaigns/Campaign.js";
 import { NotFoundError, ValidationError } from "../../../utils/errors.js";
 import mongoose from "mongoose";
+import loggerService from "../../../services/logger.service.js";
 
 export const getAllExecutionsUsecase = async (campaignId) => {
   try {
@@ -52,7 +53,7 @@ export const getAllExecutionsUsecase = async (campaignId) => {
       executions,
     };
   } catch (error) {
-    console.error("Error in getAllExecutionsUsecase:", error);
+    loggerService.error("Error in getAllExecutionsUsecase:", error);
     throw error;
   }
 };
@@ -100,7 +101,7 @@ export const getExecutionByIdUsecase = async (executionId, campaignId) => {
       },
     };
   } catch (error) {
-    console.error("Error in getExecutionByIdUsecase:", error);
+    loggerService.error("Error in getExecutionByIdUsecase:", error);
     throw error;
   }
 };

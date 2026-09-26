@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import loggerService from "../../services/logger.service.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -195,13 +196,13 @@ userSchema.pre("save", async function () {
     typeof this.passwordHash === "string" &&
     this.passwordHash.match(/^\$2[aby]\$/)
   ) {
-    console.log("⏭Password already hashed");
+    loggerService.debug("Password already hashed");
     return;
   }
 
   // Only hash plain text passwords
   if (typeof this.passwordHash === "string" && this.passwordHash.length > 0) {
-    console.log("Successfully create the hashed password");
+    loggerService.debug("Successfully created the hashed password");
     const salt = await bcrypt.genSalt(10);
     this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
   }
@@ -218,7 +219,7 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   try {
     return await bcrypt.compare(candidatePassword, this.passwordHash);
   } catch (error) {
-    console.error("Password is missmatch :", error);
+    loggerService.error("Password comparison error:", error);
     return false;
   }
 };

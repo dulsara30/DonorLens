@@ -2,6 +2,7 @@
 
 import { verifyAccessToken } from "../utils/jwt.util.js";
 import User from "../models/user/User.js";
+import loggerService from "../services/logger.service.js";
 
 /**
  * Middleware to verify JWT access token from Authorization header
@@ -49,7 +50,7 @@ export const authenticateToken = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Authentication occurs trouble in authentication process.");
+    loggerService.error("Authentication trouble in authentication process:", error);
     return res.status(500).json({
       success: false,
       message: "Authentication failed",
@@ -66,12 +67,10 @@ export const authenticateToken = async (req, res, next) => {
  */
 export const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    console.log(
-      "Authorizing user. Required roles:",
-      allowedRoles,
-      "User role:",
-      req.user?.role,
-    );
+    loggerService.logAuth("Authorizing user", {
+      requiredRoles: allowedRoles,
+      userRole: req.user?.role,
+    });
 
     if (!req.user || !req.user.role) {
       return res.status(401).json({

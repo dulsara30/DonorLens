@@ -1,6 +1,7 @@
 import ResubmissionNgoRequestUsecase from "../../usecases/auth/ResubmissionNgoRequestUsecase.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
 import { FileValidationError } from "../../utils/errors.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function ResubmissionNgoRequestController(req, res, next) {
   try {
@@ -53,7 +54,7 @@ export default async function ResubmissionNgoRequestController(req, res, next) {
       });
     }
   } catch (error) {
-    console.error("ResubmissionNgoRequestController error:", error.message);
+    loggerService.error("ResubmissionNgoRequestController error:", error);
     next(error);
   }
 }

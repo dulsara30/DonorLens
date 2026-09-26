@@ -1,4 +1,5 @@
 import emailService from "../../services/email.service.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Send Email Usecase - Business logic for sending emails
@@ -65,7 +66,7 @@ export default async function SendEmailUsecase({ type, data }) {
       data: result,
     };
   } catch (error) {
-    console.error("SendEmailUsecase error:", error);
+    loggerService.error("SendEmailUsecase error:", error);
     // Don't throw error - email failures shouldn't break the main flow
     return {
       success: false,

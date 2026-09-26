@@ -1,9 +1,10 @@
 import RejectNgoRequestUsecase from "../../usecases/admin/RejectNgoRequestUsecase.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function RejectNgoRequestController(req, res, next) {
   try {
-    console.log("Rejecting NGO Request with details", req.body);
+    loggerService.info("Rejecting NGO Request with details", req.body);
     const { ngoId } = req.params;
     const { note } = req.body;
     const adminId = req.user.userId;
@@ -16,7 +17,7 @@ export default async function RejectNgoRequestController(req, res, next) {
       });
     }
   } catch (error) {
-    console.error("Error in RejectNgoRequestController", error);
+    loggerService.error("Error in RejectNgoRequestController", error);
     next(error);
   }
 }

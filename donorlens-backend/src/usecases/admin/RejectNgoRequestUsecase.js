@@ -6,8 +6,10 @@ import {
   ValidationError,
 } from "../../utils/errors.js";
 import SendEmailUsecase from "../email/SendEmailUsecase.js";
+import loggerService from "../../services/logger.service.js";
+
 export default async function RejectNgoRequestUsecase(ngoId, note, adminId) {
-  console.log("Rejecting NGO registration request!");
+  loggerService.info("Rejecting NGO registration request!");
 
   try {
     const error = {};
@@ -68,14 +70,14 @@ export default async function RejectNgoRequestUsecase(ngoId, note, adminId) {
     const sendEmailResult = await SendEmailUsecase({ type, data });
 
     if (!sendEmailResult.success) {
-      console.error("Failed to send rejection email:", sendEmailResult.error);
+      loggerService.error("Failed to send rejection email:", sendEmailResult.error);
     }
     return {
       success: true,
       message: "NGO registration request rejected successfully",
     };
   } catch (error) {
-    console.error("RejectNgoRequestUsecase error:", error);
+    loggerService.error("RejectNgoRequestUsecase error:", error);
     throw error;
   }
 }

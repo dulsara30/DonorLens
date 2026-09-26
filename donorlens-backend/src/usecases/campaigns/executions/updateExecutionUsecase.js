@@ -12,6 +12,7 @@ import {
   deleteFromCloudinary,
 } from "../../../services/cloudinary.service.js";
 import mongoose from "mongoose";
+import loggerService from "../../../services/logger.service.js";
 
 export const updateExecutionUsecase = async (updateData) => {
   try {
@@ -113,7 +114,7 @@ export const updateExecutionUsecase = async (updateData) => {
           ...formattedNewPhotos,
         ];
 
-        console.log(
+        loggerService.info(
           `Added ${newEvidencePhotos.length} new evidence photos`,
         );
       }
@@ -135,7 +136,7 @@ export const updateExecutionUsecase = async (updateData) => {
         // Add new receipts to existing ones
         updates.receipts = [...execution.receipts, ...formattedNewReceipts];
 
-        console.log(`Added ${newReceipts.length} new receipts`);
+        loggerService.info(`Added ${newReceipts.length} new receipts`);
       }
     }
 
@@ -151,13 +152,13 @@ export const updateExecutionUsecase = async (updateData) => {
       { new: true, runValidators: true },
     );
 
-    console.log(`Execution update updated: ${executionId}`);
+    loggerService.info(`Execution update updated: ${executionId}`);
 
     // Recalculate campaign progress if fundsUsed was changed
     let updatedCampaign = campaign;
     if (fundsUsed !== undefined) {
       updatedCampaign = await recalculateCampaignProgress(campaignId);
-      console.log(
+      loggerService.info(
         `Campaign progress recalculated. New totalUsedAmount: ${updatedCampaign.totalUsedAmount}, progressPercentage: ${updatedCampaign.progressPercentage}%`,
       );
     }
@@ -175,7 +176,7 @@ export const updateExecutionUsecase = async (updateData) => {
       },
     };
   } catch (error) {
-    console.error("Error in updateExecutionUsecase:", error);
+    loggerService.error("Error in updateExecutionUsecase:", error);
     throw error;
   }
 };

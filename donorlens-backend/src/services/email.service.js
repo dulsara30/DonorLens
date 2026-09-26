@@ -1,4 +1,5 @@
 import transporter from "../config/email.config.js";
+import loggerService from "./logger.service.js";
 
 /**
  * Email Service - Handles all email sending operations
@@ -35,13 +36,13 @@ class EmailService {
       };
 
       const info = await transporter.sendMail(mailOptions);
-      console.log("Email sent successfully:", info.messageId);
+      loggerService.logEmail(`Email sent successfully: ${info.messageId}`);
       return {
         success: true,
         messageId: info.messageId,
       };
     } catch (error) {
-      console.error("Email sending failed:", error);
+      loggerService.error("Email sending failed:", error);
       throw error;
     }
   }

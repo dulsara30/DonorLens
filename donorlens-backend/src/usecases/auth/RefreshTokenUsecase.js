@@ -5,6 +5,7 @@ import {
   generateAccessToken,
   verifyRefreshToken,
 } from "../../utils/jwt.util.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Refresh Token Usecase - Generates new access token from valid refresh token
@@ -62,7 +63,7 @@ export default async function RefreshTokenUsecase(refreshToken) {
       },
     };
   } catch (error) {
-    console.error("RefreshTokenUsecase error:", error);
+    loggerService.error("RefreshTokenUsecase error:", error);
 
     return {
       success: false,

@@ -1,5 +1,6 @@
 import { ValidationError } from "../../utils/errors.js";
 import PasswordSetupTokenVerificationUsecase from "./PasswordSetupTokenVerificationUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function VerifyIdentityUsecase(
   token,
@@ -52,7 +53,7 @@ export default async function VerifyIdentityUsecase(
       },
     };
   } catch (error) {
-    console.error("Error in VerifyIdentityUsecase:", error);
+    loggerService.error("Error in VerifyIdentityUsecase:", error);
     throw error;
   }
 }

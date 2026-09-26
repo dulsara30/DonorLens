@@ -2,6 +2,7 @@
 
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import loggerService from "../services/logger.service.js";
 
 /**
  * Generate JWT Access Token (short-lived)
@@ -38,7 +39,7 @@ export const verifyAccessToken = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
   } catch (error) {
-    console.error("Access token verification failed:", error.message);
+    loggerService.warn("Access token verification failed:", { error: error.message });
     return null;
   }
 };
@@ -52,7 +53,7 @@ export const verifyRefreshToken = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
   } catch (error) {
-    console.error("Refresh token verification failed:", error.message);
+    loggerService.warn("Refresh token verification failed:", { error: error.message });
     return null;
   }
 };
@@ -83,7 +84,7 @@ export const verifyPasswordSetupToken = (token) => {
 
     return decoded;
   } catch (error) {
-    console.error("Password setup token verification failed:", error.message);
+    loggerService.warn("Password setup token verification failed:", { error: error.message });
     return null;
   }
 };
@@ -118,7 +119,7 @@ export const verifyResubmissionToken = (token) => {
 
     return decoded;
   } catch (error) {
-    console.error("Resubmission token verification failed:", error.message);
+    loggerService.warn("Resubmission token verification failed:", { error: error.message });
     return null;
   }
 };

@@ -9,6 +9,7 @@ import {
 } from "../../utils/errors.js";
 import { uploadToCloudinary } from "../../services/cloudinary.service.js";
 import emailService from "../../services/email.service.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Register NGO Admin Usecase - Handles NGO administrator registration business logic
@@ -175,9 +176,9 @@ export default async function RegisterNgoUsecase(userData, files) {
       ngoName: newNgoAdmin.ngoDetails.ngoName,
       fullName: newNgoAdmin.fullName,
     });
-    console.log("Registration confirmation email sent to:", newNgoAdmin.email);
+    loggerService.logEmail("Registration confirmation email sent to: " + newNgoAdmin.email);
   } catch (emailError) {
-    console.error("Failed to send registration email:", emailError.message);
+    loggerService.error("Failed to send registration email:", emailError);
   }
 
   return newNgoAdmin.toSafeObject();

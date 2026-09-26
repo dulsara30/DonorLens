@@ -1,5 +1,6 @@
 import SetPasswordUsecase from "../../usecases/admin/SetPasswordUsecase.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function SetPasswordController(req, res, next) {
   try {
@@ -20,7 +21,7 @@ export default async function SetPasswordController(req, res, next) {
       });
     }
   } catch (error) {
-    console.error("Error in SetPasswordController:", error);
+    loggerService.error("Error in SetPasswordController:", error);
     next(error);
   }
 }

@@ -2,6 +2,7 @@
 
 import LoginUsecase from "../../usecases/auth/LoginUsecase.js";
 import { getRefreshTokenCookieOptions } from "../../utils/cookie.util.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Login Controller - Handles HTTP login request
@@ -25,7 +26,7 @@ export const loginController = async (req, res) => {
 
     const { accessToken, refreshToken, user } = result.data;
 
-    console.log("Logging process successfull..",);
+    loggerService.logAuth("Login process successful for user: " + user?.email);
 
     res.cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
 
@@ -38,7 +39,7 @@ export const loginController = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("LoginController error:", error);
+    loggerService.error("LoginController error:", error);
 
     return res.status(500).json({
       success: false,

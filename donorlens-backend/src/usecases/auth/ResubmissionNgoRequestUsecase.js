@@ -6,10 +6,11 @@ import {
 } from "../../utils/errors.js";
 
 import { uploadToCloudinary } from "../../services/cloudinary.service.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function ResubmissionNgoRequestUsecase(userData, files) {
   try {
-    console.log("Updating NGO request...");
+    loggerService.info("Updating NGO request...");
 
     const {
       ngoId,
@@ -166,7 +167,7 @@ export default async function ResubmissionNgoRequestUsecase(userData, files) {
       data: ngoUser,
     };
   } catch (error) {
-    console.error("Error in ResubmissionNgoRequestUsecase:", error);
+    loggerService.error("Error in ResubmissionNgoRequestUsecase:", error);
     throw error;
   }
 }

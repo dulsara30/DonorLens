@@ -5,6 +5,7 @@ import {
   getTokenExpiryDate,
 } from "../../utils/jwt.util.js";
 import SendEmailUsecase from "../email/SendEmailUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function PasswordSetupEmailSendUsecase(ngoId) {
   try {
@@ -14,7 +15,7 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
 
     const ngo = await User.findById(ngoId);
 
-    console.log("NGO status is", ngo?.isActive);
+    loggerService.info("NGO status is: " + ngo?.isActive);
 
     if (!ngo) {
       throw new NotFoundError("NGO");
@@ -79,7 +80,7 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
       };
     }
 
-    console.log("Password setup email sent successful:");
+    loggerService.logEmail("Password setup email sent successfully to: " + ngo.email);
 
     return {
       success: true,
@@ -87,7 +88,7 @@ export default async function PasswordSetupEmailSendUsecase(ngoId) {
       data: ngoData,
     };
   } catch (error) {
-    console.error("Error in PasswordSetupEmailSendUsecase:", error);
+    loggerService.error("Error in PasswordSetupEmailSendUsecase:", error);
     throw error;
   }
 }

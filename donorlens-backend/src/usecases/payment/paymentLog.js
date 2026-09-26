@@ -1,4 +1,5 @@
 import PaymentLog from "../../models/payment/PaymentLog.js";
+import loggerService from "../../services/logger.service.js";
 
 export class PaymentLogUsecase {
   async createLog(logData) {
@@ -19,7 +20,7 @@ export class PaymentLogUsecase {
 
       await log.save();
     } catch (error) {
-      console.error("⚠️ PaymentLog write failed:", error.message);
+      loggerService.error("PaymentLog write failed:", error);
     }
   }
 
@@ -28,7 +29,7 @@ export class PaymentLogUsecase {
       const logs = await PaymentLog.find();
       return logs;
     } catch (error) {
-      console.error("⚠️ PaymentLog read failed:", error.message);
+      loggerService.error("PaymentLog read failed:", error);
       throw error;
     }
   }

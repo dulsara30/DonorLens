@@ -1,5 +1,6 @@
 import DeleteNgoRegistrationRequestUsecase from "../../usecases/admin/DeleteNgoRegistrationRequestUsecase.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function DeleteNgoRegistrationRequestController(
   req,
@@ -7,8 +8,8 @@ export default async function DeleteNgoRegistrationRequestController(
   next,
 ) {
   try {
-    console.log("Deleting NGO registration request...");
     const { ngoId } = req.params;
+    loggerService.info("Deleting NGO registration request...", { ngoId });
 
     const result = await DeleteNgoRegistrationRequestUsecase(ngoId);
 
@@ -18,7 +19,7 @@ export default async function DeleteNgoRegistrationRequestController(
       });
     }
   } catch (error) {
-    console.error("Error in DeleteNgoRegistrationRequestController:", error);
+    loggerService.error("Error in DeleteNgoRegistrationRequestController:", error);
     next(error);
   }
 }

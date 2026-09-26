@@ -1,5 +1,6 @@
 import PasswordSetupEmailSendUsecase from "../../usecases/admin/PasswordSetupEmailSendUsecase.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function PasswordSetupEmailSendController(req, res, next) {
   try {
@@ -12,7 +13,7 @@ export default async function PasswordSetupEmailSendController(req, res, next) {
       });
     }
   } catch (error) {
-    console.error("Error in PasswordSetupEmailSendController:", error);
+    loggerService.error("Error in PasswordSetupEmailSendController:", error);
     next(error);
   }
 }

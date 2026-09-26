@@ -6,6 +6,7 @@ import {
   NotFoundError,
   ValidationError,
 } from "../../utils/errors.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function DeactivateNgoRequestUsecase(
   ngoId,
@@ -55,11 +56,11 @@ export default async function DeactivateNgoRequestUsecase(
       });
 
       await Promise.all(campaignUpdatePromises);
-      console.log(
+      loggerService.info(
         `Canceled ${canceledCampaignsCount} active campaigns created by the NGO.`,
       );
     } else {
-      console.log("No active campaigns found for this NGO.");
+      loggerService.info("No active campaigns found for this NGO.");
     }
 
     ngoUser.ngoDetails.status = "DEACTIVATED";
@@ -78,7 +79,7 @@ export default async function DeactivateNgoRequestUsecase(
       message: `NGO has been deactivated successfully. ${canceledCampaignsCount} active campaigns were canceled.`,
     };
   } catch (error) {
-    console.error("Error in DeactivateNgoRequestUsecase", error);
+    loggerService.error("Error in DeactivateNgoRequestUsecase:", error);
     throw error;
   }
 }

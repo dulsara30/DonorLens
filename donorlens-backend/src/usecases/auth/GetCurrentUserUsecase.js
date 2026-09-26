@@ -1,6 +1,7 @@
 // Business logic for fetching current authenticated user
 
 import User from "../../models/user/User.js";
+import loggerService from "../../services/logger.service.js";
 
 /**
  * Get Current User Usecase - Retrieves user information from userId
@@ -47,7 +48,7 @@ export default async function GetCurrentUserUsecase(userId) {
       },
     };
   } catch (error) {
-    console.error("GetCurrentUserUsecase error:", error);
+    loggerService.error("GetCurrentUserUsecase error:", error);
     
     return {
       success: false,

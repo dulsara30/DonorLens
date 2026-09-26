@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
+import loggerService from "../services/logger.service.js";
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ const VerifyCloudinaryConfig = () => {
       "Cloudinary configuration is missing. Please check your environment variables.",
     );
   }
-  console.log("Cloudinary configuration verified successfully.");
+  loggerService.info("Cloudinary configuration verified successfully.");
 };
 
 VerifyCloudinaryConfig();

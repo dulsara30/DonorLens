@@ -1,5 +1,6 @@
 import { ApiResponse } from "../../utils/apiResponse.js";
 import ResubmissionRequiredUsecase from "../../usecases/admin/ResubmissionRequiredUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function ResubmissionRequiredController(req, res, next) {
   try {
@@ -15,7 +16,7 @@ export default async function ResubmissionRequiredController(req, res, next) {
       });
     }
   } catch (error) {
-    console.error("ResubmissionRequiredController error:", error);
+    loggerService.error("ResubmissionRequiredController error:", error);
     next(error);
   }
 }

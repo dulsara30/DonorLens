@@ -1,6 +1,7 @@
 import ExecutionUpdate from "../models/campaigns/executions/executions.js";
 import Campaign from "../models/campaigns/Campaign.js";
 import { ValidationError, NotFoundError } from "../utils/errors.js";
+import loggerService from "./logger.service.js";
 
 /**
  * Recalculate and update campaign totalUsedAmount and progressPercentage
@@ -53,7 +54,7 @@ export const recalculateCampaignProgress = async (campaignId) => {
 
     return campaign;
   } catch (error) {
-    console.error("Error recalculating campaign progress:", error);
+    loggerService.error("Error recalculating campaign progress:", error);
     throw error;
   }
 };

@@ -1,8 +1,9 @@
 import VerifyIdentityUsecase from "../../usecases/admin/VerifyIdentityUsecase.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function VerifyIdentityController(req, res, next) {
-  console.log("[Step 2 Controller] Verifying user identity...");
+  loggerService.info("[Step 2 Controller] Verifying user identity...");
 
   try {
     const { token, email, registrationNumber } = req.body;
@@ -20,7 +21,7 @@ export default async function VerifyIdentityController(req, res, next) {
       });
     }
   } catch (error) {
-    console.error(" Error in VerifyIdentityController:", error);
+    loggerService.error("Error in VerifyIdentityController:", error);
     next(error);
   }
 }

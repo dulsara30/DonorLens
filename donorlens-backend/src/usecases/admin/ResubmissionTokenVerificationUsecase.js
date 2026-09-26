@@ -1,6 +1,7 @@
 import { ValidationError } from "../../utils/errors.js";
 import { verifyResubmissionToken } from "../../utils/jwt.util.js";
 import User from "../../models/user/User.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function ResubmissionTokenVerificationUsecase(token) {
   try {
@@ -52,7 +53,7 @@ export default async function ResubmissionTokenVerificationUsecase(token) {
       ngoUser,
     };
   } catch (error) {
-    console.error("ResubmissionTokenVerificationUsecase error:", error);
+    loggerService.error("ResubmissionTokenVerificationUsecase error:", error);
     throw error;
   }
 }

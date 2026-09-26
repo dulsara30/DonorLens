@@ -5,6 +5,7 @@ import {
   getTokenExpiryDate,
 } from "../../utils/jwt.util.js";
 import SendEmailUsecase from "../email/SendEmailUsecase.js";
+import loggerService from "../../services/logger.service.js";
 
 export default async function ResubmissionRequiredUsecase(
   ngoId,
@@ -86,7 +87,7 @@ export default async function ResubmissionRequiredUsecase(
     });
 
     if (!emailResult.success) {
-      console.error("Failed to send resubmission email:", emailResult.error);
+      loggerService.error("Failed to send resubmission email:", emailResult.error);
       return {
         success: false,
         message: "Failed to send resubmission email",
@@ -100,7 +101,7 @@ export default async function ResubmissionRequiredUsecase(
       data: ngoData,
     };
   } catch (error) {
-    console.error("Error in ResubmissionRequiredUsecase:", error);
+    loggerService.error("Error in ResubmissionRequiredUsecase:", error);
     throw error;
   }
 }

@@ -1,6 +1,7 @@
 import RegisterNgoUsecase from "../../usecases/auth/RegisterNgoUsecase.js";
 import { FileValidationError } from "../../utils/errors.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
+import loggerService from "../../services/logger.service.js";
 
 export const adminRegisterController = async (req, res, next) => {
   try {
@@ -52,7 +53,7 @@ export const adminRegisterController = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error(" AdminRegisterController error:", error.message);
+    loggerService.error("AdminRegisterController error:", error);
     next(error);
   }
 };
