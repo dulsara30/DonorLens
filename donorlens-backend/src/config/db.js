@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import loggerService from '../services/logger.service.js';
 
 dotenv.config();
 
@@ -9,9 +10,9 @@ const connectDB = async () => {
 
     try {
         await mongoose.connect(uri);
-        console.log("MongoDB Connected Successfully!");
+        loggerService.logDB("MongoDB Connected Successfully!");
     } catch (e) {
-        console.error("MongoDB Connection error:", e.message);
+        loggerService.error("MongoDB Connection error:", e);
         process.exit(1);
     }
 

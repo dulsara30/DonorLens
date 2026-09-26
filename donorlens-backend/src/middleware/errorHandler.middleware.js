@@ -40,6 +40,7 @@ import {
   ConfigurationError,
   EnvironmentError,
 } from "../utils/errors.js";
+import loggerService from "../services/logger.service.js";
 
 // ============================================
 // GLOBAL ERROR HANDLER MIDDLEWARE
@@ -528,35 +529,10 @@ function getMulterErrorMessage(code) {
 }
 
 /**
- * Log error details for debugging and monitoring
+ * Log error details for debugging and monitoring using Winston Logger Service
  */
 function logError(err, req) {
-  const errorLog = {
-    timestamp: new Date().toISOString(),
-    method: req.method,
-    url: req.originalUrl,
-    ip: req.ip,
-    userAgent: req.get("user-agent"),
-    userId: req.user?.id || "anonymous",
-    error: {
-      name: err.name,
-      message: err.message,
-      statusCode: err.statusCode || 500,
-      stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
-    },
-  };
-
-  // Log based on severity
-  if (err.statusCode >= 500) {
-    console.error("❌ SERVER ERROR:", JSON.stringify(errorLog, null, 2));
-  } else if (err.statusCode >= 400) {
-    console.warn("⚠️  CLIENT ERROR:", JSON.stringify(errorLog, null, 2));
-  } else {
-    console.log("ℹ️  ERROR:", JSON.stringify(errorLog, null, 2));
-  }
-
-  // In production, send to logging service (e.g., Sentry, LogRocket, Winston)
-  // Example: sendToLoggingService(errorLog);
+  loggerService.logErrorDetails(err, req);
 }
 
 export default errorHandler;

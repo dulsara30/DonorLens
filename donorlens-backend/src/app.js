@@ -14,10 +14,14 @@ import adminRoutes from "./routes/admin/systemAdmin.route.js";
 import paymentRoutes from "./routes/payment/payment.route.js";
 import campaignCommentRoutes from "./routes/campaigns/campaignComment.routes.js";
 import paymentLogRoutes from "./routes/payment/paymentLogs.route.js";
+import loggerService from "./services/logger.service.js";
 
 const createApp = () => {
   dotenv.config();
   const app = express();
+
+  // Winston Logger HTTP request logging middleware
+  app.use(loggerService.httpMiddleware());
 
   // Security middleware
   app.use(helmet());
