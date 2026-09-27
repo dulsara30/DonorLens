@@ -2,7 +2,7 @@ import Campaign from "../../models/campaigns/Campaign.js";
 import User from "../../models/user/User.js";
 import { NotFoundError, ForbiddenError } from "../../utils/errors.js";
 
-export const getMyCampaignsUsecase = async ({ userId }) => {
+export const getMyCampaignsUsecase = async ({ userId, status, limit }) => {
   // Check user exists
   const user = await User.findById(userId);
 
@@ -16,10 +16,23 @@ export const getMyCampaignsUsecase = async ({ userId }) => {
   }
 
   // Fetch campaigns created by this user
-  const campaigns = await Campaign.find({
+  const filter = {
     createdBy: userId,
-    status: { $ne: "CANCELLED" },
-  }).sort({ createdAt: -1 });
+  };
+
+  if (status) {
+    filter.status = status;
+  } else {
+    filter.status = { $ne: "CANCELLED" };
+  }
+
+  let query = Campaign.find(filter).sort({ createdAt: -1 });
+
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const campaigns = await query;
 
   return campaigns;
 };
